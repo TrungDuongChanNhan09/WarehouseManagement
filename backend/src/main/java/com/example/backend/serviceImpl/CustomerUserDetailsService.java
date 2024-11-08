@@ -20,13 +20,13 @@ public class CustomerUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUserName(username);
+        User user = userRepository.findByuserName(username);
         if(user == null) {
-            throw new UsernameNotFoundException("user not found with email " + username);
+            throw new UsernameNotFoundException("user not found with username " + username);
         }
         USER_ROLE user_role = user.getRole();
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user_role.toString()));
-        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), authorities);
     }
 }
