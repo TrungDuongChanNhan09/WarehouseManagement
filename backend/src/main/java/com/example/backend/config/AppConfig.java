@@ -19,7 +19,6 @@ import java.util.Collections;
 @Configuration
 @EnableWebSecurity
 public class AppConfig {
-
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -1,12 +1,7 @@
 package com.example.backend.controller;
 
-import com.example.backend.config.JwtProvider;
-import com.example.backend.model.USER_ROLE;
-import com.example.backend.model.User;
-import com.example.backend.repository.UserRepository;
-import com.example.backend.request.LoginRequest;
-import com.example.backend.respone.AuthRespone;
-import com.example.backend.serviceImpl.CustomerUserDetailsService;
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +17,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
+import com.example.backend.config.JwtProvider;
+import com.example.backend.model.USER_ROLE;
+import com.example.backend.model.User;
+import com.example.backend.repository.UserRepository;
+import com.example.backend.request.LoginRequest;
+import com.example.backend.respone.AuthRespone;
+import com.example.backend.serviceImpl.CustomerUserDetailsService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Authentication API", description = "Đăng ký, đăng nhập tài khoản")
 public class AuthController {
     @Autowired
     private UserRepository userRepository;

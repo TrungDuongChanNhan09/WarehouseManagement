@@ -1,12 +1,11 @@
 package com.example.backend.service;
 
+import java.util.List;
+
 import com.example.backend.model.User;
-import com.example.backend.request.LoginRequest;
 import com.example.backend.request.UserAccountRequest;
 import com.example.backend.request.UserInforRequest;
 import com.example.backend.respone.AuthRespone;
-
-import java.util.List;
 
 public interface UserService {
     public User findUserByJwtToken(String jwt) throws Exception;
