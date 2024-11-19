@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Authentication API", description = "Đăng ký, đăng nhập tài khoản")
+@Tag(name = "Authentication API")
 public class AuthController {
     @Autowired
     private UserRepository userRepository;
