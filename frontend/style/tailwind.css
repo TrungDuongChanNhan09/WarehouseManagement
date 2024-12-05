@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ------Color variables------ */
+    --black_900: #000000;
+    --black_900_00: #00000000;
+    --black_900_3f: #0000003f;
+    --blue_gray_900: #292d32;
+    --gray_50: #f8f8f8;
+    --orange_800: #f25d07;
+    --white_a700: #ffffff;
+
+    /* ------Shadow variables------ */
+    --shadow-xs: 0 5px 10px 5px #0000003f;
+    --shadow-sm: 5px 5px 10px 2px #f25d07;
+    --shadow-md: 5px 5px 7px 0 #f25d07;
+
+    /* ------Border radius variables------ */
+    --radius-xs: 5px;
+    --radius-sm: 10px;
+    --radius-md: 20px;
+    --radius-lg: 34px;
+    --radius-xl: 35px;
+
+    /* ------Spacing variables------ */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 10px;
+    --space-lg: 11px;
+    --space-xl: 12px;
+    --space-2xl: 14px;
+    --space-3xl: 16px;
+    --space-4xl: 18px;
+    --space-5xl: 20px;
+    --space-6xl: 24px;
+    --space-7xl: 30px;
+    --space-8xl: 30.38px;
+
+    --tw-ring-color: transparent;
+  }
+}
+[type="text"],
+input:where(:not([type])),
+[type="email"],
+[type="url"],
+[type="password"],
+[type="number"],
+[type="date"],
+[type="datetime-local"],
+[type="month"],
+[type="search"],
+[type="tel"],
+[type="time"],
+[type="week"],
+[multiple],
+textarea,
+select {
+  appearance: none;
+  background-color: transparent;
+  border-color: unset;
+  border-width: 0;
+  border-radius: unset;
+  padding: unset;
+  font-size: unset;
+  line-height: unset;
+}
+
+/* Override default focus colors for tailwindcss-forms */
+[type="text"]:focus,
+[type="email"]:focus,
+[type="url"]:focus,
+[type="password"]:focus,
+[type="number"]:focus,
+[type="date"]:focus,
+[type="search"]:focus,
+[multiple]:focus,
+textarea:focus,
+select:focus {
+  --tw-ring-color: transparent;
+  border-color: transparent;
+}
+
+/* Focus styles for radio and checkbox inputs */
+[type="radio"]:focus,
+[type="checkbox"]:focus {
+  outline: none;
+}
+
+@layer components {
+  .container-xs {
+    @apply w-full mx-auto max-w-[1820px];
+  }
+}

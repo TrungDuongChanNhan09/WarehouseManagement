@@ -7,28 +7,17 @@ const sizes = {
   headinglg: "text-[50px] font-bold lg:text-[42px] md:text-[46px] sm:text-[40px]",
 };
 
-export type HeadingProps = Partial<{
-  className: string;
-  as: any;
-  size: keyof typeof sizes;
-}> &
-  React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
-
-const Heading: React.FC<React.PropsWithChildren<HeadingProps>> = ({
-  children,
-  className = "",
-  size = "headingxs",
-  as,
-  ...restProps
-}) => {
+const Heading = ({ children, className = "", size = "headingxs", as, ...restProps }) => {
   const Component = as || "h6";
 
   return (
-    <Component className={`text-[#000000] font-['Maven_Pro'] ${className} ${sizes[size]}`} {...restProps}>
+    <Component
+      className={`text-[#000000] font-['Maven_Pro'] ${className} ${sizes[size]}`}
+      {...restProps}
+    >
       {children}
     </Component>
   );
 };
 
 export { Heading };
-

@@ -5,14 +5,7 @@ const sizes = {
   texts: "text-[30px] font-normal lg:text-[25px] md:text-[28px] sm:text-[26px]",
 };
 
-export type TextProps = Partial<{
-  className: string;
-  as: any;
-  size: keyof typeof sizes;
-}> &
-  React.DetailedHTMLProps<React.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
-
-const Text: React.FC<React.PropsWithChildren<TextProps>> = ({
+const Text = ({
   children,
   className = "",
   as,
@@ -29,4 +22,3 @@ const Text: React.FC<React.PropsWithChildren<TextProps>> = ({
 };
 
 export { Text };
-
