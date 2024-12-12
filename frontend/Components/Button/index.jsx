@@ -4,14 +4,12 @@ const shapes = {
   square: "rounded-[0px]",
   round: "rounded-[10px]",
 };
-
 const variants = {
   fill: {
     orange_800: "bg-[#f25d07] text-[#ffffff]",
     white_A700: "bg-[#ffffff] text-[#000000]",
   },
 };
-
 const sizes = {
   lg: "h-[60px] px-[34px] text-[30px]",
   xs: "h-[50px] px-2 text-[20px]",
@@ -32,9 +30,7 @@ const Button = ({
 }) => {
   return (
     <button
-      className={`${className} flex flex-row items-center justify-center text-center cursor-pointer whitespace-nowrap ${shape && shapes[shape]} ${size && sizes[size]} ${
-        variant && variants[variant]?.[color]
-      }`}
+      className={`${className} flex flex-row items-center justify-center text-center cursor-pointer whitespace-nowrap ${shape && shapes[shape]} ${size && sizes[size]} ${variant && variants[variant]?.[color]}`}
       {...restProps}
     >
       {!!leftIcon && leftIcon}

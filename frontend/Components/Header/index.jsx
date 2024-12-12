@@ -1,49 +1,38 @@
+import { Button, Img, Text } from "..";
+import Link from "next/link";
 import React from "react";
 
-const shapes = {
-  square: "rounded-[0px]",
-  round: "rounded-[10px]",
-};
-
-const variants = {
-  fill: {
-    orange_800: "bg-[#f25d07] text-[#ffffff]",
-    white_A700: "bg-[#ffffff] text-[#000000]",
-  },
-};
-
-const sizes = {
-  lg: "h-[60px] px-[34px] text-[30px]",
-  xs: "h-[50px] px-2 text-[20px]",
-  md: "h-[60px] px-1.5",
-  sm: "h-[54px] px-2 text-[25px]",
-};
-
-const Button = ({
-  children,
-  className = "",
-  leftIcon,
-  rightIcon,
-  shape,
-  variant = "fill",
-  size = "sm",
-  color = "white_A700",
-  ...restProps
-}) => {
+export default function Header({ className, ...restProps }) {
   return (
-    <button
-      className={`${className} flex flex-row items-center justify-center text-center cursor-pointer whitespace-nowrap ${
-        shape && shapes[shape]
-      } ${size && sizes[size]} ${
-        variant && variants[variant]?.[color]
-      }`}
+    <header
       {...restProps}
+      className={`${className} flex justify-center items-center py-2.5 bg-[#ffffff] shadow-[0_5px_10px_5px_#0000003f]`}
     >
-      {!!leftIcon && leftIcon}
-      {children}
-      {!!rightIcon && rightIcon}
-    </button>
+      <div className="container-xs flex justify-center lg:px-5 md:px-5">
+        <div className="flex w-full items-center justify-between gap-5 md:flex-col">
+          <Img
+            src="img_header_logo.png"
+            width={462}
+            height={46}
+            alt="Header Logo"
+            className="h-[46px] w-[462px] object-contain"
+          />
+          <div className="flex items-center gap-5">
+            <Text
+              size="texts"
+              as="p"
+              className="mb-1.5 self-end font-['Maven_Pro'] text-[30px] font-normal text-[#000000] lg:text-[25px] md:text-[24px] sm:text-[22px]"
+            >
+              Hi, Admin
+            </Text>
+            <Link href="#">
+              <Button size="md" shape="square" className="w-[60px] px-1">
+                <Img src="img_user_square_blue_gray_900.svg" width={50} height={50} />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </header>
   );
-};
-
-export { Button };
+}

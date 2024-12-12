@@ -36,11 +36,11 @@ const Input = React.forwardRef(
       color = "black_900",
       ...restProps
     },
-    ref
+    ref,
   ) => {
     return (
       <label
-        className={`${className} flex items-center justify-center cursor-text border-solid ${shape && shapes[shape]} ${variant && (variants[variant]?.[color] || variants[variant])} ${size && sizes[size]}`}
+        className={`${className} flex items-center justify-center cursor-text border-solid  ${shape && shapes[shape]} ${variant && (variants[variant]?.[color] || variants[variant])} ${size && sizes[size]}`}
       >
         {!!label && label}
         {!!prefix && prefix}
@@ -48,7 +48,7 @@ const Input = React.forwardRef(
         {!!suffix && suffix}
       </label>
     );
-  }
+  },
 );
 
 export { Input };
