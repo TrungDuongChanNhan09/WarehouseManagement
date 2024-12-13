@@ -1,5 +1,5 @@
 import { Fragment } from "react"
-import LoginPage from "../../App/Login/page"
+import LoginPage from "../../App/Login"
 import React from "react"
 
 const publicRoutes = [

@@ -1,20 +1,19 @@
 "use client";
 
-import Link from "next/link";
-import React, { useState } from "react";
+import { Img } from "../Img";
+import React from "react";
 import { MenuItem, Menu, Sidebar } from "react-pro-sidebar";
-
-export default function SideBar(props) {
-  const [collapsed, setCollapsed] = useState(false);
-
-  // Toggle sidebar collapse
-  const toggleSidebar = () => setCollapsed(!collapsed);
+import { Link } from "react-router-dom";
+export default function SideBar({ className = "", ...props }) {
+  const [collapsed, setCollapsed] = React.useState(false);
 
   return (
     <Sidebar
       {...props}
+      width="252px !important"
+      collapsedWidth="80px !important"
       collapsed={collapsed}
-      className={`flex flex-col h-screen pt-[50px] top-0 px-2.5 md:pt-5 sm:pt-4 !border-[#f25d07] !border-r-[10px] !border-solid bg-[#ffffff] !sticky overflow-auto`}
+      className={`${className} flex flex-col h-screen pt-[50px] top-0 px-2.5 md:pt-5 sm:pt-4 !border-[#f25d07] !border-r-[10px] !border-solid bg-[#ffffff] !sticky overflow-auto md:hidden`}
     >
       <Menu
         menuItemStyles={{
@@ -27,59 +26,131 @@ export default function SideBar(props) {
             borderRadius: "35px",
             [`&:hover, &.ps-active`]: {
               color: "#ffffff",
-              backgroundColor: "#f25d07",
+              backgroundColor: "#f25d07 !important",
             },
           },
         }}
-        rootStyles={{ ["&>ul"]: { gap: "30px" } }}
+        rootStyles={{ "&>ul": { gap: "30px" } }}
         className="flex w-full flex-col self-stretch"
       >
         <MenuItem
-          icon={<img src="dashboard 1.svg" alt="Dashboard Icon" className="h-[40px] w-[40px]" />}
-          component={<Link href="/dashboard" passHref />}
+          icon={
+            <Img
+              src="dashboard 1.svg"
+              width={40}
+              height={40}
+              alt="Dashboard Icon"
+              className="h-[40px] w-[40px]"
+            />
+          }
+          component={<Link to="/" />}
         >
           Dashboard
         </MenuItem>
         <MenuItem
-          icon={<img src="delivery 1.svg" alt="Orders Icon" className="h-[50px] w-[50px]" />}
-          component={<Link href="/ordermanagement" passHref />}
+          icon={
+            <Img
+              src="delivery 1.svg"
+              width={50}
+              height={50}
+              alt="Orders Icon"
+              className="h-[50px] w-[50px]"
+            />
+          }
+            component={<Link to="/ordermanagement" />}
         >
           Order
         </MenuItem>
         <MenuItem
-          icon={<img src="briefcase 1.svg" alt="Employees Icon" className="h-[40px] w-[40px]" />}
-          component={<Link href="/employee" passHref />}
+          icon={
+            <Img
+              src="briefcase 1.svg"
+              width={40}
+              height={40}
+              alt="Employees Icon"
+              className="h-[40px] w-[40px]"
+            />
+          }
+              component={<Link to="/employee" />}
         >
           Employee
         </MenuItem>
         <MenuItem
-          icon={<img src="package-box 1.svg" alt="Inventory Icon" className="h-[50px] w-[50px]" />}
-          component={<Link href="/inventory" passHref />}
+          icon={
+            <Img
+              src="package-box 1.svg"
+              width={50}
+              height={50}
+              alt="Inventory Icon"
+              className="h-[50px] w-[50px]"
+            />
+          }
+          component={<Link to="/inventory" />}
         >
           Inventory
         </MenuItem>
         <MenuItem
-          icon={<img src="package-box 1.svg" alt="Products Icon" className="h-[50px] w-[50px]" />}
+          icon={
+            <Img
+              src="package-box 1.svg"
+              width={50}
+              height={50}
+              alt="Products Icon"
+              className="h-[50px] w-[50px]"
+            />
+          }
         >
           Product
         </MenuItem>
         <MenuItem
-          icon={<img src="package-box 1.svg" alt="Categories Icon" className="h-[50px] w-[50px]" />}
+          icon={
+            <Img
+              src="package-box 1.svg"
+              width={50}
+              height={50}
+              alt="Categories Icon"
+              className="h-[50px] w-[50px]"
+            />
+          }
         >
           Category
         </MenuItem>
         <MenuItem
-          icon={<img src="package-box 1.svg" alt="Import Icon" className="h-[50px] w-[50px]" />}
+          icon={
+            <Img
+              src="package-box 1.svg"
+              width={50}
+              height={50}
+              alt="Import Icon"
+              className="h-[50px] w-[50px]"
+            />
+          }
         >
           Import
         </MenuItem>
         <MenuItem
-          icon={<img src="package-box 1.svg" alt="Export Icon" className="h-[50px] w-[50px]" />}
+          icon={
+            <Img
+              src="package-box 1.svg"
+              width={50}
+              height={50}
+              alt="Export Icon"
+              className="h-[50px] w-[50px]"
+            />
+          }
         >
           Export
         </MenuItem>
         <MenuItem
-          icon={<img src="settings 1.svg" alt="Settings Icon" className="h-[40px] w-[40px]" />}
+          icon={
+            <Img
+              src="settings 1.svg"
+              width={40}
+              height={40}
+              alt="Settings Icon"
+              className="h-[40px] w-[40px]"
+            />
+          }
         >
           Setting
         </MenuItem>
