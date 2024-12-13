@@ -1,88 +1,94 @@
 /* Toàn bộ trang đăng nhập */
 .login-page {
   display: flex;
+  flex-direction: row; /* Giữ các phần cạnh nhau */
   width: 100%;
   min-height: 100vh;
-  min-width: 100vh;
   align-items: center;
   background-color: #ffffff;
+  overflow: hidden;
 }
 
 /* Phần hình ảnh */
 .login-image {
-  flex: 7;
+  flex: 2; /* Tỉ lệ phần hình ảnh */
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   background: url('/images/login.png') no-repeat center center;
   background-size: cover;
 }
 
-/* Lớp overlay cho hình ảnh, tạo hiệu ứng gradient */
+/* Lớp overlay cho hình ảnh */
 .login-image-overlay {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-end;
+  padding: 2rem;
+  padding-bottom: 4rem;
   background: linear-gradient(to right, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
   width: 100%;
+  height: 100%;
+  box-sizing: border-box;
   color: white;
 }
 
 /* Tiêu đề chính */
 .heading-main {
   font-family: 'Maven Pro', sans-serif;
-  font-size: 50px;
+  font-size: 3rem;
   font-weight: 600;
+  margin-bottom: 1rem;
   color: #ffffff;
 }
 
 /* Tiêu đề phụ */
 .heading-sub {
   font-family: 'Maven Pro', sans-serif;
-  font-size: 30px;
+  font-size: 1.2rem;
+  line-height: 1.5;
   color: #ffffff;
 }
 
-/* Phần form đăng nhập - chiếm 30% */
+/* Phần form đăng nhập */
 .login-form-container {
-  flex: 3;
+  flex: 1;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #ffffff;
+  padding: 2rem;
 }
 
 .login-form {
   width: 100%;
-  max-width: 600px;
+  max-width: 350px; /* Hạn chế độ rộng của form */
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start; /* Căn tất cả các thành phần sang trái */
   justify-content: center;
   background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 20px; /* Padding added for better spacing */
+  padding: 2rem;
+  gap: 1rem; /* Khoảng cách giữa các phần tử */
 }
 
 /* Logo */
 .logo {
-  width: 50%;
-  height: auto;
-  object-fit: contain;
-  margin-bottom: 20px;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 2rem; /* Đặt logo ở giữa */
 }
 
 /* Tiêu đề đăng nhập */
 .sign-in-heading {
   font-family: 'Maven Pro', sans-serif;
-  font-size: 40px;
+  font-size: 1.8rem;
   font-weight: 800;
   color: #f25d07;
-  margin-bottom: 20px; /* Margin added for spacing */
+  margin: 0 auto 2rem; /* Đặt tiêu đề ở giữa */
 }
 
 /* Nhóm input trong form */
@@ -90,58 +96,77 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 1rem;
 }
 
-/* Nhan đề cho các trường nhập */
+/* Nhãn input */
 .input-label {
   font-family: 'Maven Pro', sans-serif;
-  font-size: 18px;
+  font-size: 1rem;
   font-weight: 600;
   color: #000000;
 }
 
-/* Trường nhập liệu */
+/* Trường nhập */
 .input-field {
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: 0px solid #000;
-  font-size: 16px;
-  color: #000000; /* Ensure text color is visible */
-  background-color: #ffffff; 
+  width: 80%; 
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  background-color: #ffffff;
+  outline: none;
+  box-shadow: none;
+  transition: border-color 0.3s ease-in-out;
+}
+.input-field input {
+  border: none; /* Loại bỏ border bên trong */
+  outline: none; /* Loại bỏ outline */
+  background-color: transparent; /* Đảm bảo không có nền màu */
+  width: 100%; /* Đảm bảo chiều rộng phù hợp */
+  padding: 0; /* Loại bỏ padding thừa */
+  font-size: inherit; /* Duy trì kích thước chữ từ parent */
+}
+.input-field:focus {
+  border-color: #f25d07;
+  box-shadow: none; 
 }
 
-/* Checkbox label */
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  font-family: 'Maven Pro', sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: #000000;
-}
 
 /* Checkbox */
-.checkbox-input {
-  margin-right: 10px;
+.checkbox-label {
+  font-family: 'Maven Pro', sans-serif;
+  font-size: 0.9rem;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  
 }
 
 /* Nút đăng nhập */
 .login-button {
-  width: 100%;
-  padding: 15px;
-  border-radius: 20px;
+  width: 50%;
+  padding: 0.6rem;
+  border-radius: 6px;
   background-color: #f25d07;
   color: white;
   font-family: 'Maven Pro', sans-serif;
   font-weight: bold;
-  text-align: center;
+  text-align: right;
   cursor: pointer;
+  font-size: 1rem;
+  margin: 1.5rem auto 0; 
+  transition: background-color 0.3s ease;
+   
+  display: flex; 
+  justify-content: center;
+  align-items: center; 
 }
 
 .login-button:hover {
-  background-color: #d84e00; /* Hiệu ứng hover */
+  background-color: #d84e00;
 }
 
 /* Responsive cho màn hình nhỏ */
@@ -151,28 +176,26 @@
   }
 
   .login-image {
-    flex: 7; /* Giảm tỷ lệ ảnh trên màn hình nhỏ */
-    height: 50vh; /* Chiều cao giảm trên màn hình nhỏ */
+    flex: none;
+    height: 40vh;
   }
 
   .login-form-container {
-    flex: 3; /* Tăng tỷ lệ form trên màn hình nhỏ */
+    flex: none;
     height: auto;
-  }
-
-  .login-form {
-    width: 90%; /* Đảm bảo form nhỏ gọn */
-  }
-
-  .heading-main {
-    font-size: 40px; /* Giảm kích thước chữ */
-  }
-
-  .heading-sub {
-    font-size: 20px;
+    padding: 1.5rem;
   }
 
   .sign-in-heading {
-    font-size: 30px;
+    font-size: 1.5rem;
+  }
+
+  .input-field {
+    font-size: 0.9rem;
+    border: none;
+  }
+
+  .login-button {
+    width: 70%; /* Điều chỉnh kích thước nút nhỏ hơn */
   }
 }

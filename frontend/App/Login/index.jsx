@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button, CheckBox, Input, Heading, Img } from "../../Components";
-import './Login.css'; 
+import './Login.css';
 
 export default function LoginPage() {
   return (
@@ -9,22 +9,11 @@ export default function LoginPage() {
       {/* Phần hình nền */}
       <div className="login-image" id="login-image">
         <div className="login-image-overlay">
-          <Heading
-            size="headinglg"
-            as="h1"
-            className="heading-main"
-          >
+          <Heading size="headinglg" as="h1" className="heading-main">
             About us
           </Heading>
-          <Heading
-            size="headings"
-            as="h2"
-            className="heading-sub"
-          >
-            Our warehouse management team excels in efficiency, precision, and reliability. We are committed to
-            delivering top-tier management practices that ensure seamless operations, from inventory tracking to order
-            fulfillment. With a focus on optimizing space, minimizing errors, and streamlining processes, we
-            consistently achieve fast and accurate deliveries.
+          <Heading size="headings" as="h2" className="heading-sub">
+            Our warehouse management team excels in efficiency, precision, and reliability. We are committed to delivering top-tier management practices that ensure seamless operations, from inventory tracking to order fulfillment. With a focus on optimizing space, minimizing errors, and streamlining processes, we consistently achieve fast and accurate deliveries.
           </Heading>
         </div>
       </div>
@@ -38,33 +27,35 @@ export default function LoginPage() {
               Sign In
             </Heading>
           </Link>
-          <div className="input-group">
-            <div className="flex flex-col items-start gap-4 self-stretch">
-              <Heading as="h3" className="input-label">
-                Username
-              </Heading>
-              <Input shape="round" name="Username Input" className="input-field" />
-            </div>
-            <div className="flex flex-col items-start gap-4 self-stretch">
-              <Heading as="h4" className="input-label" >
-                Password
-              </Heading>
-              <Input shape="round" name="Password Input" className="input-field" />
-            </div>
-            <CheckBox
-              name="Show Password"
-              label="Show password"
-              id="ShowPassword"
-              className="checkbox-label"
-            />
-            <Button
-              color="orange_800"
-              size="lg"
-              className="login-button"
-            >
-              Login
-            </Button>
+
+          {/* Username Input Group */}
+          <div className="input-field-container">
+            <Heading as="h3" className="input-label">
+              Username
+            </Heading>
+            <Input shape="round" name="Username Input" className="input-field" />
           </div>
+
+          {/* Password Input Group */}
+          <div className="input-field-container">
+            <Heading as="h4" className="input-label">
+              Password
+            </Heading>
+            <Input shape="round" name="Password Input" className="input-field" />
+          </div>
+
+          {/* Show Password Checkbox */}
+          <CheckBox
+            name="Show Password"
+            label="Show password"
+            id="ShowPassword"
+            className="checkbox-label"
+          />
+
+          {/* Login Button */}
+          <Button color="orange_800" size="lg" className="login-button">
+            Login
+          </Button>
         </div>
       </div>
     </div>
