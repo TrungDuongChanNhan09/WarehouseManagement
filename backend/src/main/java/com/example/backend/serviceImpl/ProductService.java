@@ -28,14 +28,19 @@ public class ProductService implements com.example.backend.service.ProductServic
 
     @Override
     public Product addProduct(Product product) {
+        Product existingProduct = this.productRepository.findByproductName(product.getProductName());
+        if(existingProduct != null && existingProduct.getProduction_date() == product.getProduction_date() && existingProduct.getExpiration_date() == product.getExpiration_date()) {
+            existingProduct.setInventory_quantity(existingProduct.getInventory_quantity() + product.getInventory_quantity());
+            return productRepository.save(existingProduct);
+        }
         return productRepository.save(product);
     }
 
     @Override
-    public Product updateProduct(String productId, Product product) {
+    public Product updateProduct(String productId, Product product) throws Exception {
         Product existingProduct = this.productRepository.findById(productId).orElse(null);
         if (existingProduct == null) {
-            return null;
+            throw new Exception("Product not found");
         } else {
             existingProduct.setProductName(product.getProductName());
             existingProduct.setProduction_date(product.getProduction_date());

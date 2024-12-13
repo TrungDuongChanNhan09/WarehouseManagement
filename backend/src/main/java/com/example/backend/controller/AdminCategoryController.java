@@ -19,13 +19,13 @@ public class AdminCategoryController {
     private CategoryService categoryService;
     @Autowired
     private UserService userService;
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<Category> createCategory(@RequestBody Category category, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         Category newCategory = categoryService.createCategory(category);
         return new ResponseEntity<>(category, HttpStatus.CREATED);
     }
-    @GetMapping("/getAll")
+    @GetMapping("")
     public ResponseEntity<List<Category>> getAllCategory(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(categoryService.getAllCategory(), HttpStatus.OK);

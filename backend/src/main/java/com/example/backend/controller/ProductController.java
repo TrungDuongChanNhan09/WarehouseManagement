@@ -21,44 +21,44 @@ public class ProductController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/createProduct")
+    @PostMapping("")
     public ResponseEntity<Product> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.addProduct(product), HttpStatus.CREATED);
     }
 
-    @PutMapping("/updateProduct/{productId}")
+    @PutMapping("/{productId}")
     public ResponseEntity<Product> updateProduct(@RequestBody Product product, @RequestHeader("Authorization") String jwt, @PathVariable String productId) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.updateProduct(productId, product), HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/deleteProduct/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJwtToken(jwt);
         productService.deleteProductById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/getAllProduct")
+    @GetMapping("")
     private ResponseEntity<List<Product>> getAllProduct(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.getAllProduct(), HttpStatus.OK);
     }
 
-    @GetMapping("/getById/{id}")
+    @GetMapping("/{id}")
     private ResponseEntity<Optional<Product>> getProductById(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.getProductById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/getByName/{name}")
+    @GetMapping("/{name}")
     private ResponseEntity<List<Product>> getProductByName(@PathVariable String name, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.searchProductByName(name), HttpStatus.OK);
     }
 
-    @GetMapping("/getByCategory/{categoryName}")
+    @GetMapping("/{categoryName}")
     private ResponseEntity<List<Product>> getProductByCategory(@PathVariable String categoryName, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.filterProductByCategory(categoryName), HttpStatus.OK);
