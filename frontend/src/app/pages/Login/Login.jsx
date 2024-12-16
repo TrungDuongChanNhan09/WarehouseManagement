@@ -1,9 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button, CheckBox, Input, Heading, Img } from "../../Components";
-import './Login.css';
+import { Button, CheckBox, Input, Heading, Img } from "../../components";
+import './login.css';
 
-export default function LoginPage() {
+export default function Login() {
   return (
     <div className="login-page">
       {/* Phần hình nền */}
