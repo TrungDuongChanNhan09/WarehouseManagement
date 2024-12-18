@@ -1,0 +1,13 @@
+@charset "UTF-8";
+.Navbar {
+  width: 240px;
+  border: 3px solid #9AA6B2;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.Navbar .MuiBottomNavigationAction-root.Mui-selected {
+  color: #272829 !important; /* Đổi màu thành red hoặc màu khác */
+}
+.Navbar .logo img {
+  width: 70%;
+}/*# sourceMappingURL=Navbar.css.map */

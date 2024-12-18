@@ -1,0 +1,51 @@
+.login{
+    width: 100%;
+    height: 100vh;
+    // background-color: green;
+    .body-login{
+        padding: 1rem;
+        margin: 2rem;
+        border: 2px solid #9AA6B2;
+        border-radius: 1rem;
+        height: 90vh;
+        .background-page{
+            width: 68%;
+            img{
+                width: 100%;
+                height: 100%;
+            }
+        }
+        .information-page{
+            width: 32%;
+            background-color: #EEEEEE;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            .infor-email{
+                margin-bottom: 0.8rem;
+            }
+            .infor-pass{
+                margin-bottom: 0.8rem;
+            }
+            .title{
+                img{
+                    width: 50%;
+                }
+                .title-login{
+                    padding: 2rem;
+                }
+            }
+            .button-login{
+                margin-top: 1rem;
+                width: 50%;
+                .link{
+                    color: white;
+                    text-decoration: none;
+                }
+            }
+            
+            
+        }
+    }
+    
+}
+
