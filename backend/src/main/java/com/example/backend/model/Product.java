@@ -16,6 +16,8 @@ public class Product {
     private String id;
     @Field("category_id")
     private String categoryId;
+    @Field
+    private String supplierId;
     private String productName;
     private int inventory_quantity;
     private String unit;

@@ -30,7 +30,7 @@ public class ProductController {
     @PutMapping("/{productId}")
     public ResponseEntity<Product> updateProduct(@RequestBody Product product, @RequestHeader("Authorization") String jwt, @PathVariable String productId) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
-        return new ResponseEntity<>(productService.updateProduct(productId, product), HttpStatus.CREATED);
+        return new ResponseEntity<>(productService.updateProduct(productId, product), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -46,21 +46,27 @@ public class ProductController {
         return new ResponseEntity<>(productService.getAllProduct(), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     private ResponseEntity<Optional<Product>> getProductById(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.getProductById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/getByName/{name}")
     private ResponseEntity<List<Product>> getProductByName(@PathVariable String name, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.searchProductByName(name), HttpStatus.OK);
     }
 
-    @GetMapping("/{categoryName}")
+    @GetMapping("/getByCategory/{categoryName}")
     private ResponseEntity<List<Product>> getProductByCategory(@PathVariable String categoryName, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.filterProductByCategory(categoryName), HttpStatus.OK);
+    }
+
+    @GetMapping("/getBySupplier/{supplierName}")
+    private ResponseEntity<List<Product>> getProductBySupplier(@PathVariable String supplierName, @RequestHeader("Authorization") String jwt) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(productService.filterProductBySupplier(supplierName), HttpStatus.OK);
     }
 }
