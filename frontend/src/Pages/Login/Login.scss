@@ -34,16 +34,15 @@
                 font-weight: bold;
                 text-align: justify;
                 z-index: 1;
-                max-width: 60vw;
+                max-width: 62vw;
             }
         }
         .information-page{
-            
             min-width: auto;
             width: 32%;
             background-color: #EEEEEE;
             border-radius: 0.5rem;
-            padding: 2rem;
+            padding: 3rem;
             .infor-email{
                 margin-bottom: 0.8rem;
             }
@@ -52,9 +51,11 @@
             }
             .title{
                 img{
-                    width: 40%;
+                    min-width: 100px;
+                    width: 45%;
                 }
                 .title-login{
+                    text-align: center;
                     padding: 2rem;
                 }
             }
@@ -62,9 +63,12 @@
                 background-color: #F25D07;
                 margin-top: 1rem;
                 width: 50%;
+                border-radius: 1rem;
                 .link{
                     color: white;
+                    font-size: 1.1rem;
                     text-decoration: none;
+                    text-align: center;
                 }
             }
             

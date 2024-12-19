@@ -13,7 +13,7 @@ const Login = () => {
         <Container style={{padding: 0}} maxWidth="xl" className="login">
             <Stack className="body-login" direction="row" spacing={0} >
                 <Stack className="background-page">
-                    <img src="https://res.cloudinary.com/dsygvdfd2/image/upload/v1734527189/loginimage.png"/>
+                    <img src="https://res.cloudinary.com/dsygvdfd2/image/upload/v1734536548/loginimage.png"/>
                     <Typography className="background-title">
                         About us
                     </Typography>
@@ -27,8 +27,8 @@ const Login = () => {
                         <img src={Logo}/>
                         <Typography 
                             className="title-login" 
-                            variant="h5" 
-                            sx={{ color: "#495E57" }} 
+                            variant="h4" 
+                            sx={{ color: "#F25D07" }} 
                             fontWeight={"bold"}>
                             Đăng nhập
                         </Typography>
