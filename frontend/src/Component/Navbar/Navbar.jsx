@@ -13,6 +13,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CorporateFareOutlinedIcon from '@mui/icons-material/CorporateFareOutlined';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import SearchAppBar from "../AppBar/AppBar.jsx";
 
 const Navbar = () => {
@@ -211,8 +212,8 @@ const Navbar = () => {
                     </Stack>
                 
                     <Button className="btn-setting" sx={{color: "#387478", background: "none", margin:"1rem"}} variant="contained">
-                        <SettingsIcon sx={{color: "#387478"}}/>
-                        Cài đặt
+                        <HelpOutlineIcon sx={{color: "#387478", marginRight:"10px"}}/>
+                        Trợ giúp
                     </Button>
                 </Stack>
                 
