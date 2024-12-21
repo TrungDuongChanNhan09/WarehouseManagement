@@ -16,8 +16,15 @@ public class CategoryService implements com.example.backend.service.CategoryServ
     }
 
     @Override
-    public Category createCategory(Category category) {
-        return categoryRepository.save(category);
+    public Category createCategory(Category category) throws Exception {
+        Category existingCategory = categoryRepository.findBycategoryName(category.getCategoryName());
+        if(existingCategory != null){
+            throw new Exception("Category is already exist");
+        }
+        Category newCategory = new Category();
+        newCategory.setCategoryName(category.getCategoryName());
+        newCategory.setDescription(category.getDescription());
+        return categoryRepository.save(newCategory);
     }
 
     @Override

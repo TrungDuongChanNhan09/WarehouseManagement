@@ -4,16 +4,23 @@
     border-right: 5px solid #F25D07;
     padding: 1rem;
     .MuiBottomNavigationAction-root.Mui-selected {
-        color: #272829 !important; /* Đổi màu thành red hoặc màu khác */
+        color: #E2F1E7 !important; /* Đổi màu thành red hoặc màu khác */
+        font-weight: bold;
+        background-color: #243642;
+        border-radius: 0.5rem;
     }
-    .btn-add-order{
-        
-    }
+    width: 240px;
+    border-right: 1px solid #9AA6B2;
+    // border-radius: 0.5rem;
+    
+    // margin: 0.5rem;
     .logo{
+        padding: 1rem;
         img{
             width: 50%;
         }
     }
+    
    
    
 }

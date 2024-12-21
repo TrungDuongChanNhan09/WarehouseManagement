@@ -33,6 +33,8 @@ const Layout = () => (
   </>
 );
 
+import Employee from "./Pages/Employee/Employee.jsx";
+import Shelf from "./Pages/Shelf/Shelf.jsx";
 const App = () =>{
   return(
     <div className="App">
@@ -41,13 +43,14 @@ const App = () =>{
           <Route index element={<Login/>}/>
           <Route path='register' element={<Register/>}/>
           <Route path='login' element={<Login/>}/>
-            <Route path='app' element={<Layout/>}>
-              <Route index element={<DashBoard/>}/>
-              <Route path='home' element={<DashBoard/>}/>
-              <Route path='inventory' element={<Inventory/>}/>
-              <Route path='category' element={<Category/>}/>
-              <Route path='product' element={<Product/>}/>
-            </Route>
+          <Route path='app' element={<Layout/>}>
+            <Route path='home' element={<DashBoard/>}/>
+            <Route path='inventory' element={<Inventory/>}/>
+            <Route path='category' element={<Category/>}/>
+            <Route path='product' element={<Product/>}/>
+            <Route path='employee' element={<Employee/>}/>
+            <Route path='shelf' element={<Shelf/>}/>
+          </Route>
         </Routes>
       </BrowserRouter>
     </div>

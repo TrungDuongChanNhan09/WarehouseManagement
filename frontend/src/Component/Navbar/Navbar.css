@@ -2,11 +2,16 @@
 .Navbar {
   margin-top: 6.5vh;
   width: 240px;
-  border-right: 5px solid #F25D07;
-  padding: 1rem;
+  border-right: 1px solid #9AA6B2;
 }
 .Navbar .MuiBottomNavigationAction-root.Mui-selected {
-  color: #272829 !important; /* Đổi màu thành red hoặc màu khác */
+  color: #E2F1E7 !important; /* Đổi màu thành red hoặc màu khác */
+  font-weight: bold;
+  background-color: #243642;
+  border-radius: 0.5rem;
+}
+.Navbar .logo {
+  padding: 1rem;
 }
 .Navbar .logo img {
   width: 50%;
