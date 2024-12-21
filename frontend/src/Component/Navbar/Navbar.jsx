@@ -3,7 +3,7 @@ import "./Navbar.css";
 import { Stack, Button, Typography } from "@mui/material";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
-import DashboardIcon from "@mui/icons-material/Dashboard";
+import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import CategoryIcon from "@mui/icons-material/Category";
 import InventoryIcon from "@mui/icons-material/Inventory";
@@ -11,6 +11,7 @@ import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantity
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import AddIcon from '@mui/icons-material/Add';
 import SettingsIcon from '@mui/icons-material/Settings';
+import Logo from '../../assets/Logo.svg'
 
 const Navbar = () => {
     const [value, setValue] = useState("dashboard");
@@ -36,7 +37,7 @@ const Navbar = () => {
             <Stack className="Navbar" justifyContent={"space-between"}>
                 <Stack className="logo" alignItems={"center"}>
                     <img
-                        src="https://res.cloudinary.com/dozs7ggs4/image/upload/v1734362317/WarehouseManagement-3_kibnmb.png"
+                        src={Logo}
                         alt="Logo"
                     />
                 </Stack>
@@ -62,25 +63,32 @@ const Navbar = () => {
                             height: "30vh",
                         }}
                     >
-                        <BottomNavigationAction 
+                        <BottomNavigationAction
                             showLabel={true} 
                             label="Dashboard"
                             value="dashboard"
-                            icon={<DashboardIcon />}
+                            icon={<DashboardRoundedIcon />}
                             onClick={() => navigate("/app/home")} 
                             sx={{
                                 display: "flex",
                                 flexDirection: "row",
-                                width: "150px",
+                                width: "100%",
+                                maxWidth: "100%",
                                 justifyContent: "flex-start", 
                                 marginTop: "0.7rem",
-                                fontSize: "16px",
+                                fontSize: "18px",
+                                ".css-1kcvi62-MuiBottomNavigationAction-label.Mui-selected": {
+                                    fontSize: "20px",
+                                },
+                                '.Mui-selected': {
+                                    color: '#F25D07',
+                                },
                                 "& .MuiSvgIcon-root": {
                                     fontSize: "24px", 
                                     marginRight: "10px", 
                                 },
-                                "& .MuiBottomNavigationAction-label": {
-                                    fontSize: "16px", 
+                                ".MuiBottomNavigationAction-label": {
+                                    fontSize: "18px",
                                     fontWeight: "bold", 
                                 },
                             }}
@@ -94,16 +102,23 @@ const Navbar = () => {
                             sx={{
                                 display: "flex",
                                 flexDirection: "row",
-                                width: "150px",
-                                justifyContent: "flex-start",
+                                width: "100%",
+                                maxWidth: "100%",
+                                justifyContent: "flex-start", 
                                 marginTop: "0.7rem",
-                                fontSize: "16px",
-                                "& .MuiSvgIcon-root": {
-                                    fontSize: "24px",
-                                    marginRight: "10px",
+                                fontSize: "18px",
+                                ".css-1kcvi62-MuiBottomNavigationAction-label.Mui-selected": {
+                                    fontSize: "20px",
                                 },
-                                "& .MuiBottomNavigationAction-label": {
-                                    fontSize: "16px", 
+                                '.Mui-selected': {
+                                    color: '#F25D07',
+                                },
+                                "& .MuiSvgIcon-root": {
+                                    fontSize: "24px", 
+                                    marginRight: "10px", 
+                                },
+                                ".MuiBottomNavigationAction-label": {
+                                    fontSize: "18px",
                                     fontWeight: "bold", 
                                 },
                             }}
@@ -117,16 +132,23 @@ const Navbar = () => {
                             sx={{
                                 display: "flex",
                                 flexDirection: "row",
-                                width: "150px",
-                                justifyContent: "flex-start",
+                                width: "100%",
+                                maxWidth: "100%",
+                                justifyContent: "flex-start", 
                                 marginTop: "0.7rem",
-                                fontSize: "16px",
-                                "& .MuiSvgIcon-root": {
-                                    fontSize: "24px",
-                                    marginRight: "10px",
+                                fontSize: "18px",
+                                ".css-1kcvi62-MuiBottomNavigationAction-label.Mui-selected": {
+                                    fontSize: "20px",
                                 },
-                                "& .MuiBottomNavigationAction-label": {
-                                    fontSize: "16px", 
+                                '.Mui-selected': {
+                                    color: '#F25D07',
+                                },
+                                "& .MuiSvgIcon-root": {
+                                    fontSize: "24px", 
+                                    marginRight: "10px", 
+                                },
+                                ".MuiBottomNavigationAction-label": {
+                                    fontSize: "18px",
                                     fontWeight: "bold", 
                                 },
                             }}
@@ -140,37 +162,42 @@ const Navbar = () => {
                             sx={{
                                 display: "flex",
                                 flexDirection: "row",
-                                width: "150px",
-                                justifyContent: "flex-start",
+                                width: "100%",
+                                maxWidth: "100%",
+                                justifyContent: "flex-start", 
                                 marginTop: "0.7rem",
-                                fontSize: "16px",
-                                "& .MuiSvgIcon-root": {
-                                    fontSize: "24px",
-                                    marginRight: "10px",
+                                fontSize: "18px",
+                                ".css-1kcvi62-MuiBottomNavigationAction-label.Mui-selected": {
+                                    fontSize: "20px",
                                 },
-                                "& .MuiBottomNavigationAction-label": {
-                                    fontSize: "16px", 
+                                '.Mui-selected': {
+                                    color: '#F25D07',
+                                },
+                                "& .MuiSvgIcon-root": {
+                                    fontSize: "24px", 
+                                    marginRight: "10px", 
+                                },
+                                ".MuiBottomNavigationAction-label": {
+                                    fontSize: "18px",
                                     fontWeight: "bold", 
                                 },
                             }}
                         />
                     </BottomNavigation>
                 </Stack>
-                <Button className="btn-add-order" sx={{padding: "10px", border: "2px solid #387478", margin: "1rem 1rem 1rem 1rem"}}>
-                        <SettingsIcon sx={{color: "black"}}/>
-                        <Typography
-                            variant="p"
-                            align="left"
-                            sx={{
-                                width:"120px",
-                                color: "black",
-                                marginLeft:"20px",
-                                
-                            }}
-                        >Cài đặt</Typography>
-                    </Button>
+                <Button className="btn-add-order" sx={{margin: "0.5rem 0.5rem 0.5rem 0.5rem"}}>
+                    <SettingsIcon sx={{color: "black"}}/>
+                    <Typography
+                        variant="p"
+                        align="left"
+                        sx={{
+                            width:"100%",
+                            color: "black",
+                            marginLeft:"10px",
+                        }}
+                    >Cài đặt</Typography>
+                </Button>
             </Stack>
-            <Outlet />
         </>
     );
 };
