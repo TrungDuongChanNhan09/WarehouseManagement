@@ -33,26 +33,26 @@ public class ProductController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/createProduct")
+    @PostMapping("")
     public ResponseEntity<Product> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.addProduct(product), HttpStatus.CREATED);
     }
 
-    @PutMapping("/updateProduct/{productId}")
+    @PutMapping("/{productId}")
     public ResponseEntity<Product> updateProduct(@RequestBody Product product, @RequestHeader("Authorization") String jwt, @PathVariable String productId) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
-        return new ResponseEntity<>(productService.updateProduct(productId, product), HttpStatus.CREATED);
+        return new ResponseEntity<>(productService.updateProduct(productId, product), HttpStatus.OK);
     }
 
-    @DeleteMapping("/deleteProduct/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJwtToken(jwt);
         productService.deleteProductById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/getAllProduct")
+    @GetMapping("")
     private ResponseEntity<List<Product>> getAllProduct(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.getAllProduct(), HttpStatus.OK);
@@ -74,5 +74,11 @@ public class ProductController {
     private ResponseEntity<List<Product>> getProductByCategory(@PathVariable String categoryName, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.filterProductByCategory(categoryName), HttpStatus.OK);
+    }
+
+    @GetMapping("/getBySupplier/{supplierName}")
+    private ResponseEntity<List<Product>> getProductBySupplier(@PathVariable String supplierName, @RequestHeader("Authorization") String jwt) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(productService.filterProductBySupplier(supplierName), HttpStatus.OK);
     }
 }

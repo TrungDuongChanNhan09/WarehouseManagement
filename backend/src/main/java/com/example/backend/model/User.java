@@ -29,4 +29,5 @@ public class User {
     private Date dateOfBirth;
     private String address;
     private String image;
+    private String status = "off";
 }

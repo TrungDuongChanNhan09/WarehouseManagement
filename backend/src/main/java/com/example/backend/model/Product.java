@@ -16,11 +16,14 @@ public class Product {
     private String id;
     @Field("category_id")
     private String categoryId;
+    @Field("supplier_id")
+    private String supplierId;
     private String productName;
-    private Number inventory_quantity;
+    private int inventory_quantity;
     private String unit;
     private String description;
     private String image;
     private Date production_date;
     private Date expiration_date;
+    private int price;
 }

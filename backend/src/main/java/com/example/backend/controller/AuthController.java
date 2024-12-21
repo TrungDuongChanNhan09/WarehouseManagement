@@ -1,7 +1,11 @@
 package com.example.backend.controller;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
+import com.example.backend.model.Category;
+import com.example.backend.serviceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +16,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.backend.config.JwtProvider;
 import com.example.backend.model.USER_ROLE;
@@ -39,6 +40,10 @@ public class AuthController {
     private JwtProvider jwtProvider;
     @Autowired
     private CustomerUserDetailsService customerUserDetailsService;
+
+    @Autowired
+    private UserService userService;
+
 
     @PostMapping("/signup")
     public ResponseEntity<AuthRespone> createUserHandler(@RequestBody User user) throws Exception {
@@ -70,12 +75,16 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<AuthRespone> signin(@RequestBody LoginRequest request){
+    public ResponseEntity<AuthRespone> signin(@RequestBody LoginRequest request) throws Exception {
         String username = request.getUserName();
         String password = request.getPassword();
 
         Authentication authentication = authenticate(username, password);
 
+        User user = userRepository.findByuserName(username);
+        if(Objects.equals(user.getStatus(), "on")){
+            throw new Exception("User is already login");
+        }
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         String role = authorities.isEmpty()?null:authorities.iterator().next().getAuthority();
 
@@ -85,8 +94,19 @@ public class AuthController {
         authRespone.setJwt(jwt);
         authRespone.setRole(USER_ROLE.valueOf(role));
         authRespone.setMessage("Sign in success");
+        user.setStatus("on");
+        userRepository.save(user);
 
         return new ResponseEntity<>(authRespone, HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String jwt) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+
+        user.setStatus("off");
+        userRepository.save(user);
+        return new ResponseEntity<>("Successfully logged out", HttpStatus.OK);
     }
 
     private Authentication authenticate(String username, String password) {
