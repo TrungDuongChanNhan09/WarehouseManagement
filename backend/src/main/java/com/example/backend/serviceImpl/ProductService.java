@@ -38,7 +38,19 @@ public class ProductService implements com.example.backend.service.ProductServic
             existingProduct.setInventory_quantity(existingProduct.getInventory_quantity() + product.getInventory_quantity());
             return productRepository.save(existingProduct);
         }
-        return productRepository.save(product);
+
+        Product newProduct = new Product();
+        newProduct.setProductName(product.getProductName());
+        newProduct.setProduction_date(product.getProduction_date());
+        newProduct.setUnit(product.getUnit());
+        newProduct.setSupplierId(product.getSupplierId());
+        newProduct.setCategoryId(product.getCategoryId());
+        newProduct.setExpiration_date(product.getExpiration_date());
+        newProduct.setImage(product.getImage());
+        newProduct.setDescription(product.getDescription());
+        newProduct.setInventory_quantity(newProduct.getInventory_quantity());
+        newProduct.setPrice(product.getPrice());
+        return productRepository.save(newProduct);
     }
 
     @Override
@@ -56,6 +68,7 @@ public class ProductService implements com.example.backend.service.ProductServic
             existingProduct.setCategoryId(product.getCategoryId());
             existingProduct.setUnit(product.getUnit());
             existingProduct.setSupplierId(product.getSupplierId());
+            existingProduct.setPrice(product.getPrice());
             return this.productRepository.save(product);
         }
     }

@@ -34,18 +34,6 @@ public class AdminSupplierController {
         return new ResponseEntity<>(supplierService.updateSupplier(supplier, id), HttpStatus.OK);
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<Supplier>> getAllSupplier(@RequestHeader("Authorization") String jwt) throws Exception{
-        User user = userService.findUserByJwtToken(jwt);
-        return new ResponseEntity<>(supplierService.getAllSupplier(), HttpStatus.OK);
-    }
-
-    @GetMapping("/getById/{id}")
-    public ResponseEntity<Optional<Supplier>> getSupplierById(@RequestHeader("Authorization") String jwt, @PathVariable String id) throws Exception{
-        User user = userService.findUserByJwtToken(jwt);
-        return new ResponseEntity<>(supplierService.getSupplierById(id), HttpStatus.OK);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSupplier(@RequestHeader("Authorization") String jwt, @PathVariable String id) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
@@ -53,10 +41,4 @@ public class AdminSupplierController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/getByName/{name}")
-    public ResponseEntity<List<Supplier>> getSupplierByName(@RequestHeader("Authorization") String jwt, @PathVariable String name) throws Exception{
-        User user = userService.findUserByJwtToken(jwt);
-        List<Supplier> suppliers = supplierService.filterSupplier(name);
-        return new ResponseEntity<>(suppliers, HttpStatus.OK);
-    }
 }

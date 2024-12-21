@@ -1,9 +1,7 @@
 package com.example.backend.serviceImpl;
 
-import com.example.backend.model.Product;
 import com.example.backend.model.Supplier;
 import com.example.backend.repository.SupplierRepository;
-import com.example.backend.service.SupplierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -13,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class SupplierServiceImpl implements SupplierService {
+public class SupplierService implements com.example.backend.service.SupplierService {
     @Autowired
     public SupplierRepository supplierRepository;
 
@@ -23,7 +21,12 @@ public class SupplierServiceImpl implements SupplierService {
         if(existingSupplier != null) {
             throw new Exception("Supplier is already exist");
         }
-        return supplierRepository.save(supplier);
+        Supplier newSupplier = new Supplier();
+        newSupplier.setNameSupplier(supplier.getNameSupplier());
+        newSupplier.setAddress(supplier.getAddress());
+        newSupplier.setEmail(supplier.getEmail());
+        newSupplier.setPhoneNumber(supplier.getPhoneNumber());
+        return supplierRepository.save(newSupplier);
     }
 
     @Override
