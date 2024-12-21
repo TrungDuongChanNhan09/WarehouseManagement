@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 @Service
 public class InventoryService implements com.example.backend.service.InventoryService{
@@ -40,8 +43,16 @@ public class InventoryService implements com.example.backend.service.InventorySe
             throw new Exception("Inventory not found");
         }
         else{
+            List<Shelf> shelfs = shelfRepository.findByinventoryid(inventoryId);
+            
+            if(updatedInventory.getNumber_shelf() < shelfs.size()){
+                throw new Exception("Số lượng shelf đang chứa hàng đang lớn hơn số lượng shelf muốn sửa");
+            }
             existingInventory.setNameInventory(updatedInventory.getNameInventory());
             existingInventory.setTypeInventory(updatedInventory.getTypeInventory());
+            existingInventory.setTypeInventoryDescription(updatedInventory.getTypeInventoryDescription());
+            existingInventory.setStatus(updatedInventory.getStatus());
+            existingInventory.setNumber_shelf(updatedInventory.getNumber_shelf());
             return this.inventoryRepository.save(existingInventory);
         }
     }
@@ -100,7 +111,7 @@ public class InventoryService implements com.example.backend.service.InventorySe
 
     @Override
     public int getInventoryQuantity(String inventoryId){
-        return inventoryRepository.findQuantityById(inventoryId);
+        return inventoryRepository.findById(inventoryId).get().getQuantity();
     }
 
     @Override
@@ -109,9 +120,20 @@ public class InventoryService implements com.example.backend.service.InventorySe
     }
 
     @Override
-    public List<String> getDistinctInventoryTypes() {
-        return inventoryRepository.findDistinctTypeInventory();
+    public List<String> getDistinctInventoryTypes() { 
+        List<Inventory> rawData = inventoryRepository.findAll();
+
+        List<String> uniqueTypes = new ArrayList();
+
+        for (Inventory inventory : rawData) {
+            if (!uniqueTypes.contains(inventory.getTypeInventory())) {
+                uniqueTypes.add(inventory.getTypeInventory());
+            }
+        }
+
+        return uniqueTypes;
     }
+
 
     @Override
     public int calculateNewQuantity(String inventory_id){

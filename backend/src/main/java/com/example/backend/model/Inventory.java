@@ -15,7 +15,7 @@ public class Inventory {
     private String nameInventory;
     private String typeInventoryDescription;
     private String status;
-    private int quantity;
+    private int quantity = 0;
     private int number_shelf;
     private int capacity_shelf;
 }

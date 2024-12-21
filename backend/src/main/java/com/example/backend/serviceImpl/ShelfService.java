@@ -29,11 +29,45 @@ public class ShelfService implements com.example.backend.service.ShelfService{
     }
     @Override
     public Shelf addShelf(Shelf shelf) throws Exception {
-        Shelf existingInventory = shelfRepository.findById(shelf.getId()).orElse(null);
-        if(existingInventory != null)
-            throw new Exception("Shelf is already exist");
-        else
-            return shelfRepository.save(shelf);
+        List<Shelf> shelfs = shelfRepository.findByproductId(shelf.getProductId());
+        Inventory inventory = inventoryRepository.findById(shelf.getInventoryid()).orElse(null);
+        if(inventory == null){
+            throw new Exception("Inventory no have");
+        }
+        else{
+            List<Shelf> shelfs_inventory = shelfRepository.findByinventoryid(shelf.getInventoryid());
+            if(shelfs_inventory.size() + 1 > inventory.getNumber_shelf()){
+                throw new Exception("Inventory không thể lưu thêm shelfs nữa");
+            }
+            
+            shelf.setCapacity(inventory.getCapacity_shelf());
+        }
+
+        if(shelfs == null){
+            if(shelf.getQuantity() <= inventory.getCapacity_shelf() && productRepository.findById(shelf.getProductId()).get().getInventory_quantity() >= shelf.getQuantity()){
+                inventory.setQuantity(shelf.getQuantity());
+                inventoryRepository.save(inventory);
+                return shelfRepository.save(shelf);
+            }
+            else {
+                throw new Exception("Product quantity is not sufficient");
+            }
+        }
+        else{
+            int totalQuantity = 0;
+            for(Shelf i : shelfs){
+                totalQuantity += i.getQuantity();
+            }
+            if(productRepository.findById(shelf.getProductId()).get().getInventory_quantity() - totalQuantity >= shelf.getQuantity() ){
+                
+                inventory.setQuantity(inventory.getQuantity() + shelf.getQuantity());
+                inventoryRepository.save(inventory);
+                return shelfRepository.save(shelf);
+            }
+            else {
+                throw new Exception("Product quantity is not sufficient");
+            }
+        }
     }
 
     @Override
@@ -41,10 +75,21 @@ public class ShelfService implements com.example.backend.service.ShelfService{
 
         Shelf existingShelf = shelfRepository.findById(shelfId).orElse(null);
         if (existingShelf != null) {
-            existingShelf.setInventoryid(updatedShelf.getInventoryid());
-            existingShelf.setProductId(updatedShelf.getProductId());
-            updatequantityShelf(shelfId,updatedShelf.getQuantity());
-            return shelfRepository.save(existingShelf);
+            List<Shelf> shelfs = shelfRepository.findByproductId(existingShelf.getProductId());
+            int totalQuantity = 0;
+            for(Shelf i : shelfs){
+                totalQuantity += i.getQuantity();
+            }
+            if(updatedShelf.getQuantity() <= existingShelf.getCapacity() &&productRepository.findById(updatedShelf.getProductId()).get().getInventory_quantity() - totalQuantity >= updatedShelf.getQuantity() ){
+                updatequantityShelf(shelfId,updatedShelf.getQuantity());
+                return shelfRepository.save(existingShelf);
+ 
+            }
+            else {
+                throw new Exception("Product quantity is not sufficient");
+            }
+            
+            
         } else {
             throw new Exception("Shelf with ID " + shelfId + " not found");
         }
@@ -52,6 +97,11 @@ public class ShelfService implements com.example.backend.service.ShelfService{
 
     @Override
     public void deleteShelf(String shelfId){
+        Inventory inventory = inventoryRepository.findById(shelfRepository.findById(shelfId).get().getInventoryid()).orElse(null);
+        if(inventory != null){
+            inventory.setQuantity(inventory.getQuantity()-shelfRepository.findById(shelfId).get().getQuantity());
+            inventoryRepository.save(inventory);
+        }
         shelfRepository.deleteById(shelfId);
     }
 
@@ -76,12 +126,11 @@ public class ShelfService implements com.example.backend.service.ShelfService{
         Shelf shelf = shelfRepository.findById(shelfId).orElse(null);
         if (shelf != null) {
             int totalQuantitybefore = shelf.getQuantity();
-            int totalQuantity = quantity + totalQuantitybefore;
-            shelf.setQuantity(totalQuantity);
+            shelf.setQuantity(quantity);
 
             Inventory inventory = inventoryRepository.findById(shelf.getInventoryid()).orElse(null);
             if(inventory != null){
-                int sub_quantity = totalQuantity - totalQuantitybefore;
+                int sub_quantity = quantity - totalQuantitybefore;
                 int quantity_inventory = inventory.getQuantity() + sub_quantity;
                 inventory.setQuantity(quantity_inventory);
                 inventoryRepository.save(inventory);
