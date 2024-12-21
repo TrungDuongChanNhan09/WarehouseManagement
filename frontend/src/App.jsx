@@ -1,5 +1,6 @@
 import React from "react";
 import './App.css'
+import './style.css'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 
 import Login from './Pages/Login/Login.jsx';
@@ -9,6 +10,8 @@ import Navbar from "./Component/Navbar/Navbar.jsx";
 import Inventory from "./Pages/Inventory/Inventory.jsx";
 import Category from "./Pages/Category/Category.jsx";
 import Product from "./Pages/Product/Product.jsx";
+import Employee from "./Pages/Employee/Employee.jsx";
+import Shelf from "./Pages/Shelf/Shelf.jsx";
 const App = () =>{
   return(
     <div className="App">
@@ -22,6 +25,8 @@ const App = () =>{
             <Route path='inventory' element={<Inventory/>}/>
             <Route path='category' element={<Category/>}/>
             <Route path='product' element={<Product/>}/>
+            <Route path='employee' element={<Employee/>}/>
+            <Route path='shelf' element={<Shelf/>}/>
           </Route>
         </Routes>
       </BrowserRouter>
