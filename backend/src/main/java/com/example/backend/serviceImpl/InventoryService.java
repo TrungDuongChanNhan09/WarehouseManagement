@@ -3,6 +3,7 @@ package com.example.backend.serviceImpl;
 import com.example.backend.model.Inventory;
 import com.example.backend.model.Shelf;
 import com.example.backend.repository.InventoryRepository;
+import com.example.backend.repository.ShelfRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,23 +17,24 @@ import java.util.stream.Collectors;
 public class InventoryService implements com.example.backend.service.InventoryService{
     @Autowired
     private InventoryRepository inventoryRepository;
-
+    @Autowired
+    private ShelfRepository shelfRepository;
     @Override
     public List<Inventory> getAllInventories(){
         return inventoryRepository.findAll();
     }
 
     @Override
-    public void addInventory(Inventory item) throws Exception {
-        Inventory existingInventory = inventoryRepository.findByinventoryName(item.getNameInventory());
+    public Inventory addInventory(Inventory item) throws Exception {
+        Inventory existingInventory = inventoryRepository.findBynameInventory(item.getNameInventory());
         if(existingInventory != null)
             throw new Exception("Inventory is already exist");
         else
-            inventoryRepository.save(item);
+            return inventoryRepository.save(item);
     }
 
     @Override
-    public void updateInventory(String inventoryId, Inventory updatedInventory) throws Exception {
+    public Inventory updateInventory(String inventoryId, Inventory updatedInventory) throws Exception {
         Inventory existingInventory = inventoryRepository.findById(inventoryId).orElse(null);
         if (existingInventory == null) {
             throw new Exception("Inventory not found");
@@ -40,22 +42,19 @@ public class InventoryService implements com.example.backend.service.InventorySe
         else{
             existingInventory.setNameInventory(updatedInventory.getNameInventory());
             existingInventory.setTypeInventory(updatedInventory.getTypeInventory());
-            existingInventory.setShelves(updatedInventory.getShelves());
-            existingInventory.setImportdate(updatedInventory.getImportdate());
-            existingInventory.setTypeInventoryDescription(updatedInventory.getTypeInventoryDescription());
-            this.inventoryRepository.save(existingInventory);
+            return this.inventoryRepository.save(existingInventory);
         }
     }
     
     @Override
-    public void updateInventoryQuantity(String inventoryId){
+    public Inventory updateInventoryQuantity(String inventoryId){
         Inventory inventory = inventoryRepository.findById(inventoryId)
         .orElseThrow(() -> new IllegalArgumentException("Inventory not found with id: " + inventoryId));
 
         int totalQuantity = calculateNewQuantity(inventoryId);
         inventory.setQuantity(totalQuantity);
 
-        inventoryRepository.save(inventory);
+        return inventoryRepository.save(inventory);
     }
     @Override
     public void deleteInventory(String inventoryId){
@@ -68,19 +67,14 @@ public class InventoryService implements com.example.backend.service.InventorySe
     }
 
     @Override
-    public boolean inventoryExists(String inventoryId){
-        return inventoryRepository.existsById(inventoryId);
-    }
-
-    @Override
-    public void updateInventoryStatus(String inventoryId, String status) throws Exception {
+    public Inventory updateInventoryStatus(String inventoryId, String status) throws Exception {
         Inventory existingInventory = inventoryRepository.findById(inventoryId).orElse(null);
         if(existingInventory == null){
             throw new Exception("Inventory not exists");
         }
         else{
             existingInventory.setStatus(status);
-            inventoryRepository.save(existingInventory);
+            return inventoryRepository.save(existingInventory);
         }
     }
 
@@ -121,7 +115,7 @@ public class InventoryService implements com.example.backend.service.InventorySe
 
     @Override
     public int calculateNewQuantity(String inventory_id){
-        List<Shelf> shelfs = inventoryRepository.findByInventoryId(inventory_id);
+        List<Shelf> shelfs = shelfRepository.findByinventoryid(inventory_id);
         int totalQuantity = 0;
         for (Shelf shelf : shelfs) {
             totalQuantity += shelf.getQuantity();

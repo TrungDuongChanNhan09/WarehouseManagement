@@ -7,12 +7,11 @@ import com.example.backend.model.Shelf;
 
 public interface ShelfService {
     List<Shelf> getShelvesByInventory(String inventoryId);
-    void addShelf(Shelf shelf) throws Exception;
-    void updateShelf(String shelfId, Shelf updatedShelf) throws Exception;
+    Shelf addShelf(Shelf shelf) throws Exception;
+    Shelf updateShelf(String shelfId, Shelf updatedShelf) throws Exception;
     void deleteShelf(String shelfId);
 
-    int calculateNewQuantity(Shelf shelf);
-    void updatequantityShelf(String shelfId);
+    void updatequantityShelf(String shelfId, int quantity);
 
     Optional<Shelf> getShelfById(String shelfId);
     boolean shelfExists(String shelfId);

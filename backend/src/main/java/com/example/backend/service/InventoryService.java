@@ -10,18 +10,16 @@ import com.example.backend.model.Shelf;
 
 public interface InventoryService {
     List<Inventory> getAllInventories();
-    void addInventory(Inventory item) throws Exception;
-    void updateInventory(String inventoryId, Inventory updatedInventory) throws Exception;
+    Inventory addInventory(Inventory item) throws Exception;
+    Inventory updateInventory(String inventoryId, Inventory updatedInventory) throws Exception;
     void deleteInventory(String inventoryId);
     Optional<Inventory> getInventoryById(String inventoryId);
-    boolean inventoryExists(String inventoryId);
-    void updateInventoryStatus(String inventoryId, String status) throws Exception;
-    void updateInventoryQuantity(String inventoryId);
+    Inventory updateInventoryStatus(String inventoryId, String status) throws Exception;
+    Inventory updateInventoryQuantity(String inventoryId);
 
     List<Inventory> filterInventoriesByType(String type);
     List<Inventory> searchInventoriesByName(String keyword);
 
-    //Page<Inventory> getInventoriesByWarehouse(String warehouseId, Pageable pageable);
     int getInventoryQuantity(String inventoryId);
     List<Inventory> getInventoriesByStatus(String status);
 
