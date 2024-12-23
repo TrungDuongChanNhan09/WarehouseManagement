@@ -1,0 +1,81 @@
+.employee-page {
+    padding: 20px;
+    background-color: #f9f9f9;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  
+    .body-employee {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+    }
+  
+    // Header Section
+    .header-employee {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%; 
+      gap: 15px;
+  
+      .search-bar {
+        min-width: 200px;
+        max-width: 300px;
+        flex-grow: 1;
+      }
+  
+      .add-employee-btn {
+        background-color: #243642 !important; 
+        color: white;
+        text-transform: none;
+  
+        &:hover {
+          background-color: #1e2f38; 
+        }
+      }
+    }
+  
+    .employee-table {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      width: 100%; 
+      box-sizing: border-box;
+  
+      table {
+        width: 100%;
+        border-collapse: collapse;
+  
+        th {
+          background-color: #629584; 
+          color: white;
+          padding: 12px;
+          text-align: left;
+          font-weight: bold;
+        }
+  
+        td {
+          padding: 12px;
+          border-bottom: 1px solid #ddd;
+          color: #333;
+        }
+  
+        tr:hover {
+          background-color: #eef5f2;
+        }
+      }
+  
+      .MuiIconButton-root {
+        margin-right: 8px;
+  
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
+  
