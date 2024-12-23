@@ -1,6 +1,7 @@
 package com.example.backend.service;
 
 import com.example.backend.model.Product;
+import com.example.backend.request.ProductRequest;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.Optional;
 
 public interface ProductService {
     List<Product> getAllProduct();
-    Product addProduct(Product product);
+    Product addProduct(ProductRequest product);
     Product updateProduct(String productId, Product product) throws Exception;
     List<Product> filterProductByCategory(String categoryName) throws Exception;
     Optional<Product> getProductById(String productId);

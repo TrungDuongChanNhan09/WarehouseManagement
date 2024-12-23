@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.model.ORDER_STATE;
 import com.example.backend.model.Order;
 import com.example.backend.model.User;
+import com.example.backend.request.OrderStateRequest;
 import com.example.backend.request.OrderStatusRequest;
 import com.example.backend.service.OrderService;
 import com.example.backend.service.ProductService;
@@ -31,9 +32,9 @@ public class AdminOrderController {
     }
 
     @PutMapping("/updateOrderStatus/{id}")
-    public ResponseEntity<Order> updateOrderStatus(@RequestHeader("Authorization") String jwt, @PathVariable String id, @RequestBody OrderStatusRequest state) throws Exception{
+    public ResponseEntity<Order> updateOrderState(@RequestHeader("Authorization") String jwt, @PathVariable String id, @RequestBody OrderStateRequest state) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
-        return new ResponseEntity<>(orderService.updateOrderStatus(state, id), HttpStatus.OK);
+        return new ResponseEntity<>(orderService.updateOrderState(state, id), HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteOrder/{id}")

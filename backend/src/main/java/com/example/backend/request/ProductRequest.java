@@ -1,19 +1,11 @@
-package com.example.backend.model;
+package com.example.backend.request;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
-
 @Data
-@Document(
-        "products"
-)
-public class Product {
-    @Id
-    private String id;
+public class ProductRequest {
     @Field("category_id")
     private String categoryId;
     @Field("supplier_id")
@@ -26,5 +18,4 @@ public class Product {
     private Date production_date;
     private Date expiration_date;
     private int price;
-    private PRODUCT_STATUS productStatus = PRODUCT_STATUS.IN_STOCK;
 }

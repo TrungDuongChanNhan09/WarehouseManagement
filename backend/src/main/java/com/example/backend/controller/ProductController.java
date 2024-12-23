@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Product;
 import com.example.backend.model.User;
+import com.example.backend.request.ProductRequest;
 import com.example.backend.service.ProductService;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class ProductController {
     private UserService userService;
 
     @PostMapping("")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String jwt) throws Exception{
+    public ResponseEntity<Product> createProduct(@RequestBody ProductRequest product, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.addProduct(product), HttpStatus.CREATED);
     }

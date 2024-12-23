@@ -2,6 +2,7 @@ package com.example.backend.serviceImpl;
 
 import com.example.backend.model.Category;
 import com.example.backend.repository.CategoryRepository;
+import com.example.backend.request.CategoryRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class CategoryService implements com.example.backend.service.CategoryServ
     }
 
     @Override
-    public Category createCategory(Category category) throws Exception {
+    public Category createCategory(CategoryRequest category) throws Exception {
         Category existingCategory = categoryRepository.findBycategoryName(category.getCategoryName());
         if(existingCategory != null){
             throw new Exception("Category is already exist");

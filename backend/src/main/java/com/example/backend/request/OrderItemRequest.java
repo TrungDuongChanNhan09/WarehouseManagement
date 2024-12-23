@@ -12,4 +12,5 @@ public class OrderItemRequest {
     private String delivery_Address;
     private Date created_at;
     private Date update_at;
+    private String orderCode;
 }
