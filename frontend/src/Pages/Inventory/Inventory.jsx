@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import './Inventory.css'
-import { Container, Stack, StepConnector, Button, TextField, Divider } from "@mui/material";
+import { Container, Stack, StepConnector, Button, TextField, Divider, Alert } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
 import {Typography} from "@mui/material";
 import InputBase from '@mui/material/InputBase';
@@ -14,11 +14,12 @@ import SortIcon from '@mui/icons-material/Sort';
 import Select from '@mui/material/Select';
 import AddIcon from '@mui/icons-material/Add';
 import Add from "@mui/icons-material/Add";
-import StickyHeadTable from "../../Hooks/TableInventory/TableInventory.jsx";
+import TableInventory from "../../Hooks/TableInventory/TableInventory.jsx";
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
+import ApiService from "../../Service/ApiService.jsx";
 
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -56,7 +57,7 @@ width: '100%',
 
 const style = {
     position: 'absolute',
-    top: '40%',
+    top: '47%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 650,
@@ -66,34 +67,54 @@ const style = {
 };
 
 
-const currencies = [
-    {
-      value: 'USD',
-      label: '$',
-    },
-    {
-      value: 'EUR',
-      label: '€',
-    },
-    {
-      value: 'BTC',
-      label: '฿',
-    },
-    {
-      value: 'JPY',
-      label: '¥',
-    },
-];
 
 const Inventory = () => {
     const [age, setAge] = React.useState('');
 
-    const handleChange = (event) => {
+    const handleChangeSearchFilter = (event) => {
         setAge(event.target.value);
     };
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [inventoryDetails, setInventoryDetails] = useState({
+        typeInventory: "",
+        nameInventory: "",
+        typeInventoryDescription: "",
+        status: "",
+        number_shelf: 0,
+        capacity_shelf: 0,
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setInventoryDetails(prevState => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
+
+    const handleAddInventory = async () => {
+        if (
+            !inventoryDetails.nameInventory || 
+            !inventoryDetails.typeInventory || 
+            !inventoryDetails.number_shelf || 
+            !inventoryDetails.status || 
+            !inventoryDetails.capacity_shelf || 
+            !inventoryDetails.typeInventoryDescription
+        ) {
+            console.error("Dữ liệu không đầy đủ");
+            return; // Không gửi yêu cầu nếu thiếu dữ liệu
+        }
+        
+        try {
+            const response = await ApiService.addInventory(inventoryDetails);
+            setOpen(false)
+            Alert("Thêm kho hàng thành công")
+        } catch (error) {
+            console.error("Lỗi khi thêm kho hàng:", error);
+        }
+    };
     return(
         <Container maxWidth="xl" className="Dashboard">
             <PrimarySearchAppBar/>
@@ -105,26 +126,24 @@ const Inventory = () => {
                             Quản lý kho hàng
                     </Typography>
                     <Stack direction={"row"} alignItems={"center"}>
-                        <Stack className="search-bar" direction={"row"} alignItems={"center"}>
-                            <Search>
-                                <StyledInputBase sx={{padding:"0.5rem"}}
-                                placeholder="Tìm kiêm"
-                                inputProps={{ 'aria-label': 'search' }}
-                                />
-                            </Search>
-                        </Stack>
+                        <Search>
+                            <StyledInputBase sx={{height:"50px"}}
+                            placeholder="Tìm kiếm"
+                            inputProps={{ 'aria-label': 'search' }}
+                            />
+                        </Search>
 
                         <Stack className="filter-bar" direction={"row"} alignItems={"center"}> 
-                            <FormControl sx={{width:"200px", marginLeft:"0.5rem", marginRight: "0.5rem"}}>
+                            <FormControl sx={{width:"170px", marginLeft:"0.5rem", marginRight: "0.5rem"}}>
                                 {/* <SortIcon/> */}
                                 <InputLabel id="demo-simple-select-label">Lọc theo</InputLabel>
                                 <Select
-                                sx={{backgroundColor:"white", border:"none"}}
+                                sx={{backgroundColor:"white"}}
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
                                     value={age}
                                     label="Age"
-                                    onChange={handleChange}
+                                    onChange={handleChangeSearchFilter}
                                 >
                                 <MenuItem value={10}>Lớn đến nhỏ</MenuItem>
                                 <MenuItem value={20}>Nhỏ đến lớn</MenuItem>
@@ -146,7 +165,7 @@ const Inventory = () => {
                 </Stack>
 
             </Stack>
-            <StickyHeadTable/>
+            <TableInventory/>
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
@@ -157,19 +176,62 @@ const Inventory = () => {
             >
                 <Fade in={open}>
                     <Box sx={style}>
-                        <Stack className="template-add-iventory" direction={"column"} alignItems={"center"}>
+                        {/* <Stack className="template-add-iventory" direction={"column"} alignItems={"center"}> */}
                             <Typography 
                                 sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"200px", marginBottom:"1rem"}} 
                                 variant="p">
                                     Thêm kho hàng
-
                             </Typography>
                             <Stack sx={{ marginTop:"0.5rem"}} className="body-infor" flexWrap="wrap" direction={"row"} alignItems={"center"}>
-                                <TextField sx={{margin:"1rem", width:"100%"}} id="outlined-basic" label="Tên kho hàng" variant="outlined" />
-                                <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Số kệ hàng" variant="outlined" />
-                                <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Trạng thái kho" variant="outlined" />
-                                <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Diện tích" variant="outlined" />
-                                <TextField
+                                <TextField 
+                                    sx={{margin:"1rem", width:"100%"}} 
+                                    id="outlined-basic" 
+                                    label="Tên kho hàng" 
+                                    variant="outlined"
+                                    name="nameInventory"
+                                    value={inventoryDetails.nameInventory}
+                                    onChange={handleChange}
+                                     />
+                                <TextField 
+                                    sx={{margin:"1rem", width:"100%"}} 
+                                    id="outlined-basic" 
+                                    label="Loại kho hàng" variant="outlined" 
+                                    name="typeInventory"
+                                    value={inventoryDetails.typeInventory}
+                                    onChange={handleChange}
+                                    />
+                                <TextField 
+                                    sx={{margin:"1rem", width:"43%"}} 
+                                    id="outlined-basic" label="Tổng số kệ" 
+                                    variant="outlined" 
+                                    name="number_shelf"
+                                    value={inventoryDetails.number_shelf}
+                                    onChange={handleChange}
+                                    />
+                                <TextField 
+                                    sx={{margin:"1rem", width:"43%"}} 
+                                    id="outlined-basic" label="Tình trạng" 
+                                    variant="outlined" 
+                                    name="status"
+                                    value={inventoryDetails.status}
+                                    onChange={handleChange}
+                                    />
+                                <TextField 
+                                    sx={{margin:"1rem", width:"43%"}} 
+                                    id="outlined-basic" 
+                                    label="Sức chứa" variant="outlined" 
+                                    name="capacity_shelf"
+                                    value={inventoryDetails.capacity_shelf}
+                                    onChange={handleChange}
+                                    />
+                                <TextField 
+                                    sx={{margin:"1rem", width:"100%"}} 
+                                    id="outlined-basic" label="Mô tả" variant="outlined" 
+                                    name="typeInventoryDescription"
+                                    value={inventoryDetails.typeInventoryDescription}
+                                    onChange={handleChange}
+                                    />
+                                {/* <TextField
                                     id="outlined-select-currency"
                                     select
                                     label="Phân loại kho"
@@ -182,15 +244,21 @@ const Inventory = () => {
                                         {option.label}
                                         </MenuItem>
                                     ))}
-                                    </TextField>
+                                    </TextField> */}
+                                
+                                
                             </Stack>
                             <Button 
+                                onClick={() => {
+                                    console.log("Nút Thêm kho hàng đã được nhấn");
+                                    handleAddInventory();
+                                }}
                                 className="btn-setting" 
                                 sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
                                 Thêm kho hàng
                             </Button>
 
-                        </Stack>
+                        {/* </Stack> */}
                     </Box>
                 </Fade>
             </Modal>
