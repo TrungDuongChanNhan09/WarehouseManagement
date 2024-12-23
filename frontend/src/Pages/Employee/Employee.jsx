@@ -33,7 +33,16 @@ const Employee = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openEditDialog, setOpenEditDialog] = useState(false);  // State for Edit Dialog
   const [newEmployee, setNewEmployee] = useState({
+    warehouseId: "",
+    userName: "",
+    email: "",
+    address: "",
+    image: "",
+    role: "",
+  });
+  const [editEmployee, setEditEmployee] = useState({
     warehouseId: "",
     userName: "",
     email: "",
@@ -67,6 +76,12 @@ const Employee = () => {
     setOpenDialog(false); // Close the dialog after adding employee
   };
 
+  const handleEditEmployee = () => {
+    // Logic to save the edited employee details
+    console.log(editEmployee);
+    setOpenEditDialog(false); // Close the edit dialog after saving changes
+  };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -77,6 +92,11 @@ const Employee = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleOpenEditDialog = (employee) => {
+    setEditEmployee(employee);
+    setOpenEditDialog(true);
   };
 
   return (
@@ -130,7 +150,7 @@ const Employee = () => {
                   <TableCell>{employee.address}</TableCell>
                   <TableCell>{employee.role}</TableCell>
                   <TableCell>
-                    <IconButton color="default">
+                    <IconButton color="default" onClick={() => handleOpenEditDialog(employee)}>
                       <Edit />
                     </IconButton>
                     <IconButton color="default">
@@ -222,6 +242,78 @@ const Employee = () => {
           </Button>
           <Button onClick={handleAddEmployee} color="primary">
             Thêm Nhân Viên
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Employee Dialog */}
+      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
+        <DialogTitle>Chỉnh Sửa Thông Tin Nhân Viên</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Mã Kho"
+            fullWidth
+            margin="normal"
+            value={editEmployee.warehouseId}
+            onChange={(e) => setEditEmployee({ ...editEmployee, warehouseId: e.target.value })}
+          />
+          <TextField
+            label="Tên"
+            fullWidth
+            margin="normal"
+            value={editEmployee.userName}
+            onChange={(e) => setEditEmployee({ ...editEmployee, userName: e.target.value })}
+          />
+          <TextField
+            label="Email"
+            fullWidth
+            margin="normal"
+            value={editEmployee.email}
+            onChange={(e) => setEditEmployee({ ...editEmployee, email: e.target.value })}
+          />
+          <TextField
+            label="Địa Chỉ"
+            fullWidth
+            margin="normal"
+            value={editEmployee.address}
+            onChange={(e) => setEditEmployee({ ...editEmployee, address: e.target.value })}
+          />
+          
+          {/* Role Selector */}
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Vai Trò</InputLabel>
+            <Select
+              value={editEmployee.role}
+              onChange={(e) => setEditEmployee({ ...editEmployee, role: e.target.value })}
+              label="Vai Trò"
+            >
+              <MenuItem value="ADMIN">ADMIN</MenuItem>
+              <MenuItem value="STAFF">STAFF</MenuItem>
+            </Select>
+          </FormControl>
+          
+          {/* Image Upload */}
+          <div style={{ marginTop: "1rem" }}>
+            <Typography variant="body2" color="textSecondary">
+              Tải ảnh đại diện lên:
+            </Typography>
+            {imagePreview && (
+              <img src={imagePreview} alt="preview" style={{ width: "100px", height: "100px", objectFit: "cover", marginTop: "1rem" }} />
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ marginTop: "1rem" }}
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditDialog(false)} color="default">
+            Hủy
+          </Button>
+          <Button onClick={handleEditEmployee} color="primary">
+            Lưu Thay Đổi
           </Button>
         </DialogActions>
       </Dialog>
