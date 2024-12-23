@@ -93,6 +93,29 @@ const Navbar = () => {
                                     },
                                 }}
                             />
+                             <BottomNavigationAction 
+                                showLabel={true} 
+                                label="Order"
+                                value="order"
+                                icon={<AssignmentIndOutlinedIcon />}
+                                onClick={() => navigate("/app/order")} 
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "flex-start", 
+                                    marginTop: "1rem",
+                                    fontSize: "24px",
+                                    padding: "0.5rem",
+                                    flexGrow: 1,
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px", 
+                                        marginRight: "10px", 
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px", 
+                                    },
+                                }}
+                            />
                             <BottomNavigationAction 
                                 showLabel={true} 
                                 label="Employee"

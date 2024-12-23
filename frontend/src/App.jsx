@@ -12,6 +12,7 @@ import Category from "./Pages/Category/Category.jsx";
 import Product from "./Pages/Product/Product.jsx";
 import Employee from "./Pages/Employee/Employee.jsx";
 import Shelf from "./Pages/Shelf/Shelf.jsx";
+import Order from "./Pages/Order/Order.jsx";
 const App = () =>{
   return(
     <div className="App">
@@ -22,6 +23,7 @@ const App = () =>{
           <Route path='login' element={<Login/>}/>
           <Route path='app' element={<Navbar/>}>
             <Route path='home' element={<DashBoard/>}/>
+            <Route path='order' element={<Order/>}/>
             <Route path='inventory' element={<Inventory/>}/>
             <Route path='category' element={<Category/>}/>
             <Route path='product' element={<Product/>}/>
