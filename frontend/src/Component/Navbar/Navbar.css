@@ -1,11 +1,11 @@
 @charset "UTF-8";
 .Navbar {
   margin-top: 6.5vh;
-  width: 240px;
+  width: 13vw;
+  max-width: 13vw;
+  min-width: 190px;
   border-right: 5px solid #F25D07;
   padding: 1rem;
-  width: 240px;
-  border-right: 1px solid #9AA6B2;
 }
 .Navbar .MuiBottomNavigationAction-root.Mui-selected {
   color: #ffffff !important; /* Đổi màu thành red hoặc màu khác */
@@ -15,6 +15,7 @@
 }
 .Navbar .logo {
   padding: 1rem;
+  margin-bottom: 1rem;
 }
 .Navbar .logo img {
   width: 50%;

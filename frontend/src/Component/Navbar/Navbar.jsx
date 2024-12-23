@@ -3,20 +3,16 @@ import "./Navbar.css";
 import { Stack, Button, Typography } from "@mui/material";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
-import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import AddIcon from '@mui/icons-material/Add';
-import SettingsIcon from '@mui/icons-material/Settings';
 import Logo from '../../assets/Logo.svg'
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CorporateFareOutlinedIcon from '@mui/icons-material/CorporateFareOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import SearchAppBar from "../AppBar/AppBar.jsx";
+import InputRoundedIcon from '@mui/icons-material/InputRounded';
 
 const Navbar = () => {
     const [value, setValue] = useState("dashboard");
@@ -39,7 +35,7 @@ const Navbar = () => {
 
     return (
         <>
-            <Stack className="Navbar">
+            <Stack className="Navbar" justifyContent={"space-between"}>
                 <Stack className="logo" alignItems={"center"}>
                     <img
                         src={Logo}
@@ -210,11 +206,35 @@ const Navbar = () => {
                                     },
                                 }}
                             />
+                            <BottomNavigationAction
+                                showLabel={true}
+                                label="Import Shipment"
+                                value="importshipment"
+                                icon={<InputRoundedIcon />}
+                                onClick={() => navigate("/app/importshipment")} 
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    flexGrow: 1,
+                                    justifyContent: "flex-start",
+                                    marginTop: "1rem",
+                                    padding: "0.5rem",
+                                    fontSize: "24px",
+                                    textAlign: "left",
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px",
+                                        marginRight: "10px",
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px", 
+                                    },
+                                }}
+                            />
                         </BottomNavigation>
                     </Stack>
                 
-                    <Button className="btn-setting" sx={{color: "#387478", background: "none", margin:"1rem"}} variant="contained">
-                        <HelpOutlineIcon sx={{color: "#387478", marginRight:"10px"}}/>
+                    <Button className="btn-help" sx={{color: "#F25D07", background: "none", margin:"0"}} variant="contained">
+                        <HelpOutlineIcon sx={{color: "#F25D07", marginRight:"5px"}}/>
                         Trợ giúp
                     </Button>
                 </Stack>

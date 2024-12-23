@@ -1,0 +1,14 @@
+.Product{
+    .product-bar{
+        .search-bar{
+            border: 2px solid gray;
+            border-radius: 10px;
+            .input-adornment{
+                margin: 0px;
+            }
+        }
+        .search-bar:focus-within{
+            border: 2px solid #F25D07;
+        }
+    }
+}

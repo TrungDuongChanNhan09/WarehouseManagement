@@ -1,0 +1,10 @@
+.ImportShipment .ImportShipment-bar .search-bar {
+  border: 2px solid gray;
+  border-radius: 10px;
+}
+.ImportShipment .ImportShipment-bar .search-bar .input-adornment {
+  margin: 0px;
+}
+.ImportShipment .ImportShipment-bar .search-bar:focus-within {
+  border: 2px solid #F25D07;
+}

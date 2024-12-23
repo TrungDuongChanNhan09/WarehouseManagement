@@ -21,7 +21,7 @@ const Layout = () => (
         component="main"
         sx={{
           flexGrow: 1,
-          p: 1,
+          width: '87vw',
           ml: '0',
           mt: '6.5vh',
           overflowY: "auto",
@@ -35,6 +35,7 @@ const Layout = () => (
 
 import Employee from "./Pages/Employee/Employee.jsx";
 import Shelf from "./Pages/Shelf/Shelf.jsx";
+import ImportShipment from "./Pages/ImportShipment/ImportShipment.jsx";
 const App = () =>{
   return(
     <div className="App">
@@ -51,6 +52,7 @@ const App = () =>{
             <Route path='product' element={<Product/>}/>
             <Route path='employee' element={<Employee/>}/>
             <Route path='shelf' element={<Shelf/>}/>
+            <Route path='importshipment' element={<ImportShipment/>}/>
           </Route>
         </Routes>
       </BrowserRouter>
