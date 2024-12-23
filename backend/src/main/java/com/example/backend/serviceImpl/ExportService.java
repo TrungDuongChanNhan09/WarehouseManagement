@@ -51,7 +51,7 @@ public class ExportService implements com.example.backend.service.ExportService 
             order.setOrderStatus(ORDER_STATUS.IN_EXPORT);
         }
 
-        return existingExport;
+        return exportRepository.save(existingExport);
     }
 
     @Override
