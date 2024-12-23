@@ -62,15 +62,6 @@ public class ShelfController {
     }
 
 
-    @GetMapping("/exists/{shelfId}")
-    public ResponseEntity<Boolean> shelfExists(@PathVariable String shelfId, @RequestHeader("Authorization") String jwt) throws Exception{
-        
-        User user = userService.findUserByJwtToken(jwt);
-        boolean exists = shelfService.shelfExists(shelfId);
-        return new ResponseEntity<>(exists, HttpStatus.OK);
-    }
-
-
     @GetMapping("/all")
     public ResponseEntity<List<Shelf>> getAllShelves(@RequestHeader("Authorization") String jwt) throws Exception{
         

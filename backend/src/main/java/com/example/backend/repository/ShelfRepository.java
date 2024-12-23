@@ -8,4 +8,5 @@ import com.example.backend.model.Shelf;
 
 public interface ShelfRepository extends MongoRepository<Shelf, String> {
     List<Shelf> findByinventoryid(String inventoryId);
+    List<Shelf> findByproductId(String productId);
 }

@@ -2,11 +2,8 @@ package com.example.backend.service;
 
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import java.util.Optional;
 import com.example.backend.model.Inventory;
-import com.example.backend.model.Shelf;
 
 public interface InventoryService {
     List<Inventory> getAllInventories();
