@@ -15,110 +15,216 @@ import {
   IconButton,
   TextField,
   TablePagination,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  FormHelperText,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import AppBarMenu from "../../Component/AppBar/AppBar";
+import AppBarMenu from "../../Component/AppBar/AppBar"; // Assuming this is the AppBar component
+
 const Employee = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5); 
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    warehouseId: "",
+    userName: "",
+    email: "",
+    address: "",
+    image: "",
+    role: "",
+  });
+  const [imagePreview, setImagePreview] = useState(null);
 
   const mockEmployees = [
-    { id: 1, name: "John Doe", gender: "Male", dob: "12/12/1998", phone: "0987654321", address: "New York" },
-    { id: 2, name: "Jane Smith", gender: "Female", dob: "01/01/2000", phone: "0987123456", address: "Los Angeles" },
-    { id: 3, name: "David Brown", gender: "Male", dob: "03/05/1995", phone: "0912345678", address: "Chicago" },
-    { id: 4, name: "Sarah Johnson", gender: "Female", dob: "06/10/1997", phone: "0945671234", address: "Houston" },
-    { id: 5, name: "Chris Lee", gender: "Male", dob: "09/07/1999", phone: "0967894321", address: "San Francisco" },
-    { id: 6, name: "Michael Scott", gender: "Male", dob: "05/12/1987", phone: "0912345678", address: "Scranton" },
-    { id: 7, name: "Pam Beesly", gender: "Female", dob: "12/12/1988", phone: "0987654321", address: "Scranton" },
-    { id: 8, name: "Dwight Schrute", gender: "Male", dob: "02/12/1980", phone: "0912345678", address: "Scranton" },
-    { id: 9, name: "Angela Martin", gender: "Female", dob: "06/01/1985", phone: "0967894321", address: "Scranton" },
-    { id: 10, name: "Ryan Howard", gender: "Male", dob: "01/01/1982", phone: "0912345678", address: "Scranton" },
+    { id: 1, userId: "1", warehouseId: "A1", email: "john@example.com", userName: "John Doe", address: "New York", image: "image_url", role: "ADMIN" },
+    // Add more mock employees here
   ];
+
   const filteredEmployees = mockEmployees.filter((emp) =>
-    emp.name.toLowerCase().includes(search.toLowerCase())
+    emp.userName.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); 
+    setPage(0); // Reset page to 0 when rows per page change
+  };
+
+  const handleAddEmployee = () => {
+    // Add new employee logic
+    console.log(newEmployee);
+    setOpenDialog(false); // Close the dialog after adding employee
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewEmployee({ ...newEmployee, image: file });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
     <Container maxWidth="xl" className="employee-page">
-      <Stack className="body-employee" spacing={3}>
-        {/* Header Section */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center" className="header-employee">
-          <Typography variant="h5" fontWeight="bold" color="#495E57">
-            Employee Management
-          </Typography>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <TextField
-              variant="outlined"
-              placeholder="Search..."
-              onChange={(e) => setSearch(e.target.value)}
-              size="small"
-              className="search-bar"
-            />
-            <Button variant="contained" className="add-employee-btn">
-              + Add Employee
-            </Button>
-          </Stack>
+      <AppBarMenu />
+      
+      {/* Employee Management Bar */}
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ backgroundColor: "#E2F1E7", padding: "1rem", borderRadius: "0.5rem", marginTop: "20px" }}>
+        <Typography variant="h6" fontWeight="bold" color="#495E57">
+          Quản Lý Nhân Viên
+        </Typography>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <TextField
+            variant="outlined"
+            placeholder="Tìm kiếm..."
+            onChange={(e) => setSearch(e.target.value)}
+            size="small"
+            className="search-bar"
+          />
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: "#243642", height: "50px", padding: "0 20px", fontWeight: "bold" }}
+            onClick={() => setOpenDialog(true)} // Open dialog to add new employee
+          >
+            + Thêm Nhân Viên
+          </Button>
         </Stack>
-
-        {/* Employee Table */}
-        <TableContainer component={Paper} className="employee-table">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Gender</TableCell>
-                <TableCell>Date of Birth</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>Address</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredEmployees
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((employee) => (
-                  <TableRow key={employee.id}>
-                    <TableCell>{employee.id}</TableCell>
-                    <TableCell>{employee.name}</TableCell>
-                    <TableCell>{employee.gender}</TableCell>
-                    <TableCell>{employee.dob}</TableCell>
-                    <TableCell>{employee.phone}</TableCell>
-                    <TableCell>{employee.address}</TableCell>
-                    <TableCell>
-                      <IconButton color="primary">
-                        <Edit />
-                      </IconButton>
-                      <IconButton color="error">
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {/* Pagination */}
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredEmployees.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </Stack>
+
+      {/* Employee Table */}
+      <TableContainer component={Paper} className="employee-table" sx={{ marginTop: "20px" }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Mã Kho</TableCell>
+              <TableCell>Tên</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Địa Chỉ</TableCell>
+              <TableCell>Vai Trò</TableCell>
+              <TableCell>Hành Động</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredEmployees
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((employee) => (
+                <TableRow key={employee.userId}>
+                  <TableCell>{employee.warehouseId}</TableCell>
+                  <TableCell>{employee.userName}</TableCell>
+                  <TableCell>{employee.email}</TableCell>
+                  <TableCell>{employee.address}</TableCell>
+                  <TableCell>{employee.role}</TableCell>
+                  <TableCell>
+                    <IconButton color="default">
+                      <Edit />
+                    </IconButton>
+                    <IconButton color="default">
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Pagination Section */}
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={filteredEmployees.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+
+      {/* Add Employee Dialog */}
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>Thêm Nhân Viên Mới</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Mã Kho"
+            fullWidth
+            margin="normal"
+            value={newEmployee.warehouseId}
+            onChange={(e) => setNewEmployee({ ...newEmployee, warehouseId: e.target.value })}
+          />
+          <TextField
+            label="Tên"
+            fullWidth
+            margin="normal"
+            value={newEmployee.userName}
+            onChange={(e) => setNewEmployee({ ...newEmployee, userName: e.target.value })}
+          />
+          <TextField
+            label="Email"
+            fullWidth
+            margin="normal"
+            value={newEmployee.email}
+            onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
+          />
+          <TextField
+            label="Địa Chỉ"
+            fullWidth
+            margin="normal"
+            value={newEmployee.address}
+            onChange={(e) => setNewEmployee({ ...newEmployee, address: e.target.value })}
+          />
+          
+          {/* Role Selector */}
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Vai Trò</InputLabel>
+            <Select
+              value={newEmployee.role}
+              onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
+              label="Vai Trò"
+            >
+              <MenuItem value="ADMIN">ADMIN</MenuItem>
+              <MenuItem value="STAFF">STAFF</MenuItem>
+            </Select>
+          </FormControl>
+          
+          {/* Image Upload */}
+          <div style={{ marginTop: "1rem" }}>
+            <Typography variant="body2" color="textSecondary">
+              Tải ảnh đại diện lên:
+            </Typography>
+            {imagePreview && (
+              <img src={imagePreview} alt="preview" style={{ width: "100px", height: "100px", objectFit: "cover", marginTop: "1rem" }} />
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ marginTop: "1rem" }}
+            />
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="default">
+            Hủy
+          </Button>
+          <Button onClick={handleAddEmployee} color="primary">
+            Thêm Nhân Viên
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
