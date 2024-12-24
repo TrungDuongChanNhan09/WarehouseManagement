@@ -4,6 +4,7 @@ import com.example.backend.model.Inventory;
 import com.example.backend.model.Shelf;
 import com.example.backend.repository.InventoryRepository;
 import com.example.backend.repository.ShelfRepository;
+import com.example.backend.service.ShelfService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,7 @@ public class InventoryService implements com.example.backend.service.InventorySe
     }
     @Override
     public void deleteInventory(String inventoryId){
+        
         inventoryRepository.deleteById(inventoryId);
     }
 
