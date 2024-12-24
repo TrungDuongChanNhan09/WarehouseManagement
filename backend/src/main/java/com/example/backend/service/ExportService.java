@@ -5,6 +5,7 @@ import com.example.backend.model.Export;
 import com.example.backend.request.ExportRequest;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 @Repository
 public interface ExportService {
@@ -15,4 +16,6 @@ public interface ExportService {
     List<Export> getAllExport();
     List<Export> getExportByState(EXPORT_STATE exportState);
     Export updateExportStatus(String id, EXPORT_STATE exportState) throws Exception;
+
+    List<Export> getExportByDateRange(LocalDate startDate, LocalDate endDate) throws Exception;
 }

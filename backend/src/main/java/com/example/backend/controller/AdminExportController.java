@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/admin/export")
 public class AdminExportController {
@@ -46,4 +49,9 @@ public class AdminExportController {
         return new ResponseEntity<>(exportService.updateExportStatus(id, stateRequest.getExportState()), HttpStatus.OK);
     }
 
+    @GetMapping("/getExportByDayRange")
+    public ResponseEntity<List<Export>> getExportByDateRange(@RequestHeader("Authorization") String jwt, @RequestParam LocalDate startDate, @RequestParam LocalDate endDate) throws Exception {
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(exportService.getExportByDateRange(startDate, endDate), HttpStatus.OK);
+    }
 }

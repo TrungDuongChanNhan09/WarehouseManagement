@@ -7,7 +7,9 @@ import com.example.backend.request.ExportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -20,7 +22,12 @@ public class ExportService implements com.example.backend.service.ExportService 
     @Override
     public Export createExport(ExportRequest export) {
         Export newExport = new Export();
-
+        LocalDate currentDate = LocalDate.now();
+        if(export.getCreated_at() == null)
+            newExport.setCreated_at(currentDate);
+        else if (export.getCreated_at().compareTo(currentDate) > 0) {
+            throw new IllegalArgumentException("Ngày nhập không được lớn hơn ngày hiện tại.");
+        }
         newExport.setCreated_at(export.getCreated_at());
         newExport.setOrderCode(export.getOrderCode());
         newExport.setOrderQuantity(export.getOrderCode().size());
@@ -40,7 +47,12 @@ public class ExportService implements com.example.backend.service.ExportService 
         if(existingExport == null){
             throw new Exception("Export not found");
         }
-
+        LocalDate currentDate = LocalDate.now();
+        if(export.getCreated_at() == null)
+            existingExport.setCreated_at(currentDate);
+        else if (export.getUpdated_at().compareTo(currentDate) > 0) {
+            throw new IllegalArgumentException("Ngày nhập không được lớn hơn ngày hiện tại.");
+        }
         existingExport.setExport_address(export.getExport_address());
         existingExport.setOrderCode(export.getOrderCode());
         existingExport.setOrderQuantity(export.getOrderCode().size());
@@ -49,6 +61,7 @@ public class ExportService implements com.example.backend.service.ExportService 
         for (String i : export.getOrderCode()){
             Order order = orderRepository.findByorderCode(i);
             order.setOrderStatus(ORDER_STATUS.IN_EXPORT);
+            orderRepository.save(order);
         }
 
         return exportRepository.save(existingExport);
@@ -99,5 +112,14 @@ public class ExportService implements com.example.backend.service.ExportService 
             }
         }
         return existingExport;
+    }
+
+    @Override
+    public List<Export> getExportByDateRange(LocalDate startDate, LocalDate endDate) throws Exception {
+        List<Export> importShipments = exportRepository.findByCreatedAtBetween(startDate, endDate);
+        if (importShipments == null || importShipments.isEmpty()) {
+            throw new Exception("No import shipments found for the given date range.");
+        }
+        return importShipments;
     }
 }
