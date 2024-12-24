@@ -24,11 +24,7 @@ public class AdminImportShipmentController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public ResponseEntity<List<ImportShipment>> getAllImportShipments(@RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        return ResponseEntity.ok(importShipmentService.getAllImportShipments());
-    }
+    
 
     @PostMapping("")
     public ResponseEntity<ImportShipment> createImportShipment(@RequestBody ImportShipment importShipment, @RequestHeader("Authorization") String jwt) throws Exception {

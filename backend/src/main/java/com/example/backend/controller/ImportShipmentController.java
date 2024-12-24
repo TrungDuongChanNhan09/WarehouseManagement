@@ -24,6 +24,13 @@ public class ImportShipmentController {
     @Autowired
     private UserService userService;
 
+
+    @GetMapping
+    public ResponseEntity<List<ImportShipment>> getAllImportShipments(@RequestHeader("Authorization") String jwt) throws Exception {
+        User user = userService.findUserByJwtToken(jwt);
+        return ResponseEntity.ok(importShipmentService.getAllImportShipments());
+    }
+    
     @GetMapping("/{id}")
     public ResponseEntity<ImportShipment> getImportShipmentById(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception  {
         User user = userService.findUserByJwtToken(jwt);

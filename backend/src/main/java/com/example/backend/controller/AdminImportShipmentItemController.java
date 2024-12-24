@@ -39,14 +39,6 @@ public class AdminImportShipmentItemController {
         return new ResponseEntity<>(importitem, HttpStatus.OK);
     }
 
-
-    @GetMapping
-    public ResponseEntity<List<ImportShipmentItem>> getAllImportShipmentItems(@RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        List<ImportShipmentItem> listitem = service.getAllImportShipmentItems();
-        return new ResponseEntity<>(listitem, HttpStatus.OK);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteImportShipmentItem(@PathVariable String id ,@RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJwtToken(jwt);
