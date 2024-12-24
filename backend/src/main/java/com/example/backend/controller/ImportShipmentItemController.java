@@ -25,40 +25,14 @@ public class ImportShipmentItemController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/admin")
-    public ResponseEntity<ImportShipmentItem> createImportShipmentItem(@RequestBody ImportShipmentItem item, @RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        ImportShipmentItem importitem = service.createImportShipmentItem(item);
-        return new ResponseEntity<>(importitem, HttpStatus.OK);
-    }
-
-    @PutMapping("/admin/{id}")
-    public ResponseEntity<ImportShipmentItem> updateImportShipmentItem(@PathVariable String id, @RequestBody ImportShipmentItem item,@RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        ImportShipmentItem importitem = service.updateImportShipmentItem(id, item);
-        return new ResponseEntity<>(importitem, HttpStatus.OK);
-    }
-
+    
     @GetMapping("/{id}")
     public ResponseEntity<ImportShipmentItem> getImportShipmentItem(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJwtToken(jwt);
-        service.deleteImportShipmentItem(id);
+        service.getImportShipmentItemById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping
-    public ResponseEntity<List<ImportShipmentItem>> getAllImportShipmentItems(@RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        List<ImportShipmentItem> listitem = service.getAllImportShipmentItems();
-        return new ResponseEntity<>(listitem, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/admin/{id}")
-    public ResponseEntity<Void> deleteImportShipmentItem(@PathVariable String id ,@RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        service.deleteImportShipmentItem(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
     @GetMapping("/search")
     public ResponseEntity<List<ImportShipmentItem>> searchImportShipmentItems(@RequestParam String productName, @RequestHeader("Authorization") String jwt) throws Exception {
         

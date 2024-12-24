@@ -24,12 +24,6 @@ public class ImportShipmentController {
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public ResponseEntity<List<ImportShipment>> getAllImportShipments(@RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        return ResponseEntity.ok(importShipmentService.getAllImportShipments());
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ImportShipment> getImportShipmentById(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception  {
         User user = userService.findUserByJwtToken(jwt);
@@ -45,24 +39,6 @@ public class ImportShipmentController {
         return ResponseEntity.ok(items);
     }
 
-    @PostMapping("/admin")
-    public ResponseEntity<ImportShipment> createImportShipment(@RequestBody ImportShipment importShipment, @RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        return ResponseEntity.ok(importShipmentService.createImportShipment(importShipment));
-    }
-
-    @PutMapping("/admin/{id}")
-    public ResponseEntity<ImportShipment> updateImportShipment(@PathVariable String id, @RequestBody ImportShipment updatedShipment, @RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        return ResponseEntity.ok(importShipmentService.updateImportShipment(id, updatedShipment));
-    }
-
-    @DeleteMapping("/admin/{id}")
-    public ResponseEntity<Void> deleteImportShipment(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        importShipmentService.deleteImportShipment(id);
-        return ResponseEntity.noContent().build();
-    }
     @GetMapping("/{importShipmentId}/total-cost")
     public ResponseEntity<BigDecimal> getImportShipmentTotalCost(
             @PathVariable String importShipmentId,
