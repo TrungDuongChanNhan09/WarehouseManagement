@@ -4,17 +4,15 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 
 @Data
-public class Export {
+public class Report {
     @Id
     private String id;
-    private List<String> orderCode;
-    private int orderQuantity;
-    private EXPORT_STATE exportState = EXPORT_STATE.PENDING;
-    private String export_address;
+    private String userName;
+    private String title;
+    private String description;
     private LocalDate createdAt;
     private LocalDate updatedAt;
+    private REPORT_PRIORITY reportPriority;
 }

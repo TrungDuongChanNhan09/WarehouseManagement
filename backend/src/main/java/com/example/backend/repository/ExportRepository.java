@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ExportRepository extends MongoRepository<Export, String> {
-    List<Export> findByCreatedAtBetween(LocalDate startDate, LocalDate endDate);
+    List<Export> findBycreatedAtBetween(LocalDate startDate, LocalDate endDate);
 }

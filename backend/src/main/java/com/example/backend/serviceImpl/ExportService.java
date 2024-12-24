@@ -24,11 +24,11 @@ public class ExportService implements com.example.backend.service.ExportService 
         Export newExport = new Export();
         LocalDate currentDate = LocalDate.now();
         if(export.getCreated_at() == null)
-            newExport.setCreated_at(currentDate);
+            newExport.setCreatedAt(currentDate);
         else if (export.getCreated_at().compareTo(currentDate) > 0) {
             throw new IllegalArgumentException("Ngày nhập không được lớn hơn ngày hiện tại.");
         }
-        newExport.setCreated_at(export.getCreated_at());
+        newExport.setCreatedAt(export.getCreated_at());
         newExport.setOrderCode(export.getOrderCode());
         newExport.setOrderQuantity(export.getOrderCode().size());
         newExport.setExport_address(export.getExport_address());
@@ -49,14 +49,14 @@ public class ExportService implements com.example.backend.service.ExportService 
         }
         LocalDate currentDate = LocalDate.now();
         if(export.getCreated_at() == null)
-            existingExport.setCreated_at(currentDate);
+            existingExport.setCreatedAt(currentDate);
         else if (export.getUpdated_at().compareTo(currentDate) > 0) {
             throw new IllegalArgumentException("Ngày nhập không được lớn hơn ngày hiện tại.");
         }
         existingExport.setExport_address(export.getExport_address());
         existingExport.setOrderCode(export.getOrderCode());
         existingExport.setOrderQuantity(export.getOrderCode().size());
-        existingExport.setUpdated_at(export.getUpdated_at());
+        existingExport.setUpdatedAt(export.getUpdated_at());
 
         for (String i : export.getOrderCode()){
             Order order = orderRepository.findByorderCode(i);
@@ -116,7 +116,7 @@ public class ExportService implements com.example.backend.service.ExportService 
 
     @Override
     public List<Export> getExportByDateRange(LocalDate startDate, LocalDate endDate) throws Exception {
-        List<Export> importShipments = exportRepository.findByCreatedAtBetween(startDate, endDate);
+        List<Export> importShipments = exportRepository.findBycreatedAtBetween(startDate, endDate);
         if (importShipments == null || importShipments.isEmpty()) {
             throw new Exception("No import shipments found for the given date range.");
         }
