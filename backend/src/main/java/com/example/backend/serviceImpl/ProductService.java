@@ -8,6 +8,7 @@ import com.example.backend.serviceImpl.ShelfService;
 import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.repository.SupplierRepository;
+import com.example.backend.request.ProductRequest;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -34,7 +35,7 @@ public class ProductService implements com.example.backend.service.ProductServic
     }
 
     @Override
-    public Product addProduct(Product product) {
+    public Product addProduct(ProductRequest product) {
         Product existingProduct = this.productRepository.findByproductName(product.getProductName());
         if(existingProduct != null) {
             existingProduct.setInventory_quantity(existingProduct.getInventory_quantity() + product.getInventory_quantity());
@@ -42,6 +43,7 @@ public class ProductService implements com.example.backend.service.ProductServic
         }
 
         Product newProduct = new Product();
+
         newProduct.setProductName(product.getProductName());
         newProduct.setProduction_date(product.getProduction_date());
         newProduct.setUnit(product.getUnit());
@@ -114,12 +116,12 @@ public class ProductService implements com.example.backend.service.ProductServic
 
     @Override
     public List<Product> searchProductByName(String productName) {
-        Product product = new Product();
-        product.setProductName(productName);
-        ExampleMatcher matcher = ExampleMatcher.matchingAny()
-                .withMatcher("productName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-        Example<Product> example = Example.of(product, matcher);
-        return this.productRepository.findAll(example);
+//        Product product = new Product();
+//        product.setProductName(productName);
+//        ExampleMatcher matcher = ExampleMatcher.matchingAny()
+//                .withMatcher("productName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+//        Example<Product> example = Example.of(product, matcher);
+        return this.productRepository.searchByProductName(productName);
     }
 
     @Override

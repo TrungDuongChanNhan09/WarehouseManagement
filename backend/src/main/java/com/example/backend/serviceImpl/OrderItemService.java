@@ -2,6 +2,7 @@ package com.example.backend.serviceImpl;
 
 import com.example.backend.model.ORDER_ITEM_STATE;
 import com.example.backend.model.OrderItem;
+import com.example.backend.model.PRODUCT_STATUS;
 import com.example.backend.model.Product;
 import com.example.backend.repository.OrderItemRepository;
 import com.example.backend.repository.ProductRepository;
@@ -20,6 +21,9 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @Override
     public OrderItem createOrderItem(OrderItem orderItem) throws Exception {
@@ -45,7 +49,10 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
 
         //check if product quantity in inventory equal with orderItem
         if(existProduct.get().getInventory_quantity() == orderItem.getQuantity()){
-            productService.deleteProductById(orderItem.getProduct_id());
+            existProduct.get().setInventory_quantity(0);
+            Optional<Product> product = productService.getProductById(orderItem.getProduct_id());
+            existProduct.get().setProductStatus(PRODUCT_STATUS.OUT_STOCK);
+            productRepository.save(existProduct.get());
         } else {
             existProduct.get().setInventory_quantity(existProduct.get().getInventory_quantity() - orderItem.getQuantity());
             productService.updateProduct(existProduct.get().getId(), existProduct.get());
@@ -75,7 +82,10 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
 
         //check if product quantity in inventory equal with orderItem
         if(existProduct.get().getInventory_quantity() == orderItem.getQuantity()){
-            productService.deleteProductById(orderItem.getProduct_id());
+            existProduct.get().setInventory_quantity(0);
+            Optional<Product> product = productService.getProductById(orderItem.getProduct_id());
+            existProduct.get().setProductStatus(PRODUCT_STATUS.OUT_STOCK);
+            productRepository.save(existProduct.get());
         } else {
             existProduct.get().setInventory_quantity(existProduct.get().getInventory_quantity() - orderItem.getQuantity());
             productService.updateProduct(existProduct.get().getId(), existProduct.get());

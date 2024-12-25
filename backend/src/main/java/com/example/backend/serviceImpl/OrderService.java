@@ -4,12 +4,14 @@ import com.example.backend.model.*;
 import com.example.backend.repository.OrderItemRepository;
 import com.example.backend.repository.OrderRepository;
 import com.example.backend.request.OrderItemRequest;
+import com.example.backend.request.OrderStateRequest;
 import com.example.backend.request.OrderStatusRequest;
 import com.example.backend.service.ProductService;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,14 +35,15 @@ public class OrderService implements com.example.backend.service.OrderService {
     @Override
     public Order createOrder(OrderItemRequest order, String jwt) throws Exception {
         User user = userService.findUserByJwtToken(jwt);
+        Order existingOrder = orderRepository.findByorderCode(order.getOrderCode());
+        if(existingOrder != null){
+            throw new Exception("Order code is already used");
+        }
         Order newOrder = new Order();
-
         newOrder.setCreated_at(order.getCreated_at());
         newOrder.setDelivery_Address(order.getDelivery_Address());
         newOrder.setOrderItem_code(order.getOrderItem_code());
-
         newOrder.setUserId(user.getId());
-
         newOrder.setOrderItem_quantity(order.getOrderItem_code().size());
         int totalPrice = 0;
         for(String orderItemCode : order.getOrderItem_code()){
@@ -50,6 +53,7 @@ public class OrderService implements com.example.backend.service.OrderService {
             orderItemRepository.save(orderItem);
         }
         newOrder.setOrderPrice(totalPrice);
+        newOrder.setOrderCode(order.getOrderCode());
         return orderRepository.save(newOrder);
     }
 
@@ -63,6 +67,7 @@ public class OrderService implements com.example.backend.service.OrderService {
         if(existingOrder.getOrderState() == ORDER_STATE.ON_GOING || existingOrder.getOrderState() == ORDER_STATE.DELIVERED){
             throw new Exception("Cannot update order");
         }
+
         existingOrder.setUpdate_at(order.getUpdate_at());
         existingOrder.setDelivery_Address(order.getDelivery_Address());
         existingOrder.setOrderItem_code(order.getOrderItem_code());
@@ -99,18 +104,18 @@ public class OrderService implements com.example.backend.service.OrderService {
     }
 
     @Override
-    public Order updateOrderStatus(OrderStatusRequest state, String orderId) throws Exception {
+    public Order updateOrderState(OrderStateRequest state, String orderId) throws Exception {
         Order existingOrder = orderRepository.findById(orderId).orElse(null);
         if(existingOrder == null){
             throw new Exception("Order not found");
         }
 
-        if(existingOrder.getOrderState() == ORDER_STATE.ON_GOING || existingOrder.getOrderState() == ORDER_STATE.DELIVERED){
+        if(existingOrder.getOrderState() == ORDER_STATE.DELIVERED){
             throw new Exception("Cannot update order");
         }
 
         existingOrder.setOrderState(state.getState());
-        if(state.getState() == ORDER_STATE.ON_GOING || state.getState() == ORDER_STATE.DELIVERED){
+        if(state.getState() == ORDER_STATE.DELIVERED){
             for (String orderItemCode : existingOrder.getOrderItem_code()){
                 orderItemRepository.deleteByorderItemCode(orderItemCode);
             }
@@ -120,7 +125,63 @@ public class OrderService implements com.example.backend.service.OrderService {
                 orderItem.setOrderItemState(ORDER_ITEM_STATE.OUT_ORDER);
                 orderItemRepository.save(orderItem);
             }
+            existingOrder.setOrderStatus(ORDER_STATUS.OUT_EXPORT);
         }
         return orderRepository.save(existingOrder);
+    }
+
+    @Override
+    public List<Order> getOrderByState(ORDER_STATE orderState) {
+        List<Order> orders = new ArrayList<>();
+        for(Order order : orderRepository.findAll()){
+            if(order.getOrderState() == orderState){
+                orders.add(order);
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public List<Order> getOrderByStatus(ORDER_STATUS orderStatus) {
+        List<Order> orders = new ArrayList<>();
+        for(Order order : orderRepository.findAll()){
+            if(order.getOrderStatus() == orderStatus){
+                orders.add(order);
+            }
+        }
+        return orders;
+    }
+
+    @Override
+    public List<Integer> getOrderQuantity() {
+        int on_pending = 0;
+        int confirmed = 0;
+        int delivered = 0;
+        int on_going = 0;
+        int cancel = 0;
+        for(Order order : orderRepository.findAll()){
+            if(order.getOrderState() == ORDER_STATE.ON_GOING){
+                on_going += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.DELIVERED){
+                delivered += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.CANCELLED){
+                cancel += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.PENDING){
+                on_pending += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.CONFIRMED){
+                confirmed += 1;
+            }
+        }
+        List<Integer> quantity = new ArrayList<>();
+        quantity.add(on_going);
+        quantity.add(delivered);
+        quantity.add(cancel);
+        quantity.add(on_pending);
+        quantity.add(confirmed);
+        return quantity;
     }
 }
