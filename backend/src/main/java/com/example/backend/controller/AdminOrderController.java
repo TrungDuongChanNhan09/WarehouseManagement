@@ -43,4 +43,10 @@ public class AdminOrderController {
         orderService.deleteOrder(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/getOrderQuantity")
+    public ResponseEntity<List<Integer>> getOrderQuantity(@RequestHeader("Authorization") String jwt) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(orderService.getOrderQuantity(), HttpStatus.OK);
+    }
 }

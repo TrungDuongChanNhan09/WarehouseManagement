@@ -151,4 +151,37 @@ public class OrderService implements com.example.backend.service.OrderService {
         }
         return orders;
     }
+
+    @Override
+    public List<Integer> getOrderQuantity() {
+        int on_pending = 0;
+        int confirmed = 0;
+        int delivered = 0;
+        int on_going = 0;
+        int cancel = 0;
+        for(Order order : orderRepository.findAll()){
+            if(order.getOrderState() == ORDER_STATE.ON_GOING){
+                on_going += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.DELIVERED){
+                delivered += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.CANCELLED){
+                cancel += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.PENDING){
+                on_pending += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.CONFIRMED){
+                confirmed += 1;
+            }
+        }
+        List<Integer> quantity = new ArrayList<>();
+        quantity.add(on_going);
+        quantity.add(delivered);
+        quantity.add(cancel);
+        quantity.add(on_pending);
+        quantity.add(confirmed);
+        return quantity;
+    }
 }
