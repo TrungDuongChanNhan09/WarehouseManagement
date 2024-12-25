@@ -1,6 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Paper,
+  Modal,
+  Fade,
+  TextField,
+  Box,
+  Typography,
+  Stack,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -13,58 +20,50 @@ import {
   IconButton,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import ApiService from "../../Service/ApiService";
 
 const columns = [
   { id: "id", label: "ID", minWidth: 30 },
-  { id: "name", label: "Tên kho hàng", minWidth: 170 },
-  { id: "code", label: "Trạng thái", minWidth: 100 },
-  {
-    id: "population",
-    label: "Tổng sản phẩm",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "size",
-    label: "Diện tích\u00a0(km\u00b2)",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toLocaleString("en-US"),
-  },
-  {
-    id: "density",
-    label: "Tổng số kệ",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toFixed(2),
-  },
+  { id: "nameInventory", label: "Tên kho hàng", maxWidth: 140 },
+  { id: "typeInventory", label: "Loại kho hàng", maxWidth: 140 },
+  { id: "status", label: "Tình trạng", minWidth: 140 },
+  { id: "quantity", label: "Hàng tồn kho (sản phẩm)", minWidth: 140 },
+  { id: "number_shelf", label: "Tổng số kệ", maxWidth: 150 },
+  { id: "capacity_shelf", label: "Sức chứa (sản phẩm)", maxWidth: 100 },
 ];
 
-function createData(id, name, code, population, size) {
-  const density = population / size;
-  return { id, name, code, population, size, density };
-}
+const style = {
+  position: "absolute",
+  top: "47%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 650,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+};
 
-const rows = [
-  createData(1, "India", "IN", 1324171354, 3287263),
-  createData(2, "China", "CN", 1403500365, 9596961),
-  createData(3, "Italy", "IT", 60483973, 301340),
-  createData(4, "United States", "US", 327167434, 9833520),
-  createData(5, "Canada", "CA", 37602103, 9984670),
-  createData(6, "Canada", "CA", 37602103, 9984670),
-  createData(7, "Canada", "CA", 37602103, 9984670),
-  createData(8, "Canada", "CA", 37602103, 9984670),
-  createData(9, "Canada", "CA", 37602103, 9984670),
-  createData(10, "Canada", "CA", 37602103, 9984670),
-];
-
-export default function EnhancedTable() {
+const TableInventory = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [inventorys, setInventorys] = useState([]);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editData, setEditData] = useState({});
 
-  const [anchorEl, setAnchorEl] = useState(null); // Anchor for menu
-  const [selectedRow, setSelectedRow] = useState(null); // Selected row
+  const fetchInventorys = async () => {
+    try {
+      const response = await ApiService.getAllInventory();
+      setInventorys(response);
+    } catch (error) {
+      console.error("Lỗi khi tải thông tin các Inventory", error.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchInventorys();
+  }, []);
 
   const handleOpenMenu = (event, row) => {
     setAnchorEl(event.currentTarget);
@@ -77,13 +76,41 @@ export default function EnhancedTable() {
   };
 
   const handleUpdate = () => {
-    console.log("Cập nhật:", selectedRow);
+    if (selectedRow) {
+      setEditData(selectedRow);
+      setIsEditModalOpen(true);
+    }
     handleCloseMenu();
   };
 
-  const handleDelete = () => {
-    console.log("Xóa:", selectedRow);
-    handleCloseMenu();
+  const handleSaveUpdate = async () => {
+    try {
+      await ApiService.updateInventory(editData.id, editData);
+      alert("Cập nhật thành công!");
+      setInventorys((prev) =>
+        prev.map((item) => (item.id === editData.id ? editData : item))
+      );
+      setIsEditModalOpen(false);
+    } catch (error) {
+      alert("Lỗi khi cập nhật kho hàng!");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (selectedRow && selectedRow.id) {
+      const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa kho hàng "${selectedRow.nameInventory}"?`);
+      if (confirmDelete) {
+        try {
+          await ApiService.deleteInventory(selectedRow.id);
+          alert("Kho hàng đã được xóa thành công!");
+          setInventorys((prev) => prev.filter((item) => item.id !== selectedRow.id));
+        } catch (error) {
+          alert("Lỗi khi xóa kho hàng. Vui lòng thử lại.");
+        } finally {
+          handleCloseMenu();
+        }
+      }
+    }
   };
 
   const handleChangePage = (event, newPage) => {
@@ -102,31 +129,21 @@ export default function EnhancedTable() {
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  style={{ minWidth: column.minWidth }}
-                >
+                <TableCell key={column.id} style={{ minWidth: column.minWidth }}>
                   {column.label}
                 </TableCell>
               ))}
-              <TableCell align="center">Actions</TableCell>
+              <TableCell align="center">Tùy chọn</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows
+            {inventorys
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
                   {columns.map((column) => {
                     const value = row[column.id];
-                    return (
-                      <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === "number"
-                          ? column.format(value)
-                          : value}
-                      </TableCell>
-                    );
+                    return <TableCell key={column.id}>{value}</TableCell>;
                   })}
                   <TableCell align="center">
                     <IconButton onClick={(event) => handleOpenMenu(event, row)}>
@@ -141,22 +158,57 @@ export default function EnhancedTable() {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={rows.length}
+        count={inventorys.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-
-      {/* Menu for actions */}
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-      >
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
         <MenuItem onClick={handleUpdate}>Cập nhật</MenuItem>
         <MenuItem onClick={handleDelete}>Xóa</MenuItem>
       </Menu>
+      <Modal open={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+        <Fade in={isEditModalOpen}>
+          <Box sx={style}>
+            <Typography sx={{ fontWeight: "bold", fontSize: "20px", marginBottom: "1rem" }}>
+              Cập nhật kho hàng
+            </Typography>
+            <Stack spacing={2}>
+              <TextField
+                label="Tên kho hàng"
+                value={editData.nameInventory || ""}
+                onChange={(e) => setEditData({ ...editData, nameInventory: e.target.value })}
+              />
+              <TextField
+                label="Loại kho hàng"
+                value={editData.typeInventory || ""}
+                onChange={(e) => setEditData({ ...editData, typeInventory: e.target.value })}
+              />
+              <TextField
+                label="Tình trạng"
+                value={editData.status || ""}
+                onChange={(e) => setEditData({ ...editData, status: e.target.value })}
+              />
+              <TextField
+                label="Tổng số kệ"
+                value={editData.number_shelf || ""}
+                onChange={(e) => setEditData({ ...editData, number_shelf: e.target.value })}
+              />
+              <TextField
+                label="Sức chứa sản phẩm"
+                value={editData.capacity_shelf || ""}
+                onChange={(e) => setEditData({ ...editData, capacity_shelf: e.target.value })}
+              />
+              <Button variant="contained" onClick={handleSaveUpdate}>
+                Lưu
+              </Button>
+            </Stack>
+          </Box>
+        </Fade>
+      </Modal>
     </Paper>
   );
-}
+};
+
+export default TableInventory;
