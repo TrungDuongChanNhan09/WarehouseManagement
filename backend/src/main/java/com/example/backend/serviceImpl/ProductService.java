@@ -114,12 +114,12 @@ public class ProductService implements com.example.backend.service.ProductServic
 
     @Override
     public List<Product> searchProductByName(String productName) {
-        Product product = new Product();
-        product.setProductName(productName);
-        ExampleMatcher matcher = ExampleMatcher.matchingAny()
-                .withMatcher("productName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-        Example<Product> example = Example.of(product, matcher);
-        return this.productRepository.findAll(example);
+//        Product product = new Product();
+//        product.setProductName(productName);
+//        ExampleMatcher matcher = ExampleMatcher.matchingAny()
+//                .withMatcher("productName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+//        Example<Product> example = Example.of(product, matcher);
+        return this.productRepository.searchByProductName(productName);
     }
 
     @Override
