@@ -23,18 +23,18 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
-  FormHelperText,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import AppBarMenu from "../../Component/AppBar/AppBar"; // Assuming this is the AppBar component
+import AppBarMenu from "../../Component/AppBar/AppBar";
 
 const Employee = () => {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openDialog, setOpenDialog] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);  // State for Edit Dialog
+  const [openEditDialog, setOpenEditDialog] = useState(false);
   const [newEmployee, setNewEmployee] = useState({
+    employeeId: "",
     warehouseId: "",
     userName: "",
     email: "",
@@ -43,6 +43,7 @@ const Employee = () => {
     role: "",
   });
   const [editEmployee, setEditEmployee] = useState({
+    employeeId: "",
     warehouseId: "",
     userName: "",
     email: "",
@@ -51,10 +52,18 @@ const Employee = () => {
     role: "",
   });
   const [imagePreview, setImagePreview] = useState(null);
+  const [editImagePreview, setEditImagePreview] = useState(null);
 
   const mockEmployees = [
-    { id: 1, userId: "1", warehouseId: "A1", email: "john@example.com", userName: "John Doe", address: "New York", image: "image_url", role: "ADMIN" },
-    // Add more mock employees here
+    {
+      id: 1,
+      employeeId: "NV001",
+      warehouseId: "A1",
+      email: "john@example.com",
+      userName: "John Doe",
+      address: "New York",
+      role: "ADMIN",
+    },
   ];
 
   const filteredEmployees = mockEmployees.filter((emp) =>
@@ -67,28 +76,26 @@ const Employee = () => {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Reset page to 0 when rows per page change
+    setPage(0);
   };
 
   const handleAddEmployee = () => {
-    // Add new employee logic
     console.log(newEmployee);
-    setOpenDialog(false); // Close the dialog after adding employee
+    setOpenDialog(false);
   };
 
   const handleEditEmployee = () => {
-    // Logic to save the edited employee details
     console.log(editEmployee);
-    setOpenEditDialog(false); // Close the edit dialog after saving changes
+    setOpenEditDialog(false);
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (e, setEmployee, setPreview) => {
     const file = e.target.files[0];
     if (file) {
-      setNewEmployee({ ...newEmployee, image: file });
+      setEmployee((prev) => ({ ...prev, image: file }));
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
+        setPreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -96,15 +103,26 @@ const Employee = () => {
 
   const handleOpenEditDialog = (employee) => {
     setEditEmployee(employee);
+    setEditImagePreview(employee.image || null);
     setOpenEditDialog(true);
   };
 
   return (
     <Container maxWidth="xl" className="employee-page">
       <AppBarMenu />
-      
+
       {/* Employee Management Bar */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ backgroundColor: "#E2F1E7", padding: "1rem", borderRadius: "0.5rem", marginTop: "20px" }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{
+          backgroundColor: "#E2F1E7",
+          padding: "1rem",
+          borderRadius: "0.5rem",
+          marginTop: "20px",
+        }}
+      >
         <Typography variant="h6" fontWeight="bold" color="#495E57">
           Quản Lý Nhân Viên
         </Typography>
@@ -118,8 +136,13 @@ const Employee = () => {
           />
           <Button
             variant="contained"
-            sx={{ backgroundColor: "#243642", height: "50px", padding: "0 20px", fontWeight: "bold" }}
-            onClick={() => setOpenDialog(true)} // Open dialog to add new employee
+            sx={{
+              backgroundColor: "#243642",
+              height: "50px",
+              padding: "0 20px",
+              fontWeight: "bold",
+            }}
+            onClick={() => setOpenDialog(true)}
           >
             + Thêm Nhân Viên
           </Button>
@@ -127,10 +150,15 @@ const Employee = () => {
       </Stack>
 
       {/* Employee Table */}
-      <TableContainer component={Paper} className="employee-table" sx={{ marginTop: "20px" }}>
+      <TableContainer
+        component={Paper}
+        className="employee-table"
+        sx={{ marginTop: "20px" }}
+      >
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell>Mã Nhân Viên</TableCell>
               <TableCell>Mã Kho</TableCell>
               <TableCell>Tên</TableCell>
               <TableCell>Email</TableCell>
@@ -143,14 +171,18 @@ const Employee = () => {
             {filteredEmployees
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((employee) => (
-                <TableRow key={employee.userId}>
+                <TableRow key={employee.id}>
+                  <TableCell>{employee.employeeId}</TableCell>
                   <TableCell>{employee.warehouseId}</TableCell>
                   <TableCell>{employee.userName}</TableCell>
                   <TableCell>{employee.email}</TableCell>
                   <TableCell>{employee.address}</TableCell>
                   <TableCell>{employee.role}</TableCell>
                   <TableCell>
-                    <IconButton color="default" onClick={() => handleOpenEditDialog(employee)}>
+                    <IconButton
+                      color="default"
+                      onClick={() => handleOpenEditDialog(employee)}
+                    >
                       <Edit />
                     </IconButton>
                     <IconButton color="default">
@@ -178,63 +210,74 @@ const Employee = () => {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Thêm Nhân Viên Mới</DialogTitle>
         <DialogContent>
+      
           <TextField
             label="Mã Kho"
             fullWidth
             margin="normal"
             value={newEmployee.warehouseId}
-            onChange={(e) => setNewEmployee({ ...newEmployee, warehouseId: e.target.value })}
+            onChange={(e) =>
+              setNewEmployee({ ...newEmployee, warehouseId: e.target.value })
+            }
           />
           <TextField
             label="Tên"
             fullWidth
             margin="normal"
             value={newEmployee.userName}
-            onChange={(e) => setNewEmployee({ ...newEmployee, userName: e.target.value })}
+            onChange={(e) =>
+              setNewEmployee({ ...newEmployee, userName: e.target.value })
+            }
           />
           <TextField
             label="Email"
             fullWidth
             margin="normal"
             value={newEmployee.email}
-            onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
+            onChange={(e) =>
+              setNewEmployee({ ...newEmployee, email: e.target.value })
+            }
           />
           <TextField
             label="Địa Chỉ"
             fullWidth
             margin="normal"
             value={newEmployee.address}
-            onChange={(e) => setNewEmployee({ ...newEmployee, address: e.target.value })}
+            onChange={(e) =>
+              setNewEmployee({ ...newEmployee, address: e.target.value })
+            }
           />
-          
-          {/* Role Selector */}
           <FormControl fullWidth margin="normal">
             <InputLabel>Vai Trò</InputLabel>
             <Select
               value={newEmployee.role}
-              onChange={(e) => setNewEmployee({ ...newEmployee, role: e.target.value })}
+              onChange={(e) =>
+                setNewEmployee({ ...newEmployee, role: e.target.value })
+              }
               label="Vai Trò"
             >
               <MenuItem value="ADMIN">ADMIN</MenuItem>
               <MenuItem value="STAFF">STAFF</MenuItem>
             </Select>
           </FormControl>
-          
-          {/* Image Upload */}
-          <div style={{ marginTop: "1rem" }}>
-            <Typography variant="body2" color="textSecondary">
-              Tải ảnh đại diện lên:
-            </Typography>
-            {imagePreview && (
-              <img src={imagePreview} alt="preview" style={{ width: "100px", height: "100px", objectFit: "cover", marginTop: "1rem" }} />
-            )}
+          <Button variant="contained" component="label" sx={{ marginTop: "15px" }}>
+            Upload Hình Ảnh
             <input
               type="file"
+              hidden
               accept="image/*"
-              onChange={handleImageChange}
-              style={{ marginTop: "1rem" }}
+              onChange={(e) =>
+                handleImageChange(e, setNewEmployee, setImagePreview)
+              }
             />
-          </div>
+          </Button>
+          {imagePreview && (
+            <img
+              src={imagePreview}
+              alt="Preview"
+              style={{ marginTop: "10px", width: "100px", height: "100px" }}
+            />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)} color="default">
@@ -255,58 +298,68 @@ const Employee = () => {
             fullWidth
             margin="normal"
             value={editEmployee.warehouseId}
-            onChange={(e) => setEditEmployee({ ...editEmployee, warehouseId: e.target.value })}
+            onChange={(e) =>
+              setEditEmployee({ ...editEmployee, warehouseId: e.target.value })
+            }
           />
           <TextField
             label="Tên"
             fullWidth
             margin="normal"
             value={editEmployee.userName}
-            onChange={(e) => setEditEmployee({ ...editEmployee, userName: e.target.value })}
+            onChange={(e) =>
+              setEditEmployee({ ...editEmployee, userName: e.target.value })
+            }
           />
           <TextField
             label="Email"
             fullWidth
             margin="normal"
             value={editEmployee.email}
-            onChange={(e) => setEditEmployee({ ...editEmployee, email: e.target.value })}
+            onChange={(e) =>
+              setEditEmployee({ ...editEmployee, email: e.target.value })
+            }
           />
           <TextField
             label="Địa Chỉ"
             fullWidth
             margin="normal"
             value={editEmployee.address}
-            onChange={(e) => setEditEmployee({ ...editEmployee, address: e.target.value })}
+            onChange={(e) =>
+              setEditEmployee({ ...editEmployee, address: e.target.value })
+            }
           />
-          
-          {/* Role Selector */}
           <FormControl fullWidth margin="normal">
             <InputLabel>Vai Trò</InputLabel>
             <Select
               value={editEmployee.role}
-              onChange={(e) => setEditEmployee({ ...editEmployee, role: e.target.value })}
+              onChange={(e) =>
+                setEditEmployee({ ...editEmployee, role: e.target.value })
+              }
               label="Vai Trò"
             >
               <MenuItem value="ADMIN">ADMIN</MenuItem>
               <MenuItem value="STAFF">STAFF</MenuItem>
             </Select>
           </FormControl>
-          
-          {/* Image Upload */}
-          <div style={{ marginTop: "1rem" }}>
-            <Typography variant="body2" color="textSecondary">
-              Tải ảnh đại diện lên:
-            </Typography>
-            {imagePreview && (
-              <img src={imagePreview} alt="preview" style={{ width: "100px", height: "100px", objectFit: "cover", marginTop: "1rem" }} />
-            )}
+          <Button variant="contained" component="label" sx={{ marginTop: "15px" }}>
+            Upload Hình Ảnh
             <input
               type="file"
+              hidden
               accept="image/*"
-              onChange={handleImageChange}
-              style={{ marginTop: "1rem" }}
+              onChange={(e) =>
+                handleImageChange(e, setEditEmployee, setEditImagePreview)
+              }
             />
-          </div>
+          </Button>
+          {editImagePreview && (
+            <img
+              src={editImagePreview}
+              alt="Preview"
+              style={{ marginTop: "10px", width: "100px", height: "100px" }}
+            />
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenEditDialog(false)} color="default">

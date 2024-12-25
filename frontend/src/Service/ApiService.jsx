@@ -89,4 +89,96 @@ export default class ApiService {
 
 
     // Tân
+    //employee
+    static async getAllEmployees() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/user`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách nhân viên:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async addEmployee(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/user`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi thêm nhân viên:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async updateEmployee(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/user/${id}`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi cập nhật thông tin nhân viên:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    static async deleteEmployee(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/user/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi xóa nhân viên:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    //Category
+    static async getAllCategorys() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/category`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách :", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async addCategory(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/category`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi thêm danh mục:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async updateCategory(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/category/${id}`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi cập nhật thông tin nhân viên:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async deleteEmployee(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/category/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi xóa nhân viên:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    //Order
 }
