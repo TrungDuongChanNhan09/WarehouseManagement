@@ -239,8 +239,8 @@ const Navbar = () => {
                         </BottomNavigation>
                     </Stack>
                 
-                    <Button className="btn-help" sx={{color: "#297342", background: "none", margin:"0"}} variant="contained">
-                        <HelpOutlineIcon sx={{color: "#297342", marginRight:"5px"}}/>
+                    <Button className="btn-setting" sx={{color: "#387478", background: "none", margin:"1rem"}} variant="contained">
+                        <HelpOutlineIcon sx={{color: "#387478", marginRight:"10px"}}/>
                         Trợ giúp
                     </Button>
                 </Stack>
