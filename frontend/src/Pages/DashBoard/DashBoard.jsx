@@ -121,7 +121,7 @@ function valueFormatter(value) {
 
 const DashBoard = () => {
     return(
-        <Container  maxWidth="xl" className="Dashboard" sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+        <Container maxWidth="xl" className="Dashboard" sx={{ width: "100%" , height: "100%", display: "flex", flexDirection: "column" }}>
             <PrimarySearchAppBar />
             <Stack
                 sx={{marginTop:"1rem", flexGrow: 1, overflowY: "auto"}} 

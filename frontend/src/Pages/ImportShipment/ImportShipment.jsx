@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import './Product.css'
+import './ImportShipment.css'
 import { alpha, Box, Button, Container, Fade, FormControl, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Stack, styled, TextField, Typography } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar";
 import AddIcon from '@mui/icons-material/Add';
@@ -39,14 +39,10 @@ const Search = styled('div')(({ theme }) => ({
 
 const columns = [
   { id: 'stt', label: 'STT', minWidth: 50, align: 'center'},
-  { id: 'id', label: 'ID', minWidth: 80, align: 'center' },
-  { id: 'productName', label: 'Tên sản phẩm', minWidth: 100, align: 'left' },
-  { id: 'categoryId', label: 'Loại', minWidth: 100, align: 'left' },
-  { id: 'supplierId', label: 'Nhà cung cấp', minWidth: 100, align: 'left' },
-  { id: 'inventory_quantity', label: 'Số lượng tồn kho', minWidth: 100, align: 'center', format: (value) => value.toLocaleString('en-US'), },
-  { id: 'price', label: 'Giá', minWidth: 100, align: 'center', format: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value) },
-  { id: 'production_date', label: 'Ngày sản xuất', minWidth: 150, align: 'center', format: (value) => value.toLocaleDateString('en-GB'), },
-  { id: 'expiration_date', label: 'Ngày hết hạn', minWidth: 150, align: 'center', format: (value) => value.toLocaleDateString('en-GB'), },
+  { id: 'import_id', label: 'ID đơn nhập hàng', minWidth: 80, align: 'center' },
+  { id: 'product_quantity', label: 'Số lượng mặt hàng', align: 'center' },
+  { id: 'totalPrice', label: 'Tổng giá trị', align: 'center', format: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value) },
+  { id: 'create_At', label: 'Ngày tạo đơn', align: 'center', format: (value) => value.toLocaleDateString('en-GB'), },
   // {
   //   id: 'density',
   //   label: 'Density',
@@ -56,21 +52,21 @@ const columns = [
   // },
 ];
 
-function createData(id, productName, categoryId, supplierId, inventory_quantity, price, production_date, expiration_date) {
-  return {id, productName, categoryId, supplierId, inventory_quantity, price, production_date, expiration_date};
+function createData(import_id, product_quantity, totalPrice, create_At) {
+  return {import_id, product_quantity, totalPrice, create_At};
 }
 
 const rows = [
-    createData('P1', 'Máy Khoan', 'Tools', 'Bosch', 10, 1000000, new Date(2024, 11, 23), new Date(2026, 0, 1)),
-    createData('P2', 'Galaxy S24 Ultra', 'Electronics', 'Samsung', 25, 24590000, new Date(2024, 10, 15), new Date(2025, 5, 30)),
-    createData('P3', 'Laptop ThinkPad X1', 'Electronics', 'Lenovo', 15, 35000000, new Date(2024, 8, 10), new Date(2025, 8, 10)),
-    createData('P4', 'Bàn phím cơ', 'Accessories', 'Logitech', 50, 1500000, new Date(2024, 6, 1), new Date(2025, 6, 1)),
-    createData('P5', 'Chuột không dây', 'Accessories', 'Razer', 40, 1200000, new Date(2024, 5, 15), new Date(2025, 5, 15)),
-    createData('P6', 'Tivi OLED 4K', 'Electronics', 'LG', 8, 50000000, new Date(2024, 3, 20), new Date(2026, 3, 20)),
-    createData('P7', 'Máy lọc nước RO', 'Home Appliances', 'Kangaroo', 20, 5500000, new Date(2024, 4, 10), new Date(2025, 4, 10)),
-    createData('P8', 'Điều hòa 2 chiều', 'Home Appliances', 'Daikin', 30, 12000000, new Date(2024, 2, 25), new Date(2025, 2, 25)),
-    createData('P9', 'Bộ nồi inox 5 món', 'Kitchenware', 'Sunhouse', 60, 2500000, new Date(2024, 7, 14), new Date(2026, 7, 14)),
-    createData('P10', 'Đèn LED thông minh', 'Electronics', 'Philips', 70, 900000, new Date(2024, 9, 5), new Date(2025, 9, 5)),
+    createData('IM001', 150, 50000000, new Date(2024, 5, 10)),
+    createData('IM002', 200, 75000000, new Date(2024, 5, 11)),
+    createData('IM003', 120, 30000000, new Date(2024, 5, 12)),
+    createData('IM004', 80, 16000000, new Date(2024, 5, 13)),
+    createData('IM005', 300, 90000000, new Date(2024, 5, 14)),
+    createData('IM006', 50, 10000000, new Date(2024, 5, 15)),
+    createData('IM007', 400, 120000000, new Date(2024, 5, 16)),
+    createData('IM008', 75, 15000000, new Date(2024, 5, 17)),
+    createData('IM009', 220, 66000000, new Date(2024, 5, 18)),
+    createData('IM010', 130, 39000000, new Date(2024, 5, 19))
 ];
 
 const style = {
@@ -84,7 +80,7 @@ const style = {
     p: 4,
 };
 
-const Product = () => {
+export default function ImportShipment() {
     const [filter, setFilter] = useState();
 
     useEffect(() => {
@@ -100,13 +96,13 @@ const Product = () => {
     const handleClose = () => setOpen(false);
 
     return(
-        <Container maxWidth="xl" className="Product" sx={{ width: "100%", height: "auto", display: "flex", flexDirection: "column"}}>
-            <Stack className="product-bar" sx={{backgroundColor: "#ffffff",padding:"1rem", borderRadius:"0.5rem"}}>
+        <Container maxWidth="xl" className="ImportShipment" sx={{ width: "100%", height: "auto", display: "flex", flexDirection: "column"}}>
+            <Stack className="ImportShipment-bar" sx={{backgroundColor: "#ffffff",padding:"1rem", borderRadius:"0.5rem"}}>
                 <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
                     <Typography 
                         sx={{fontWeight: 'bold', fontSize:"25px", paddingLeft:"10px", width:"auto"}} 
                         variant="p">
-                            Quản lý sản phẩm
+                            Quản lý nhập hàng
                     </Typography>
                     <Stack direction={"row"} alignItems={"center"}>
                         <Stack className="search-bar" direction={"row"} alignItems={"center"}>
@@ -162,7 +158,7 @@ const Product = () => {
                                 className="btn-setting" 
                                 sx={{color: "white", height:"55px", backgroundColor: "#297342"}} variant="contained">
                                 <AddIcon sx={{color: "white"}}/>
-                                Thêm sản phẩm
+                                Thêm đơn nhập hàng
                             </Button>
                         </Stack>
                     </Stack>
@@ -205,4 +201,3 @@ const Product = () => {
         </Container>
     )
 }
-export default Product
