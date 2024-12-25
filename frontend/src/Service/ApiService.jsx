@@ -48,6 +48,20 @@ export default class ApiService {
             throw error;
         }
     }
+
+    static async getAllShelf() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+
     static async addInventory(formData) {
         try {
             const response = await axios.post(`${this.BASE_URL}/api/admin/inventory`, formData, {

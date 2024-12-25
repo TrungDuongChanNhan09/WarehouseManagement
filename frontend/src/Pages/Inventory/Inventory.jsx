@@ -248,15 +248,17 @@ const Inventory = () => {
                                 
                                 
                             </Stack>
-                            <Button 
-                                onClick={() => {
-                                    console.log("Nút Thêm kho hàng đã được nhấn");
-                                    handleAddInventory();
-                                }}
-                                className="btn-setting" 
-                                sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
-                                Thêm kho hàng
-                            </Button>
+                            <Stack direction={"column"} alignItems={"center"}>
+
+                                <Button 
+                                    onClick={() => {
+                                        handleAddInventory();
+                                    }}
+                                    className="btn-setting" 
+                                    sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
+                                    Thêm kho hàng
+                                </Button>
+                            </Stack>
 
                         {/* </Stack> */}
                     </Box>
