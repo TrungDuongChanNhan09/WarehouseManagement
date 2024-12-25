@@ -123,7 +123,7 @@ export default function ImportShipment() {
                             <FormControl sx={{width:"200px", marginLeft:"0.5rem", marginRight: "0.5rem"}}>
                                 <InputLabel sx={{
                                     "&.Mui-focused": { 
-                                        color: "#F25D07" 
+                                        color: "#297342" 
                                     }}} 
                                     id="demo-simple-select-label">
                                         Lọc theo
@@ -133,7 +133,7 @@ export default function ImportShipment() {
                                         backgroundColor:"white", 
                                         border:"none",
                                         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: '#F25D07',
+                                            borderColor: '#297342',
                                         },
                                     }}
                                     labelId="demo-simple-select-label"
@@ -156,7 +156,7 @@ export default function ImportShipment() {
                             <Button 
                                 onClick={handleOpen} 
                                 className="btn-setting" 
-                                sx={{color: "white", height:"55px", backgroundColor: "#F25D07"}} variant="contained">
+                                sx={{color: "white", height:"55px", backgroundColor: "#297342"}} variant="contained">
                                 <AddIcon sx={{color: "white"}}/>
                                 Thêm đơn nhập hàng
                             </Button>

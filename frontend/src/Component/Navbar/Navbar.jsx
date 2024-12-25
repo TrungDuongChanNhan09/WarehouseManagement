@@ -38,7 +38,7 @@ const Navbar = () => {
             <Stack className="Navbar" justifyContent={"space-between"}>
                 <Stack className="logo" alignItems={"center"}>
                     <img
-                        src={Logo}
+                        src="https://res.cloudinary.com/dozs7ggs4/image/upload/v1734362317/WarehouseManagement-3_kibnmb.png"
                         alt="Logo"
                     />
                 </Stack>
@@ -233,13 +233,13 @@ const Navbar = () => {
                         </BottomNavigation>
                     </Stack>
                 
-                    <Button className="btn-help" sx={{color: "#F25D07", background: "none", margin:"0"}} variant="contained">
-                        <HelpOutlineIcon sx={{color: "#F25D07", marginRight:"5px"}}/>
+                    <Button className="btn-help" sx={{color: "#297342", background: "none", margin:"0"}} variant="contained">
+                        <HelpOutlineIcon sx={{color: "#297342", marginRight:"5px"}}/>
                         Trợ giúp
                     </Button>
                 </Stack>
-                
             </Stack>
+            <Outlet />
         </>
     );
 };
