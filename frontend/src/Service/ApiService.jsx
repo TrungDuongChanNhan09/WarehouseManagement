@@ -48,6 +48,20 @@ export default class ApiService {
             throw error;
         }
     }
+
+    static async getAllShelf() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+
     static async addInventory(formData) {
         try {
             const response = await axios.post(`${this.BASE_URL}/api/admin/inventory`, formData, {
@@ -89,6 +103,18 @@ export default class ApiService {
 
 
     // Tân
+    //order
+    static async getAllOrders() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/order`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách nhân viên:", error.response?.data || error.message);
+            throw error;
+        }
+    }
     //employee
     static async getAllEmployees() {
         try {
@@ -136,7 +162,7 @@ export default class ApiService {
         }
     }
     //Category
-    static async getAllCategorys() {
+    static async getAllCategory() {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/admin/category`, {
                 headers: this.getHeader(),
@@ -169,7 +195,7 @@ export default class ApiService {
             throw error;
         }
     }
-    static async deleteEmployee(id) {
+    static async deleteCategory(id) {
         try {
             const response = await axios.delete(`${this.BASE_URL}/api/admin/category/${id}`, {
                 headers: this.getHeader(),
