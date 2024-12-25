@@ -19,7 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api")
-@Tag(name = "Users API", description = "Thêm, xóa, cập nhật tài khoản")
+@Tag(name = "Users API")
 public class UserController {
     @Autowired
     private UserService userService;

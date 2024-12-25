@@ -3,6 +3,8 @@ package com.example.backend.serviceImpl;
 import com.example.backend.model.Category;
 import com.example.backend.model.Product;
 import com.example.backend.model.Supplier;
+import com.example.backend.serviceImpl.ShelfService;
+
 import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.repository.SupplierRepository;
