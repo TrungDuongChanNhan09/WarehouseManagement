@@ -97,6 +97,29 @@ const Navbar = () => {
                                     },
                                 }}
                             />
+                             <BottomNavigationAction 
+                                showLabel={true} 
+                                label="Order"
+                                value="order"
+                                icon={<LocalShippingIcon />}
+                                onClick={() => navigate("/app/order")} 
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "flex-start", 
+                                    marginTop: "1rem",
+                                    fontSize: "24px",
+                                    padding: "0.5rem",
+                                    flexGrow: 1,
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px", 
+                                        marginRight: "10px", 
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px", 
+                                    },
+                                }}
+                            />
                             <BottomNavigationAction 
                                 showLabel={true} 
                                 label="Employee"
@@ -230,6 +253,23 @@ const Navbar = () => {
                                     "& .MuiSvgIcon-root": {
                                         fontSize: "24px",
                                         marginRight: "10px",
+                             <BottomNavigationAction 
+                                showLabel={true} 
+                                label="ExportShipment"
+                                value="exportshipment"
+                                icon={<AssignmentIndOutlinedIcon />}
+                                onClick={() => navigate("/app/exportshipment")} 
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "flex-start", 
+                                    marginTop: "1rem",
+                                    fontSize: "24px",
+                                    padding: "0.5rem",
+                                    flexGrow: 1,
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px", 
+                                        marginRight: "10px", 
                                     },
                                     "& .MuiBottomNavigationAction-label": {
                                         fontSize: "16px", 
