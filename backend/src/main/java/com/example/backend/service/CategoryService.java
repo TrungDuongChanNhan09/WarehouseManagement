@@ -11,4 +11,5 @@ public interface CategoryService {
     Category createCategory(CategoryRequest categoryRequest) throws Exception;
 
     void deleteCategory(String categoryId);
+    List<String> getCategoryName();
 }

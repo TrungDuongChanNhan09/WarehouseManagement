@@ -26,15 +26,10 @@ public class AdminCategoryController {
         Category newCategory = categoryService.createCategory(category);
         return new ResponseEntity<>(category, HttpStatus.CREATED);
     }
-    @GetMapping("")
-    public ResponseEntity<List<Category>> getAllCategory(@RequestHeader("Authorization") String jwt) throws Exception{
-        User user = userService.findUserByJwtToken(jwt);
-        return new ResponseEntity<>(categoryService.getAllCategory(), HttpStatus.OK);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<List<Category>> deleteCategory(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception{
         categoryService.deleteCategory(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 }
