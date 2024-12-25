@@ -1,7 +1,7 @@
 import React from "react";
 import './App.css'
 import './style.css'
-import {BrowserRouter, Routes, Route, Outlet} from 'react-router-dom'
+import {BrowserRouter, Routes, Route} from 'react-router-dom'
 
 import Login from './Pages/Login/Login.jsx';
 import Register from './Pages/Register/Register.jsx';
@@ -19,7 +19,7 @@ const App = () =>{
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route index element={<Login/>}/>
+          <Route index element = {<Login/>}/>
           <Route path='register' element={<Register/>}/>
           <Route path='login' element={<Login/>}/>
           <Route path='app' element={<Navbar/>}>

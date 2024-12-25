@@ -3,16 +3,22 @@ import "./Navbar.css";
 import { Stack, Button, Typography } from "@mui/material";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import Logo from '../../assets/Logo.svg'
+import AddIcon from '@mui/icons-material/Add';
+import SettingsIcon from '@mui/icons-material/Settings';
+
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CorporateFareOutlinedIcon from '@mui/icons-material/CorporateFareOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
+import SearchAppBar from "../AppBar/AppBar.jsx";
+
 
 const Navbar = () => {
     const [value, setValue] = useState("dashboard");
@@ -35,7 +41,7 @@ const Navbar = () => {
 
     return (
         <>
-            <Stack className="Navbar" justifyContent={"space-between"}>
+            <Stack className="Navbar">
                 <Stack className="logo" alignItems={"center"}>
                     <img
                         src="https://res.cloudinary.com/dozs7ggs4/image/upload/v1734362317/WarehouseManagement-3_kibnmb.png"
