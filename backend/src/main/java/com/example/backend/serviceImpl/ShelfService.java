@@ -1,5 +1,6 @@
 package com.example.backend.serviceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -118,6 +119,17 @@ public class ShelfService implements com.example.backend.service.ShelfService{
     @Override
     public List<Shelf> getAllShelves() {
         return shelfRepository.findAll();
+    }
+
+    @Override
+    public List<String> getShelfContainProduct(String productName) {
+        Product product = productRepository.findByproductName(productName);
+        List<Shelf> shelves = shelfRepository.findByproductId(product.getId());
+        List<String> shelfCode = new ArrayList<>();
+        for(Shelf shelf : shelves){
+            shelfCode.add(shelf.getShelfCode());
+        }
+        return shelfCode;
     }
 
 

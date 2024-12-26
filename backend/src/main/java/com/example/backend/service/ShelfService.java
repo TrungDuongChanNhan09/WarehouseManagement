@@ -16,4 +16,6 @@ public interface ShelfService {
     Optional<Shelf> getShelfById(String shelfId);
     boolean shelfExists(String shelfId);
     List<Shelf> getAllShelves();
+
+    List<String> getShelfContainProduct(String productId);
 }

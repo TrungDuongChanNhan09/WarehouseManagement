@@ -69,4 +69,11 @@ public class ShelfController {
         List<Shelf> shelves = shelfService.getAllShelves();
         return new ResponseEntity<>(shelves, HttpStatus.OK);
     }
+
+    @GetMapping("/allShelfCode/{productName}")
+    public ResponseEntity<List<String>> getAllShelfCode(@RequestHeader("Authorization") String jwt, @PathVariable String productName) throws Exception{
+
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(shelfService.getShelfContainProduct(productName), HttpStatus.OK);
+    }
 }

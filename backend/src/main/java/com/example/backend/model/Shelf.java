@@ -13,4 +13,5 @@ public class Shelf {
     private String productId;
     private int quantity;
     private int capacity;
+    private String shelfCode;
 }

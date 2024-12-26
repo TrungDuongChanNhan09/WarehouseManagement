@@ -93,12 +93,7 @@ public class InventoryService implements com.example.backend.service.InventorySe
 
     @Override
     public List<Inventory> searchInventoriesByName(String keyword){
-        Inventory inventory = new Inventory();
-        inventory.setNameInventory(keyword);
-        ExampleMatcher matcher = ExampleMatcher.matchingAny()
-                .withMatcher("nameInventory", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-        Example<Inventory> example = Example.of(inventory, matcher);
-        return this.inventoryRepository.findAll(example);
+        return inventoryRepository.searchBynameInventory(keyword);
     }
 
     @Override
