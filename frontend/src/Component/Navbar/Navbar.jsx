@@ -13,6 +13,7 @@ import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined
 import CorporateFareOutlinedIcon from '@mui/icons-material/CorporateFareOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
+import BusinessIcon from '@mui/icons-material/Business';
 
 const Navbar = () => {
     const [value, setValue] = useState("dashboard");
@@ -212,6 +213,30 @@ const Navbar = () => {
                                 value="importshipment"
                                 icon={<InputRoundedIcon />}
                                 onClick={() => navigate("/app/importshipment")} 
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    flexGrow: 1,
+                                    justifyContent: "flex-start",
+                                    marginTop: "1rem",
+                                    padding: "0.5rem",
+                                    fontSize: "24px",
+                                    textAlign: "left",
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px",
+                                        marginRight: "10px",
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px", 
+                                    },
+                                }}
+                            />
+                            <BottomNavigationAction
+                                showLabel={true}
+                                label="Supplier"
+                                value="supplier"
+                                icon={<BusinessIcon />}
+                                onClick={() => navigate("/app/supplier")} 
                                 sx={{
                                     display: "flex",
                                     flexDirection: "row",

@@ -86,7 +86,27 @@ export default class ApiService {
     
 
     // Phát
+    static async getAllProduct() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 
+    static async getAllSupplier() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/supplier`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 
     // Tân
 }
