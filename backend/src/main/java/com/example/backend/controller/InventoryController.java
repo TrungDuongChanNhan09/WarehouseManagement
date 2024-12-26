@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Inventory;
 import com.example.backend.model.User;
+import com.example.backend.request.InventoryStatus;
 import com.example.backend.service.InventoryService;
 import com.example.backend.service.UserService;
 
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/admin/inventory")
+@RequestMapping("/api/inventory")
 public class InventoryController {
     @Autowired
     private InventoryService inventoryService;
@@ -31,26 +32,6 @@ public class InventoryController {
         return new ResponseEntity<>(inventories, HttpStatus.OK);
     }
 
-    @PostMapping("")
-    public ResponseEntity<Inventory> addInventory(@RequestBody Inventory inventory, @RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        Inventory createdInventory = inventoryService.addInventory(inventory);
-        return new ResponseEntity<>(createdInventory, HttpStatus.CREATED);
-    }
-
-    @PutMapping("/{inventoryId}")
-    public ResponseEntity<Inventory> updateInventory(@PathVariable String inventoryId, @RequestBody Inventory updatedInventory, @RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        Inventory updated = inventoryService.updateInventory(inventoryId, updatedInventory);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{inventoryId}")
-    public ResponseEntity<Void> deleteInventory(@PathVariable String inventoryId, @RequestHeader("Authorization") String jwt) throws Exception {
-        User user = userService.findUserByJwtToken(jwt);
-        inventoryService.deleteInventory(inventoryId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 
     @GetMapping("/{inventoryId}")
     public ResponseEntity<Optional<Inventory>> getInventoryById(@PathVariable String inventoryId, @RequestHeader("Authorization") String jwt) throws Exception {
@@ -78,6 +59,13 @@ public class InventoryController {
         User user = userService.findUserByJwtToken(jwt);
         List<String> types = inventoryService.getDistinctInventoryTypes();
         return new ResponseEntity<>(types, HttpStatus.OK);
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<List<Inventory>> getInventoriesByStatus(@RequestBody InventoryStatus status, @RequestHeader("Authorization") String jwt) throws Exception {
+        User user = userService.findUserByJwtToken(jwt); 
+        List<Inventory> inventories = inventoryService.getInventoriesByStatus(status);
+        return ResponseEntity.ok(inventories);
     }
 
 }

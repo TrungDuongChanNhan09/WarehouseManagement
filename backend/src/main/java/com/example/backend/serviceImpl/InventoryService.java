@@ -1,9 +1,11 @@
 package com.example.backend.serviceImpl;
 
+import com.example.backend.model.INVENTORY_STATE;
 import com.example.backend.model.Inventory;
 import com.example.backend.model.Shelf;
 import com.example.backend.repository.InventoryRepository;
 import com.example.backend.repository.ShelfRepository;
+import com.example.backend.request.InventoryStatus;
 import com.example.backend.service.ShelfService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +46,7 @@ public class InventoryService implements com.example.backend.service.InventorySe
             throw new Exception("Inventory not found");
         }
         else{
+            
             List<Shelf> shelfs = shelfRepository.findByinventoryid(inventoryId);
             
             if(updatedInventory.getNumber_shelf() < shelfs.size()){
@@ -52,7 +55,6 @@ public class InventoryService implements com.example.backend.service.InventorySe
             existingInventory.setNameInventory(updatedInventory.getNameInventory());
             existingInventory.setTypeInventory(updatedInventory.getTypeInventory());
             existingInventory.setTypeInventoryDescription(updatedInventory.getTypeInventoryDescription());
-            existingInventory.setStatus(updatedInventory.getStatus());
             existingInventory.setNumber_shelf(updatedInventory.getNumber_shelf());
             return this.inventoryRepository.save(existingInventory);
         }
@@ -80,17 +82,18 @@ public class InventoryService implements com.example.backend.service.InventorySe
     }
 
     @Override
-    public Inventory updateInventoryStatus(String inventoryId, String status) throws Exception {
+    public Inventory updateInventoryStatus(String inventoryId, InventoryStatus status) throws Exception {
         Inventory existingInventory = inventoryRepository.findById(inventoryId).orElse(null);
-        if(existingInventory == null){
-            throw new Exception("Inventory not exists");
+        if(status.getStatus() == INVENTORY_STATE.CLOSE && existingInventory.getQuantity() > 0){
+            throw new Exception("Không thể đóng kho vì còn sản phẩm");
         }
         else{
-            existingInventory.setStatus(status);
+            existingInventory.setStatus(status.getStatus());
             return inventoryRepository.save(existingInventory);
         }
     }
 
+    
     @Override
     public List<Inventory> searchInventoriesByName(String keyword){
         return inventoryRepository.searchBynameInventory(keyword);
@@ -112,8 +115,8 @@ public class InventoryService implements com.example.backend.service.InventorySe
     }
 
     @Override
-    public List<Inventory> getInventoriesByStatus(String status){
-        return inventoryRepository.findByStatus(status);
+    public List<Inventory> getInventoriesByStatus(InventoryStatus status){
+        return inventoryRepository.findByStatus(status.getStatus());
     }
 
     @Override
