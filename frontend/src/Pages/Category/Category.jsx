@@ -20,7 +20,9 @@ import {
   IconButton,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
+import AppBarMenu from "../../Component/AppBar/AppBar";
 import ApiService from "../../Service/ApiService.jsx";
+
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
@@ -31,6 +33,8 @@ const Category = () => {
   const [openEditDialog, setOpenEditDialog] = useState(false);
   const [newCategory, setNewCategory] = useState({ categoryName: "", description: "" });
   const [editCategory, setEditCategory] = useState({ categoryName: "", description: "" });
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // New state for confirmation dialog
+  const [categoryToDelete, setCategoryToDelete] = useState(null); // Store the category to delete
 
   // Fetch categories from API
   const fetchCategories = async () => {
@@ -48,6 +52,10 @@ const Category = () => {
 
   // Add a new category
   const handleAddCategory = async () => {
+    if (!newCategory.categoryName || !newCategory.description) {
+      alert("Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
     try {
       await ApiService.addCategory(newCategory);
       setNewCategory({ categoryName: "", description: "" });
@@ -60,6 +68,10 @@ const Category = () => {
 
   // Edit an existing category
   const handleEditCategory = async () => {
+    if (!editCategory.categoryName || !editCategory.description) {
+      alert("Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
     try {
       await ApiService.updateCategory(editCategory);
       fetchCategories(); // Refresh list
@@ -70,10 +82,13 @@ const Category = () => {
   };
 
   // Delete a category
-  const handleDeleteCategory = async (id) => {
+  const handleDeleteCategory = async () => {
+    if (!categoryToDelete) return;
+
     try {
-      await ApiService.deleteCategory(id);
+      await ApiService.deleteCategory(categoryToDelete);
       fetchCategories(); // Refresh list
+      setOpenConfirmDialog(false); // Close confirm dialog after delete
     } catch (error) {
       console.error("Lỗi khi xóa danh mục:", error);
     }
@@ -85,6 +100,9 @@ const Category = () => {
 
   return (
     <Container maxWidth="xl" className="category-page">
+      {/* Chỉ sử dụng AppBarMenu như yêu cầu */}
+      <AppBarMenu />
+
       {/* Search and Add Button */}
       <Stack
         direction="row"
@@ -126,17 +144,26 @@ const Category = () => {
             {filteredCategories
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((category) => (
-                <TableRow key={category.Id}>
+                <TableRow key={category.categoryId}>
                   <TableCell>{category.categoryName}</TableCell>
                   <TableCell>{category.description}</TableCell>
                   <TableCell>
-                    <IconButton color="default" onClick={() => {
-                      setEditCategory(category);
-                      setOpenEditDialog(true);
-                    }}>
+                    <IconButton
+                      color="default"
+                      onClick={() => {
+                        setEditCategory(category);
+                        setOpenEditDialog(true);
+                      }}
+                    >
                       <Edit />
                     </IconButton>
-                    <IconButton color="default" onClick={() => handleDeleteCategory(category.categoryId)}>
+                    <IconButton
+                      color="default"
+                      onClick={() => {
+                        setCategoryToDelete(category.categoryId); // Store category ID to delete
+                        setOpenConfirmDialog(true); // Open confirmation dialog
+                      }}
+                    >
                       <Delete />
                     </IconButton>
                   </TableCell>
@@ -213,6 +240,24 @@ const Category = () => {
           </Button>
           <Button onClick={handleEditCategory} color="primary">
             Lưu Thay Đổi
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirm Delete Dialog */}
+      <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
+        <DialogTitle>Xác Nhận Xóa</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Bạn có chắc chắn muốn xóa danh mục này không?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenConfirmDialog(false)} color="default">
+            Hủy
+          </Button>
+          <Button onClick={handleDeleteCategory} color="primary">
+            Xóa
           </Button>
         </DialogActions>
       </Dialog>
