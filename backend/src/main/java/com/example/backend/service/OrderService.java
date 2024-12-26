@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.model.ORDER_STATE;
 import com.example.backend.model.ORDER_STATUS;
 import com.example.backend.model.Order;
+import com.example.backend.model.OrderQuantity;
 import com.example.backend.request.OrderItemRequest;
 import com.example.backend.request.OrderStateRequest;
 import com.example.backend.request.OrderStatusRequest;
@@ -20,5 +21,5 @@ public interface OrderService {
     Order updateOrderState(OrderStateRequest state, String orderId) throws Exception;
     List<Order> getOrderByState(ORDER_STATE orderState);
     List<Order> getOrderByStatus(ORDER_STATUS orderStatus);
-    List<Integer> getOrderQuantity();
+    List<OrderQuantity> getOrderQuantity();
 }

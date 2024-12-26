@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.model.ORDER_STATE;
 import com.example.backend.model.Order;
+import com.example.backend.model.OrderQuantity;
 import com.example.backend.model.User;
 import com.example.backend.request.OrderStateRequest;
 import com.example.backend.request.OrderStatusRequest;
@@ -45,7 +46,7 @@ public class AdminOrderController {
     }
 
     @GetMapping("/getOrderQuantity")
-    public ResponseEntity<List<Integer>> getOrderQuantity(@RequestHeader("Authorization") String jwt) throws Exception{
+    public ResponseEntity<List<OrderQuantity>> getOrderQuantity(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(orderService.getOrderQuantity(), HttpStatus.OK);
     }
