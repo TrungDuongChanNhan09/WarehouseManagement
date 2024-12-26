@@ -1,1 +1,10 @@
-/*# sourceMappingURL=Product.css.map */
+.Product .product-bar .search-bar {
+  border: 2px solid gray;
+  border-radius: 10px;
+}
+.Product .product-bar .search-bar .input-adornment {
+  margin: 0px;
+}
+.Product .product-bar .search-bar:focus-within {
+  border: 2px solid #297342;
+}/*# sourceMappingURL=Product.css.map */

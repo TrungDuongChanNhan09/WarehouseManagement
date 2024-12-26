@@ -164,7 +164,7 @@ export default class ApiService {
     //Category
     static async getAllCategory() {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/admin/category`, {
+            const response = await axios.get(`${this.BASE_URL}/api/category`, {
                 headers: this.getHeader(),
             });
             return response.data;

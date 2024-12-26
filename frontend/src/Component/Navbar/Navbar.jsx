@@ -8,13 +8,17 @@ import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import Logo from '../../assets/Logo.svg'
 import AddIcon from '@mui/icons-material/Add';
 import SettingsIcon from '@mui/icons-material/Settings';
+
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CorporateFareOutlinedIcon from '@mui/icons-material/CorporateFareOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import InputRoundedIcon from '@mui/icons-material/InputRounded';
 import SearchAppBar from "../AppBar/AppBar.jsx";
+
 
 const Navbar = () => {
     const [value, setValue] = useState("dashboard");
@@ -231,29 +235,54 @@ const Navbar = () => {
                                     },
                                 }}
                             />
-                             <BottomNavigationAction 
-                                showLabel={true} 
-                                label="ExportShipment"
-                                value="exportshipment"
-                                icon={<AssignmentIndOutlinedIcon />}
-                                onClick={() => navigate("/app/exportshipment")} 
+                            <BottomNavigationAction
+                                showLabel={true}
+                                label="Import Shipment"
+                                value="importshipment"
+                                icon={<InputRoundedIcon />}
+                                onClick={() => navigate("/app/importshipment")}
                                 sx={{
                                     display: "flex",
                                     flexDirection: "row",
-                                    justifyContent: "flex-start", 
+                                    flexGrow: 1,
+                                    justifyContent: "flex-start",
+                                    marginTop: "1rem",
+                                    padding: "0.5rem",
+                                    fontSize: "24px",
+                                    textAlign: "left",
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px",
+                                        marginRight: "10px",
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px",
+                                    },
+                                }}
+                            />
+                            <BottomNavigationAction
+                                showLabel={true}
+                                label="Export Shipment"
+                                value="exportshipment"
+                                icon={<AssignmentIndOutlinedIcon />}
+                                onClick={() => navigate("/app/exportshipment")}
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "flex-start",
                                     marginTop: "1rem",
                                     fontSize: "24px",
                                     padding: "0.5rem",
                                     flexGrow: 1,
                                     "& .MuiSvgIcon-root": {
-                                        fontSize: "24px", 
-                                        marginRight: "10px", 
+                                        fontSize: "24px",
+                                        marginRight: "10px",
                                     },
                                     "& .MuiBottomNavigationAction-label": {
-                                        fontSize: "16px", 
+                                        fontSize: "16px",
                                     },
                                 }}
                             />
+
                         </BottomNavigation>
                     </Stack>
                 
@@ -262,7 +291,6 @@ const Navbar = () => {
                         Trợ giúp
                     </Button>
                 </Stack>
-                
             </Stack>
             <Outlet />
         </>

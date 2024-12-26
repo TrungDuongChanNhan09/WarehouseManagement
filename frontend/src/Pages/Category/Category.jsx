@@ -126,7 +126,7 @@ const Category = () => {
             {filteredCategories
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((category) => (
-                <TableRow key={category.categoryId}>
+                <TableRow key={category.Id}>
                   <TableCell>{category.categoryName}</TableCell>
                   <TableCell>{category.description}</TableCell>
                   <TableCell>

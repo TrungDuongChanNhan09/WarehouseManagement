@@ -3,6 +3,8 @@ package com.example.backend.controller;
 import com.example.backend.model.Order;
 import com.example.backend.model.User;
 import com.example.backend.request.OrderItemRequest;
+import com.example.backend.request.OrderStateRequest;
+import com.example.backend.request.OrderStatusRequest;
 import com.example.backend.service.OrderService;
 import com.example.backend.service.ProductService;
 import com.example.backend.serviceImpl.UserService;
@@ -46,5 +48,17 @@ public class OrderController {
     public ResponseEntity<List<Order>> getOrderByUserId(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(orderService.getOrderByUserId(user.getId()), HttpStatus.OK);
+    }
+
+    @GetMapping("/getOrderByState")
+    public ResponseEntity<List<Order>> getOrderByState(@RequestHeader("Authorization") String jwt, OrderStateRequest orderStateRequest) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(orderService.getOrderByState(orderStateRequest.getState()), HttpStatus.OK);
+    }
+
+    @GetMapping("/getOrderByStatus")
+    public ResponseEntity<List<Order>> getOrderByStatus(@RequestHeader("Authorization") String jwt, OrderStatusRequest orderStatusRequest) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(orderService.getOrderByStatus(orderStatusRequest.getOrderStatus()), HttpStatus.OK);
     }
 }

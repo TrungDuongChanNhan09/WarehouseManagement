@@ -59,10 +59,14 @@ const Login = () => {
                     </Typography>
                 </Stack>
 
-                <Box component="form" onSubmit={handleSubmit} display={{ maxWidth: "100%" }} justifyContent="center" className="information-page">
+                <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" maxWidth="100%" justifyContent="center" alignItems="center" className="information-page">
                     <Stack className="title" alignItems={"center"}>
-                        <img src={Logo} />
-                        <Typography className="title-login" variant="h5" sx={{ color: "#495E57" }} fontWeight={"bold"}>
+                        <img src={Logo}/>
+                        <Typography 
+                            className="title-login" 
+                            variant="h4" 
+                            sx={{ color: "#F25D07" }} 
+                            fontWeight={"bold"}>
                             Đăng nhập
                         </Typography>
                     </Stack>
@@ -89,7 +93,7 @@ const Login = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
 
-                    <Stack direction="row" alignItems={"space-between"}>
+                    <Stack alignSelf="flex-start" direction="row" alignItems={"space-between"}>
                         <FormControlLabel control={<Checkbox style={{ color: "#F25D07" }} onChange={handleClickShowPassword} />} label="Hiện mật khẩu" />
                     </Stack>
 

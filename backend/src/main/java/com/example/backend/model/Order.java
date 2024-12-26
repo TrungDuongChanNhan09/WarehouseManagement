@@ -24,4 +24,6 @@ public class Order {
     private Date created_at;
     private Date update_at;
     private int orderPrice;
+    private String orderCode;
+    private ORDER_STATUS orderStatus = ORDER_STATUS.OUT_EXPORT;
 }

@@ -36,14 +36,14 @@
   font-weight: bold;
   text-align: justify;
   z-index: 1;
-  max-width: 60vw;
+  max-width: 62vw;
 }
 .login .body-login .information-page {
   min-width: auto;
   width: 32%;
   background-color: #EEEEEE;
   border-radius: 0.5rem;
-  padding: 2rem;
+  padding: 3rem;
 }
 .login .body-login .information-page .infor-email {
   margin-bottom: 0.8rem;
@@ -52,20 +52,24 @@
   margin-bottom: 0.8rem;
 }
 .login .body-login .information-page .title img {
-  width: 40%;
+  min-width: 100px;
+  width: 45%;
 }
 .login .body-login .information-page .title .title-login {
+  text-align: center;
   padding: 2rem;
 }
 .login .body-login .information-page .button-login {
   background-color: #F25D07;
   margin-top: 1rem;
-  width: 50%;
-  width: 400px;
+  width: 100%;
+  border-radius: 1rem;
 }
 .login .body-login .information-page .button-login .link {
   color: white;
+  font-size: 1.1rem;
   text-decoration: none;
+  text-align: center;
 }
 
 @media (max-aspect-ratio: 1) {

@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Supplier;
 import com.example.backend.model.User;
+import com.example.backend.request.SupplierRequest;
 import com.example.backend.service.SupplierService;
 import com.example.backend.serviceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +23,14 @@ public class AdminSupplierController {
     public SupplierService supplierService;
 
     @PostMapping("")
-    public ResponseEntity<Supplier> addSupplier(@RequestBody Supplier supplier, @RequestHeader("Authorization") String jwt) throws Exception{
+    public ResponseEntity<Supplier> addSupplier(@RequestBody SupplierRequest supplier, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         Supplier newSupplier = supplierService.addSupplier(supplier);
         return new ResponseEntity<>(newSupplier, HttpStatus.CREATED);
     }
 
     @PutMapping("/updateSupplier/{id}")
-    public ResponseEntity<Supplier> updateSupplier(@RequestBody Supplier supplier, @RequestHeader("Authorization") String jwt, @PathVariable String id) throws Exception{
+    public ResponseEntity<Supplier> updateSupplier(@RequestBody SupplierRequest supplier, @RequestHeader("Authorization") String jwt, @PathVariable String id) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(supplierService.updateSupplier(supplier, id), HttpStatus.OK);
     }

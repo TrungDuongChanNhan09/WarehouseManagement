@@ -10,10 +10,13 @@ import Navbar from "./Component/Navbar/Navbar.jsx";
 import Inventory from "./Pages/Inventory/Inventory.jsx";
 import Category from "./Pages/Category/Category.jsx";
 import Product from "./Pages/Product/Product.jsx";
+
 import Employee from "./Pages/Employee/Employee.jsx";
 import Shelf from "./Pages/Shelf/Shelf.jsx";
+import ImportShipment from "./Pages/ImportShipment/ImportShipment.jsx";
 import Order from "./Pages/Order/Order.jsx";
 import ExportShipment from "./Pages/ExportShipment/ExportShipment.jsx";
+
 const App = () =>{
   return(
     <div className="App">
@@ -23,6 +26,7 @@ const App = () =>{
           <Route path='register' element={<Register/>}/>
           <Route path='login' element={<Login/>}/>
           <Route path='app' element={<Navbar/>}>
+            <Route index element={<DashBoard/>}/>
             <Route path='home' element={<DashBoard/>}/>
             <Route path='order' element={<Order/>}/>
             <Route path='inventory' element={<Inventory/>}/>
@@ -30,6 +34,7 @@ const App = () =>{
             <Route path='product' element={<Product/>}/>
             <Route path='employee' element={<Employee/>}/>
             <Route path='shelf' element={<Shelf/>}/>
+            <Route path='importshipment' element={<ImportShipment/>}/>
             <Route path='exportshipment' element={<ExportShipment/>}/>
           </Route>
         </Routes>
