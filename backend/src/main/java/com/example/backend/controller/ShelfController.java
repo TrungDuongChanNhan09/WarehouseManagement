@@ -64,7 +64,7 @@ public class ShelfController {
     @GetMapping("/searchByName/{keyword}")
     public ResponseEntity<List<Shelf>> searchInventoriesByName(@PathVariable String keyword, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJwtToken(jwt);
-        List<Shelf> inventories = shelfService.searchShelfByName(keyword);
+        List<Shelf> inventories = shelfService.searchShelfByCode(keyword);
         return new ResponseEntity<>(inventories, HttpStatus.OK);
     }
 
