@@ -151,17 +151,7 @@ export default class ApiService {
             throw error;
         }
     }
-    // static async updateEmployee(id, formData) {
-    //     try {
-    //         const response = await axios.put(`${this.BASE_URL}/api/admin/user/${id}`, formData, {
-    //             headers: this.getHeader(),
-    //         });
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error("Lỗi khi cập nhật thông tin nhân viên:", error.response?.data || error.message);
-    //         throw error;
-    //     }
-    // }
+    
 
     static async deleteEmployee(id) {
         try {
@@ -196,18 +186,7 @@ export default class ApiService {
             console.error("Lỗi khi thêm danh mục:", error.response?.data || error.message);
             throw error;
         }
-    }
-    static async updateCategory(id, formData) {
-        try {
-            const response = await axios.put(`${this.BASE_URL}/api/admin/category/${id}`, formData, {
-                headers: this.getHeader(),
-            });
-            return response.data;
-        } catch (error) {
-            console.error("Lỗi khi cập nhật thông tin nhân viên:", error.response?.data || error.message);
-            throw error;
-        }
-    }
+    }   
     static async deleteCategory(id) {
         try {
             const response = await axios.delete(`${this.BASE_URL}/api/admin/category/${id}`, {
@@ -215,7 +194,7 @@ export default class ApiService {
             });
             return response.data;
         } catch (error) {
-            console.error("Lỗi khi xóa nhân viên:", error.response?.data || error.message);
+            console.error("Lỗi khi xóa danh mục:", error.response?.data || error.message);
             throw error;
         }
     }
