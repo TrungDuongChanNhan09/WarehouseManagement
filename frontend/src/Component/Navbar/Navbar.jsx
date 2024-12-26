@@ -42,7 +42,7 @@ const Navbar = () => {
 
     return (
         <>
-            <Stack className="Navbar" justifyContent={"space-between"}>
+            <Stack className="Navbar">
                 <Stack className="logo" alignItems={"center"}>
                     <img
                         src="https://res.cloudinary.com/dozs7ggs4/image/upload/v1734362317/WarehouseManagement-3_kibnmb.png"
@@ -50,7 +50,7 @@ const Navbar = () => {
                     />
                 </Stack>
 
-                <Stack justifyContent={"space-between"} sx={{width: "100%",marginTop:"0rem", padding: "0.7rem"}}>
+                <Stack justifyContent={"space-between"} sx={{width: "100%",height:"80vh",marginTop:"3rem", padding: "0.7rem"}}>
                     <Stack>
                         {/* <Button className="btn-add-order" sx={{padding: "10px", borderRadius:"10px", width: "175px", border: "2px solid #387478", margin: "1.5rem 1rem 1rem 1rem"}}>
                             <AddIcon sx={{color: "black"}}/>
@@ -310,11 +310,12 @@ const Navbar = () => {
                             />
                         </BottomNavigation>
                     </Stack>
-                </Stack>
-                <Button className="btn-setting" sx={{color: "#387478", background: "none", margin:"1rem"}} variant="contained">
-                    <HelpOutlineIcon sx={{color: "#387478", marginRight:"5px"}}/>
+          
+                    <Button className="btn-setting" sx={{color: "#387478", background: "none", margin:"1rem"}} variant="contained">
+                        <HelpOutlineIcon sx={{color: "#387478", marginRight:"10px"}}/>
                         Trợ giúp
-                </Button>
+                    </Button>
+                </Stack>
             </Stack>
             <Outlet />
         </>

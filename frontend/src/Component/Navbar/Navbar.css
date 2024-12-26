@@ -14,6 +14,7 @@
 }
 .Navbar .logo {
   padding: 1rem;
+  margin-bottom: 1rem;
 }
 .Navbar .logo img {
   width: 80%;
