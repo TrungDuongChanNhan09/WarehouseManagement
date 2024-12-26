@@ -115,6 +115,19 @@ export default class ApiService {
             throw error;
         }
     }
+    //order items
+    
+    static async getOrderItemById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/orderItem/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error.response?.data || error.message);
+            throw error;
+        }
+    }
     //employee
     static async getAllEmployees() {
         try {
