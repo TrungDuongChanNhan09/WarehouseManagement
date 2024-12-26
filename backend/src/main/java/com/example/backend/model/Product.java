@@ -26,4 +26,5 @@ public class Product {
     private Date production_date;
     private Date expiration_date;
     private int price;
+    private PRODUCT_STATUS productStatus = PRODUCT_STATUS.IN_STOCK;
 }

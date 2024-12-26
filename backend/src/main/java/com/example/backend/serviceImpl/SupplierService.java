@@ -2,6 +2,7 @@ package com.example.backend.serviceImpl;
 
 import com.example.backend.model.Supplier;
 import com.example.backend.repository.SupplierRepository;
+import com.example.backend.request.SupplierRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -16,21 +17,23 @@ public class SupplierService implements com.example.backend.service.SupplierServ
     public SupplierRepository supplierRepository;
 
     @Override
-    public Supplier addSupplier(Supplier supplier) throws Exception {
+    public Supplier addSupplier(SupplierRequest supplier) throws Exception {
         Supplier existingSupplier = supplierRepository.findBynameSupplier(supplier.getNameSupplier());
         if(existingSupplier != null) {
             throw new Exception("Supplier is already exist");
         }
         Supplier newSupplier = new Supplier();
+
         newSupplier.setNameSupplier(supplier.getNameSupplier());
         newSupplier.setAddress(supplier.getAddress());
         newSupplier.setEmail(supplier.getEmail());
         newSupplier.setPhoneNumber(supplier.getPhoneNumber());
+
         return supplierRepository.save(newSupplier);
     }
 
     @Override
-    public Supplier updateSupplier(Supplier supplier, String supplierId) throws Exception {
+    public Supplier updateSupplier(SupplierRequest supplier, String supplierId) throws Exception {
         Supplier existingSupplier = this.supplierRepository.findById(supplierId).orElse(null);
         if(existingSupplier == null) {
             throw new Exception("Supplier not found...");

@@ -82,12 +82,7 @@ public class ImportShipmentItemService implements com.example.backend.service.Im
 
     @Override
     public List<ImportShipmentItem> searchImportShipmentItems(String productname) {
-        ImportShipmentItem item = new ImportShipmentItem();
-        item.setProductName(productname);
-        ExampleMatcher matcher = ExampleMatcher.matchingAny()
-                .withMatcher("productName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-        Example<ImportShipmentItem> example = Example.of(item, matcher);
-        return this.importShipmentItemRepository.findAll(example);
+        return importShipmentItemRepository.searchByproductName(productname);
     }
 
     
