@@ -114,12 +114,7 @@ public class ImportShipmentService implements com.example.backend.service.Import
 
     @Override
     public List<ImportShipment> searchImportShipmentsBysuppiler(String suppiler) {
-        ImportShipment importShipment = new ImportShipment();
-        importShipment.setSuppiler(suppiler);
-        ExampleMatcher matcher = ExampleMatcher.matchingAny()
-                .withMatcher("suppiler", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-        Example<ImportShipment> example = Example.of(importShipment, matcher);
-        return this.importShipmentRepository.findAll(example);
+        return importShipmentRepository.searchBysuppiler(suppiler);
     }
 
     @Override
