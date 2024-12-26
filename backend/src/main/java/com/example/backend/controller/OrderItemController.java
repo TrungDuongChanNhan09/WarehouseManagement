@@ -2,6 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.model.OrderItem;
 import com.example.backend.model.User;
+import com.example.backend.request.OrderItemRequest;
 import com.example.backend.service.OrderItemService;
 import com.example.backend.serviceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
