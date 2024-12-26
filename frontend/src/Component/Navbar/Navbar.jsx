@@ -3,17 +3,23 @@ import "./Navbar.css";
 import { Stack, Button, Typography } from "@mui/material";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ProductionQuantityLimitsIcon from "@mui/icons-material/ProductionQuantityLimits";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import Logo from '../../assets/Logo.svg'
+import AddIcon from '@mui/icons-material/Add';
+import SettingsIcon from '@mui/icons-material/Settings';
+
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CorporateFareOutlinedIcon from '@mui/icons-material/CorporateFareOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
 import BusinessIcon from '@mui/icons-material/Business';
+import SearchAppBar from "../AppBar/AppBar.jsx";
+
 
 const Navbar = () => {
     const [value, setValue] = useState("dashboard");
@@ -36,7 +42,7 @@ const Navbar = () => {
 
     return (
         <>
-            <Stack className="Navbar" justifyContent={"space-between"}>
+            <Stack className="Navbar">
                 <Stack className="logo" alignItems={"center"}>
                     <img
                         src="https://res.cloudinary.com/dozs7ggs4/image/upload/v1734362317/WarehouseManagement-3_kibnmb.png"
@@ -82,6 +88,29 @@ const Navbar = () => {
                                     marginTop: "1rem",
                                     padding: "0.5rem",
                                     fontSize: "24px",
+                                    flexGrow: 1,
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px", 
+                                        marginRight: "10px", 
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px", 
+                                    },
+                                }}
+                            />
+                             <BottomNavigationAction 
+                                showLabel={true} 
+                                label="Order"
+                                value="order"
+                                icon={<LocalShippingIcon />}
+                                onClick={() => navigate("/app/order")} 
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "flex-start", 
+                                    marginTop: "1rem",
+                                    fontSize: "24px",
+                                    padding: "0.5rem",
                                     flexGrow: 1,
                                     "& .MuiSvgIcon-root": {
                                         fontSize: "24px", 
@@ -230,6 +259,29 @@ const Navbar = () => {
                                         fontSize: "16px", 
                                     },
                                 }}
+                            />    
+                            <BottomNavigationAction 
+                                showLabel={true} 
+                                label="ExportShipment"
+                                value="exportshipment"
+                                icon={<AssignmentIndOutlinedIcon />}
+                                onClick={() => navigate("/app/exportshipment")} 
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "flex-start", 
+                                    marginTop: "1rem",
+                                    fontSize: "24px",
+                                    padding: "0.5rem",
+                                    flexGrow: 1,
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px", 
+                                        marginRight: "10px", 
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px", 
+                                    },
+                                }}
                             />
                             <BottomNavigationAction
                                 showLabel={true}
@@ -258,8 +310,8 @@ const Navbar = () => {
                         </BottomNavigation>
                     </Stack>
                 
-                    <Button className="btn-help" sx={{color: "#297342", background: "none", margin:"0"}} variant="contained">
-                        <HelpOutlineIcon sx={{color: "#297342", marginRight:"5px"}}/>
+                    <Button className="btn-setting" sx={{color: "#387478", background: "none", margin:"1rem"}} variant="contained">
+                        <HelpOutlineIcon sx={{color: "#387478", marginRight:"10px"}}/>
                         Trợ giúp
                     </Button>
                 </Stack>

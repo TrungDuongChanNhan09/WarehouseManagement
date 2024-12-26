@@ -13,18 +13,21 @@ import Employee from "./Pages/Employee/Employee.jsx";
 import Shelf from "./Pages/Shelf/Shelf.jsx";
 import ImportShipment from "./Pages/ImportShipment/ImportShipment.jsx";
 import Supplier from "./Pages/Supplier/Supplier.jsx";
+import Order from "./Pages/Order/Order.jsx";
+import ExportShipment from "./Pages/ExportShipment/ExportShipment.jsx";
 
 const App = () =>{
   return(
     <div className="App">
       <BrowserRouter>
         <Routes>
-          <Route index element={<Login/>}/>
+          <Route index element = {<Login/>}/>
           <Route path='register' element={<Register/>}/>
           <Route path='login' element={<Login/>}/>
           <Route path='app' element={<Navbar/>}>
             <Route index element={<DashBoard/>}/>
             <Route path='home' element={<DashBoard/>}/>
+            <Route path='order' element={<Order/>}/>
             <Route path='inventory' element={<Inventory/>}/>
             <Route path='category' element={<Category/>}/>
             <Route path='product' element={<Product/>}/>
@@ -32,6 +35,7 @@ const App = () =>{
             <Route path='shelf' element={<Shelf/>}/>
             <Route path='importshipment' element={<ImportShipment/>}/>
             <Route path='supplier' element={<Supplier/>} />
+            <Route path='exportshipment' element={<ExportShipment/>}/>
           </Route>
         </Routes>
       </BrowserRouter>

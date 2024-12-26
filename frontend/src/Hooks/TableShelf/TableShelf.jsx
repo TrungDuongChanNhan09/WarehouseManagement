@@ -24,11 +24,10 @@ import ApiService from "../../Service/ApiService";
 
 const columns = [
   { id: "id", label: "ID", minWidth: 30 },
-  { id: "nameInventory", label: "Tên kho hàng", maxWidth: 140 },
-  { id: "typeInventory", label: "Loại kho hàng", maxWidth: 140 },
+  { id: "nameInventory", label: "Tên kệ hàng", maxWidth: 140 },
+  { id: "typeInventory", label: "Loại kệ", maxWidth: 140 },
   { id: "status", label: "Tình trạng", minWidth: 140 },
-  { id: "quantity", label: "Hàng tồn kho (sản phẩm)", minWidth: 140 },
-  { id: "number_shelf", label: "Tổng số kệ", maxWidth: 150 },
+  { id: "quantity", label: "Tổng sản phẩm", minWidth: 140 },
   { id: "capacity_shelf", label: "Sức chứa (sản phẩm)", maxWidth: 100 },
 ];
 
@@ -56,6 +55,7 @@ const TableInventory = () => {
     try {
       const response = await ApiService.getAllInventory();
       setInventorys(response);
+      setInventorys([])
     } catch (error) {
       console.error("Lỗi khi tải thông tin các Inventory", error.message);
     }
