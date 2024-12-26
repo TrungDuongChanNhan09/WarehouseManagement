@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Shelf {
     @Id
     private String id;
+    private String nameShelf;
     private String inventoryid;
     private String productId;
     private int quantity;

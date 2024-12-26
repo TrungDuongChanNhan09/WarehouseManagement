@@ -1,4 +1,5 @@
 package com.example.backend.controller;
+import com.example.backend.model.Inventory;
 import com.example.backend.model.Shelf;
 import com.example.backend.model.User;
 import com.example.backend.service.ShelfService;
@@ -60,7 +61,12 @@ public class ShelfController {
         return shelf.map(s -> new ResponseEntity<>(s, HttpStatus.OK))
                     .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
+    @GetMapping("/searchByName/{keyword}")
+    public ResponseEntity<List<Shelf>> searchInventoriesByName(@PathVariable String keyword, @RequestHeader("Authorization") String jwt) throws Exception {
+        User user = userService.findUserByJwtToken(jwt);
+        List<Shelf> inventories = shelfService.searchShelfByName(keyword);
+        return new ResponseEntity<>(inventories, HttpStatus.OK);
+    }
 
     @GetMapping("/all")
     public ResponseEntity<List<Shelf>> getAllShelves(@RequestHeader("Authorization") String jwt) throws Exception{
