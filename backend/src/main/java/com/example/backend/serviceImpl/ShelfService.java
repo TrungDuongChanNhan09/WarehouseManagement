@@ -91,7 +91,7 @@ public class ShelfService implements com.example.backend.service.ShelfService{
             }
             if(updatedShelf.getQuantity() <= existingShelf.getCapacity() &&productRepository.findById(updatedShelf.getProductId()).get().getInventory_quantity() - totalQuantity >= updatedShelf.getQuantity() ){
                 updatequantityShelf(shelfId,updatedShelf.getQuantity());
-                existingShelf.setNameShelf(updatedShelf.getNameShelf());
+                existingShelf.setCodeShelf(updatedShelf.getCodeShelf());
                 return shelfRepository.save(existingShelf);
  
             }
@@ -131,8 +131,8 @@ public class ShelfService implements com.example.backend.service.ShelfService{
     }
 
     @Override
-    public List<Shelf> searchShelfByName(String keyword){
-        return shelfRepository.searchBynameShelf(keyword);
+    public List<Shelf> searchShelfByCode(String keyword){
+        return shelfRepository.searchBycodeShelf(keyword);
     }
 
     @Override

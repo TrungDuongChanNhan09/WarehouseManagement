@@ -14,7 +14,7 @@ public interface ShelfService {
 
     void updatequantityShelf(String shelfId, int quantity) throws Exception;
 
-    List<Shelf> searchShelfByName(String keyword);
+    List<Shelf> searchShelfByCode(String keyword);
     Optional<Shelf> getShelfById(String shelfId);
     boolean shelfExists(String shelfId);
     List<Shelf> getAllShelves();
