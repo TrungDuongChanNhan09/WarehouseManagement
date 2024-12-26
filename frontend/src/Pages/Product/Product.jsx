@@ -174,7 +174,7 @@ const Product = () => {
                             <Button 
                                 onClick={handleOpen} 
                                 className="btn-setting" 
-                                sx={{color: "white", height:"55px", backgroundColor: "#297342"}} variant="contained">
+                                sx={{color: "white", height:"55px", backgroundColor: "#243642"}} variant="contained">
                                 <AddIcon sx={{color: "white"}}/>
                                 Thêm sản phẩm
                             </Button>

@@ -147,7 +147,7 @@ export default function Supplier() {
                             <Button 
                                 onClick={handleOpen} 
                                 className="btn-setting" 
-                                sx={{color: "white", height:"55px", backgroundColor: "#297342"}} variant="contained">
+                                sx={{color: "white", height:"55px", backgroundColor: "#243642"}} variant="contained">
                                 <AddIcon sx={{color: "white"}}/>
                                 Thêm nhà cung cấp
                             </Button>
@@ -167,7 +167,7 @@ export default function Supplier() {
                     <Box sx={style}>
                         <Stack className="template-add-iventory" direction={"column"} alignItems={"center"}>
                             <Typography 
-                                sx={{alignContent:"center" , fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"100%", marginBottom:"1rem"}} 
+                                sx={{textAlign: 'center', fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"100%", marginBottom:"1rem"}} 
                                 variant="p">
                                     Thêm nhà cung cấp
                             </Typography>
