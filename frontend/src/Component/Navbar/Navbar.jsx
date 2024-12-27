@@ -253,6 +253,12 @@ const Navbar = () => {
                                     "& .MuiSvgIcon-root": {
                                         fontSize: "24px",
                                         marginRight: "10px",
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px", 
+                                    },
+                                }}
+                            /> 
                              <BottomNavigationAction 
                                 showLabel={true} 
                                 label="ExportShipment"
@@ -279,15 +285,4 @@ const Navbar = () => {
                         </BottomNavigation>
                     </Stack>
                 
-                    <Button className="btn-setting" sx={{color: "#387478", background: "none", margin:"1rem"}} variant="contained">
-                        <HelpOutlineIcon sx={{color: "#387478", marginRight:"10px"}}/>
-                        Trợ giúp
-                    </Button>
-                </Stack>
-            </Stack>
-            <Outlet />
-        </>
-    );
-};
-
-export default Navbar;
+                    <Button className="btn-setting" sx={{color: "#387478", background: "none", margin:"1rem"}} variant="contai
