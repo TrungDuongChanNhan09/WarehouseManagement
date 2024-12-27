@@ -43,13 +43,7 @@ const columns = [
   { id: 'product_quantity', label: 'Số lượng mặt hàng', align: 'center' },
   { id: 'totalPrice', label: 'Tổng giá trị', align: 'center', format: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value) },
   { id: 'create_At', label: 'Ngày tạo đơn', align: 'center', format: (value) => value.toLocaleDateString('en-GB'), },
-  // {
-  //   id: 'density',
-  //   label: 'Density',
-  //   minWidth: 170,
-  //   align: 'center',
-  //   format: (value) => value.toFixed(2),
-  // },
+  { id: 'action', label: '', align: 'center' },
 ];
 
 function createData(import_id, product_quantity, totalPrice, create_At) {
@@ -176,24 +170,21 @@ export default function ImportShipment() {
                     <Box sx={style}>
                         <Stack className="template-add-iventory" direction={"column"} alignItems={"center"}>
                             <Typography 
-                                sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"200px", marginBottom:"1rem"}} 
+                                sx={{textAlign: 'center', fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"100%", marginBottom:"1rem"}} 
                                 variant="p">
-                                    Thêm kho hàng
-
+                                    Thêm đơn nhập hàng
                             </Typography>
                             <Stack sx={{ marginTop:"0.5rem"}} className="body-infor" flexWrap="wrap" direction={"row"} alignItems={"center"}>
                                 <TextField sx={{margin:"1rem", width:"100%"}} id="outlined-basic" label="Tên kho hàng" variant="outlined" />
                                 <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Số kệ hàng" variant="outlined" />
                                 <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Trạng thái kho" variant="outlined" />
                                 <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Diện tích" variant="outlined" />
-                                
                             </Stack>
                             <Button 
                                 className="btn-setting" 
                                 sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
-                                Thêm kho hàng
+                                Thêm đơn nhập hàng
                             </Button>
-
                         </Stack>
                     </Box>
                 </Fade>

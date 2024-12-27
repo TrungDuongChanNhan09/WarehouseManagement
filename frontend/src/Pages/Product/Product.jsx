@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import './Product.css'
 import { alpha, Box, Button, Container, Fade, FormControl, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Stack, styled, TextField, Typography } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import MyTable from "../../Component/MyTable";
 import ApiService from "../../Service/ApiService";
+import dayjs from 'dayjs';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: 'black',
@@ -40,19 +44,14 @@ const Search = styled('div')(({ theme }) => ({
 const columns = [
   { id: 'stt', label: 'STT', minWidth: 50, align: 'center'},
   { id: 'productName', label: 'Tên sản phẩm', minWidth: 100, align: 'left' },
-  { id: 'categoryId', label: 'Loại', minWidth: 100, align: 'left' },
-  { id: 'supplierId', label: 'Nhà cung cấp', minWidth: 100, align: 'left' },
-  { id: 'inventory_quantity', label: 'Số lượng tồn kho', minWidth: 100, align: 'center', format: (value) => value.toLocaleString('en-US'), },
+  { id: 'categoryName', label: 'Loại', align: 'center' },
+  { id: 'supplierName', label: 'Nhà cung cấp', align: 'center' },
+  { id: 'inventory_quantity', label: 'Số lượng', align: 'center', format: (value) => value.toLocaleString('en-US'), },
   { id: 'price', label: 'Giá', minWidth: 100, align: 'center', format: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value) },
-  { id: 'production_date', label: 'Ngày sản xuất', minWidth: 150, align: 'center', format: (value) => Intl.DateTimeFormat('vi-VN').format(new Date(value)) },
-  { id: 'expiration_date', label: 'Ngày hết hạn', minWidth: 150, align: 'center', format: (value) => Intl.DateTimeFormat('vi-VN').format(new Date(value)) },
-  // {
-  //   id: 'density',
-  //   label: 'Density',
-  //   minWidth: 170,
-  //   align: 'center',
-  //   format: (value) => value.toFixed(2),
-  // },
+  { id: 'production_date', label: 'Ngày sản xuất', minWidth: 100, align: 'center', format: (value) => Intl.DateTimeFormat('vi-VN').format(new Date(value)) },
+  { id: 'expiration_date', label: 'Ngày hết hạn', minWidth: 100, align: 'center', format: (value) => value ? Intl.DateTimeFormat('vi-VN').format(new Date(value)) : '' },
+  { id: 'productStatus', label: 'Trạng thái', align: 'center' },
+  { id: 'action', label: '', align: 'center' },
 ];
 
 function createData(productName, categoryId, supplierId, inventory_quantity, price, production_date, expiration_date) {
@@ -74,7 +73,7 @@ function createData(productName, categoryId, supplierId, inventory_quantity, pri
 
 const style = {
     position: 'absolute',
-    top: '40%',
+    top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 650,
@@ -85,33 +84,109 @@ const style = {
 
 const Product = () => {
     const [filter, setFilter] = useState();
+    const refInput = useRef({});
+    const [listCategory, setListCategory] = React.useState([]);
+    const [listSupplier, setListSupplier] = React.useState([]);
+    const [open, setOpen] = React.useState(false);
+    const [openEdit, setOpenEdit] = React.useState(false);
+    const [rows, setRows] = React.useState([]);
+    const [selectedRow, setSelectedRow] = useState(null);
+
+    useEffect(() => {
+      fetchRows();
+    }, []);
+
+    useEffect(() => {
+        fetchRows();
+    }, [open,openEdit]);
 
     useEffect(() => {
         console.log('change filter ' + filter);
     },[filter]);
+    
+    const handleChange = ({target}) => {
+        refInput.current[target.name] = target.value;
+        console.log(refInput);
+    }
+
+    const handleChangeProductionDate = (value) => {
+        refInput.current['production_date'] = value.$y + "-" + (value.$M + 1) + "-" + value.$D;
+        console.log(refInput);
+    }
+
+    const handleChangeExpirationDate = (value) => {
+        refInput.current['expiration_date'] = value.$y + "-" + (value.$M + 1) + "-" + value.$D;
+        console.log(refInput);
+    }
+
+    const handleAddProduct = async () => {
+        const respond = await ApiService.addProduct(refInput.current);
+        if (respond.status === 201) setOpen(false);
+        console.log(respond);
+    }
+
+    const handleUpdateProduct = async () => {
+        const respond = await ApiService.updateProduct(selectedRow.id, refInput.current);
+        if (respond.status === 200) setOpenEdit(false);
+    }
+
+    const handleDeleteButton = async (id) => {
+        await ApiService.deleteProduct(id);
+        fetchRows();
+    }
+
+    const handleEditButton = async (row) => {
+        setSelectedRow(row);
+        setOpenEdit(true);
+        refInput.current = row;
+        setListCategory(await ApiService.getAllCategorys());
+        setListSupplier(await ApiService.getAllSupplier());
+    };
 
     const handleFilterChange = (e) => {
         setFilter(e.target.value);
     };
 
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
+    const handleOpen = async () => {
+        setOpen(true);
+        setListCategory(await ApiService.getAllCategorys());
+        setListSupplier(await ApiService.getAllSupplier());
+    }
     const handleClose = () => setOpen(false);
 
-    const [rows, setRows] = React.useState([]);
+    
 
     const fetchRows = async () => {
       try {
         const response = await ApiService.getAllProduct();
-        setRows(response);
+
+        const updatedRows = await Promise.all(
+            response.map(async (row) => {
+                try {
+                    const supplier = await ApiService.getSupplierById(row.supplierId);
+                    const category = await ApiService.getCategoryById(row.categoryId);
+                    return { 
+                      ...row, 
+                      supplierName: supplier?.nameSupplier || '',
+                      categoryName: category?.categoryName || '',
+                    };
+                } catch (error) {
+                    console.error('Lỗi khi lấy dữ liệu:', error);
+                    return { 
+                      ...row, 
+                      supplierName: '',
+                      categoryName: '',
+                    };
+                }
+            })
+        );
+
+        console.log(updatedRows);
+        setRows(updatedRows);
       } catch (error) {
         console.error("Lỗi khi tải thông tin các Product", error.message);
       }
     };
-
-    useEffect(() => {
-      fetchRows();
-    }, []);
 
     return(
         <Container maxWidth="xl" className="Product" sx={{ width: "100%", height: "auto", display: "flex", flexDirection: "column"}}>
@@ -181,7 +256,7 @@ const Product = () => {
                         </Stack>
                     </Stack>
                 </Stack>
-                <MyTable tableColumns={columns} tableRows={rows} />
+                <MyTable tableColumns={columns} tableRows={rows} handleDeleteButton={handleDeleteButton} handleEditButton={handleEditButton} />
             </Stack>
             <Modal
                 aria-labelledby="transition-modal-title"
@@ -194,28 +269,175 @@ const Product = () => {
                     <Box sx={style}>
                         <Stack className="template-add-iventory" direction={"column"} alignItems={"center"}>
                             <Typography 
-                                sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"200px", marginBottom:"1rem"}} 
+                                sx={{textAlign: 'center', fontWeight: 'bold', fontSize:"20px", width:"100%"}} 
                                 variant="p">
-                                    Thêm kho hàng
-
+                                    Thêm sản phẩm
                             </Typography>
-                            <Stack sx={{ marginTop:"0.5rem"}} className="body-infor" flexWrap="wrap" direction={"row"} alignItems={"center"}>
-                                <TextField sx={{margin:"1rem", width:"100%"}} id="outlined-basic" label="Tên kho hàng" variant="outlined" />
-                                <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Số kệ hàng" variant="outlined" />
-                                <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Trạng thái kho" variant="outlined" />
-                                <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Diện tích" variant="outlined" />
-                                
+                            <Stack sx={{ marginTop:"1rem", marginBottom:"1rem"}} className="body-infor" flexWrap="wrap" direction={"row"} alignItems={"center"}>
+                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} name="productName" label="Tên sản phẩm" variant="outlined" />
+                                <FormControl sx={{margin:"1%", width:"48%" }}>
+                                    <InputLabel id="demo-simple-select-helper-label">Loại</InputLabel>
+                                    <Select
+                                    labelId="demo-simple-select-helper-label"
+                                    id="demo-simple-select-helper"
+                                    name="categoryId"
+                                    label="Loại"
+                                    onChange={handleChange}
+                                    >
+                                        {listCategory.map((category) => {
+                                            return (
+                                                <MenuItem value={category.id}>{category.categoryName}</MenuItem>
+                                            );
+                                        })}
+                                    </Select>
+                                </FormControl>
+                                <FormControl sx={{margin:"1%", width:"48%" }}>
+                                    <InputLabel id="demo-simple-select-helper-label">Nhà cung cấp</InputLabel>
+                                    <Select
+                                    labelId="demo-simple-select-helper-label"
+                                    id="demo-simple-select-helper"
+                                    name="supplierId"
+                                    label="Nhà cung cấp"
+                                    onChange={handleChange}
+                                    >
+                                        {listSupplier.map((supplier) => {
+                                            return (
+                                                <MenuItem value={supplier.id}>{supplier.nameSupplier}</MenuItem>
+                                            );
+                                        })}
+                                    </Select>
+                                </FormControl>
+                                <TextField sx={{margin:"1%", width:"31%" }} onChange={handleChange} name="unit" label="Đơn vị" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"31%" }} onChange={handleChange} name="inventory_quantity" label="Số lượng" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"32%" }} onChange={handleChange} name="price" label="Giá" variant="outlined" />
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DesktopDatePicker 
+                                        views={['year', 'month', 'day']} 
+                                        sx={{margin:"1%", width:"48%" }} 
+                                        onChange={(newValue) => {
+                                            handleChangeProductionDate(newValue);
+                                        }}
+                                        label="Ngày sản xuất" 
+                                        format="DD/MM/YYYY"
+                                    />
+                                </LocalizationProvider>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DesktopDatePicker 
+                                        views={['year', 'month', 'day']} 
+                                        sx={{margin:"1%", width:"48%" }} 
+                                        onChange={(newValue) => {
+                                            handleChangeExpirationDate(newValue);
+                                        }}
+                                        label="Ngày hết hạn" 
+                                        format="DD/MM/YYYY"
+                                    />
+                                </LocalizationProvider>
+                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} multiline="true" name="description" label="Mô tả sản phẩm" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} name="image" label="Hình ảnh" variant="outlined" />
                             </Stack>
                             <Button 
-                                className="btn-setting" 
+                                className="btn-setting"
+                                onClick={handleAddProduct}
                                 sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
-                                Thêm kho hàng
+                                Thêm sản phẩm
                             </Button>
-
                         </Stack>
                     </Box>
                 </Fade>
             </Modal>
+
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={openEdit}
+                onClose={()=>{setOpenEdit(false)}}
+                closeAfterTransition
+            >
+                <Fade in={openEdit}>
+                    <Box sx={style}>
+                        <Stack className="template-add-iventory" direction={"column"} alignItems={"center"}>
+                            <Typography 
+                                sx={{textAlign: 'center', fontWeight: 'bold', fontSize:"20px", width:"100%"}} 
+                                variant="p">
+                                    Cập nhật sản phẩm
+                            </Typography>
+                            <Stack sx={{ marginTop:"1rem", marginBottom:"1rem"}} className="body-infor" flexWrap="wrap" direction={"row"} alignItems={"center"}>
+                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} defaultValue={selectedRow?.productName || ''} name="productName" label="Tên sản phẩm" variant="outlined" />
+                                <FormControl sx={{margin:"1%", width:"48%" }}>
+                                    <InputLabel id="demo-simple-select-helper-label">Loại</InputLabel>
+                                    <Select
+                                    labelId="demo-simple-select-helper-label"
+                                    id="demo-simple-select-helper"
+                                    name="categoryId"
+                                    defaultValue={selectedRow?.categoryId ?? ''}
+                                    label="Loại"
+                                    onChange={handleChange}
+                                    >
+                                        {listCategory.map((category) => {
+                                            return (
+                                                <MenuItem value={category.id}>{category.categoryName}</MenuItem>
+                                            );
+                                        })}
+                                    </Select>
+                                </FormControl>
+                                <FormControl sx={{margin:"1%", width:"48%" }}>
+                                    <InputLabel id="demo-simple-select-helper-label">Nhà cung cấp</InputLabel>
+                                    <Select
+                                    labelId="demo-simple-select-helper-label"
+                                    id="demo-simple-select-helper"
+                                    name="supplierId"
+                                    defaultValue={selectedRow?.supplierId ?? ''}
+                                    label="Nhà cung cấp"
+                                    onChange={handleChange}
+                                    >
+                                        {listSupplier.map((supplier) => {
+                                            return (
+                                                <MenuItem value={supplier.id}>{supplier.nameSupplier}</MenuItem>
+                                            );
+                                        })}
+                                    </Select>
+                                </FormControl>
+                                <TextField sx={{margin:"1%", width:"31%" }} onChange={handleChange} defaultValue={selectedRow?.unit || ''} name="unit" label="Đơn vị" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"31%" }} onChange={handleChange} defaultValue={selectedRow?.inventory_quantity || ''} name="inventory_quantity" label="Số lượng" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"32%" }} onChange={handleChange} defaultValue={selectedRow?.price || ''} name="price" label="Giá" variant="outlined" />
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DesktopDatePicker 
+                                        views={['year', 'month', 'day']} 
+                                        sx={{margin:"1%", width:"48%" }} 
+                                        onChange={(newValue) => {
+                                            handleChangeProductionDate(newValue);
+                                        }}
+                                        defaultValue={dayjs(selectedRow?.production_date || '')}
+                                        label="Ngày sản xuất" 
+                                        format="DD/MM/YYYY"
+                                    />
+                                </LocalizationProvider>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DesktopDatePicker 
+                                        views={['year', 'month', 'day']} 
+                                        sx={{margin:"1%", width:"48%" }} 
+                                        onChange={(newValue) => {
+                                            handleChangeExpirationDate(newValue);
+                                        }}
+                                        defaultValue={dayjs(selectedRow?.expiration_date || '')}
+                                        label="Ngày hết hạn" 
+                                        format="DD/MM/YYYY"
+                                    />
+                                </LocalizationProvider>
+                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} defaultValue={selectedRow?.description || ''} multiline="true" name="description" label="Mô tả sản phẩm" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} name="image" label="Hình ảnh" variant="outlined" />
+                            </Stack>
+                            <Button 
+                                className="btn-setting"
+                                onClick={handleUpdateProduct}
+                                sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
+                                Cập nhật
+                            </Button>
+                        </Stack>
+                    </Box>
+                </Fade>
+            </Modal>
+
         </Container>
     )
 }

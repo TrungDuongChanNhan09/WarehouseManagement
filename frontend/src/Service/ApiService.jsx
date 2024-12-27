@@ -60,8 +60,6 @@ export default class ApiService {
         }
     }
 
-
-
     static async addInventory(formData) {
         try {
             const response = await axios.post(`${this.BASE_URL}/api/admin/inventory`, formData, {
@@ -100,6 +98,8 @@ export default class ApiService {
     
 
     // Phát
+    
+    //Product
     static async getAllProduct() {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/product`, {
@@ -111,6 +111,54 @@ export default class ApiService {
         }
     }
 
+    static async addProduct(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/product`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async updateProduct(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/product/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async deleteProduct(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/product/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    static async getCategoryById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/category/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    //Supplier
     static async getAllSupplier() {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/supplier`, {
@@ -118,6 +166,53 @@ export default class ApiService {
             });
             return response.data;
         } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addSupplier(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/supplier`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async updateSupplier(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/supplier/updateSupplier/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async getSupplierById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/supplier/getById/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async deleteSupplier(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/supplier/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response; 
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error.response?.data || error.message);
             throw error;
         }
     }
@@ -172,7 +267,7 @@ export default class ApiService {
     //Category
     static async getAllCategorys() {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/admin/category`, {
+            const response = await axios.get(`${this.BASE_URL}/api/category`, {
                 headers: this.getHeader(),
             });
             return response.data;

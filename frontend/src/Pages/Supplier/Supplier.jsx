@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import './Supplier.css'
 import { alpha, Box, Button, Container, Fade, FormControl, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Stack, styled, TextField, Typography } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
@@ -41,37 +41,65 @@ const columns = [
   { id: 'stt', label: 'STT', minWidth: 50, align: 'center'},
   { id: 'nameSupplier', label: 'Tên nhà cung cấp', minWidth: 100, align: 'left' },
   { id: 'address', label: 'Địa chỉ', minWidth: 100, align: 'left' },
-  { id: 'phoneNumber', label: 'Nhà cung cấp', minWidth: 100, align: 'left' },
-  { id: 'email', label: 'Số lượng tồn kho', minWidth: 100, align: 'center' },
+  { id: 'phoneNumber', label: 'Số điện thoại', minWidth: 100, align: 'center' },
+  { id: 'email', label: 'Email', minWidth: 100, align: 'center' },
+  { id: 'action', label: '', align: 'center' },
 ];
 
 const style = {
     position: 'absolute',
-    top: '40%',
+    top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 650,
     bgcolor: 'background.paper',
     boxShadow: 24,
-    p: 4,
+    p: 5,
 };
 
 export default function Supplier() {
     const [filter, setFilter] = useState();
+    const [open, setOpen] = React.useState(false);
+    const [openEdit, setOpenEdit] = React.useState(false);
+    const [rows, setRows] = React.useState([]);
+    const [selectedRow, setSelectedRow] = useState(null);
+    const refInput = useRef({});
 
-    useEffect(() => {
-        console.log('change filter ' + filter);
-    },[filter]);
+    const handleChange = ({target}) => {
+        refInput.current[target.name] = target.value;
+    }
+
+    const handleAddSupplier = async () => {
+        const respond = await ApiService.addSupplier(refInput.current);
+        if (respond.status === 201) setOpen(false);
+    }
+
+    const handleUpdateSupplier = async () => {
+        const respond = await ApiService.updateSupplier(selectedRow.id, refInput.current);
+        if (respond.status === 200) setOpenEdit(false);
+    }
+
+    const handleDeleteButton = async (id) => {
+        await ApiService.deleteSupplier(id);
+        fetchRows();
+    }
+
+    const handleEditButton = (row) => {
+        setSelectedRow(row);
+        setOpenEdit(true);
+        refInput.current = row;
+    };
+    
+    const handleOpen = () => {
+        setOpen(true);
+        refInput.current.reset();
+    };
+
+    const handleClose = () => setOpen(false);
 
     const handleFilterChange = (e) => {
         setFilter(e.target.value);
     };
-
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-
-    const [rows, setRows] = React.useState([]);
 
     const fetchRows = async () => {
       try {
@@ -83,8 +111,16 @@ export default function Supplier() {
     };
 
     useEffect(() => {
-      fetchRows();
+        console.log('change filter ' + filter);
+    },[filter]);
+
+    useEffect(() => {
+        fetchRows();
     }, []);
+
+    useEffect(() => {
+        fetchRows();
+    }, [open,openEdit]);
 
     return(
         <Container maxWidth="xl" className="Supplier" sx={{ width: "100%", height: "auto", display: "flex", flexDirection: "column"}}>
@@ -154,8 +190,9 @@ export default function Supplier() {
                         </Stack>
                     </Stack>
                 </Stack>
-                <MyTable tableColumns={columns} tableRows={rows} />
+                <MyTable tableColumns={columns} tableRows={rows} handleDeleteButton={handleDeleteButton} handleEditButton={handleEditButton}/>
             </Stack>
+            {/* Modal Add */}
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
@@ -167,20 +204,53 @@ export default function Supplier() {
                     <Box sx={style}>
                         <Stack className="template-add-iventory" direction={"column"} alignItems={"center"}>
                             <Typography 
-                                sx={{textAlign: 'center', fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"100%", marginBottom:"1rem"}} 
+                                sx={{textAlign: 'center', fontWeight: 'bold', fontSize:"20px", width:"100%"}} 
                                 variant="p">
                                     Thêm nhà cung cấp
                             </Typography>
-                            <Stack sx={{ marginTop:"0.5rem"}} className="body-infor" flexWrap="wrap" direction={"row"} alignItems={"center"}>
-                                <TextField sx={{margin:"1rem", width:"100%"}} id="outlined-basic" label="Tên kho hàng" variant="outlined" />
-                                <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Số kệ hàng" variant="outlined" />
-                                <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Trạng thái kho" variant="outlined" />
-                                <TextField sx={{margin:"1rem", width:"43%"}} id="outlined-basic" label="Diện tích" variant="outlined" />
+                            <Stack sx={{ marginTop:"1rem", marginBottom:"1rem"}} className="body-infor" flexWrap="wrap" direction={"row"} alignItems={"center"}>
+                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} name="nameSupplier" label="Tên nhà cung cấp" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"48%" }} onChange={handleChange} name="email" label="Email" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"48%" }} onChange={handleChange} name="phoneNumber" label="Số điện thoại" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} name="address" label="Địa chỉ" variant="outlined" />
                             </Stack>
                             <Button 
-                                className="btn-setting" 
+                                className="btn-setting"
+                                onClick={handleAddSupplier} 
                                 sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
                                 Thêm nhà cung cấp
+                            </Button>
+                        </Stack>
+                    </Box>
+                </Fade>
+            </Modal>
+            {/* Modal Edit */}
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={openEdit}
+                onClose={()=>{setOpenEdit(false)}}
+                closeAfterTransition
+            >
+                <Fade in={openEdit}>
+                    <Box sx={style}>
+                        <Stack className="template-add-iventory" direction={"column"} alignItems={"center"}>
+                            <Typography 
+                                sx={{textAlign: 'center', fontWeight: 'bold', fontSize:"20px", width:"100%"}} 
+                                variant="p">
+                                    Cập nhật nhà cung cấp
+                            </Typography>
+                            <Stack sx={{ marginTop:"1rem", marginBottom:"1rem"}} className="body-infor" flexWrap="wrap" direction={"row"} alignItems={"center"}>
+                                <TextField sx={{margin:"1%", width:"100%"}} defaultValue={selectedRow?.nameSupplier || ''} onChange={handleChange} name="nameSupplier" label="Tên nhà cung cấp" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"48%" }} defaultValue={selectedRow?.email || ''} onChange={handleChange} name="email" label="Email" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"48%" }} defaultValue={selectedRow?.phoneNumber || ''} onChange={handleChange} name="phoneNumber" label="Số điện thoại" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"100%"}} defaultValue={selectedRow?.address || ''} onChange={handleChange} name="address" label="Địa chỉ" variant="outlined" />
+                            </Stack>
+                            <Button 
+                                className="btn-setting"
+                                onClick={handleUpdateSupplier}
+                                sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
+                                Cập nhật
                             </Button>
                         </Stack>
                     </Box>
