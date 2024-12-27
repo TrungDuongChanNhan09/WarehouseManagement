@@ -17,6 +17,4 @@ public interface InventoryRepository  extends MongoRepository<Inventory, String>
     @Query("{ 'nameInventory': { $regex: ?0, $options: 'i' } }")
     List<Inventory> searchBynameInventory(String nameInventory);
     List<Inventory> findByStatus(INVENTORY_STATE status);
-    @Query("{ 'nameInventory': { $regex: ?0, $options: 'i' } }")
-    List<Inventory> searchBynameInventory(String inventoryName);
 }

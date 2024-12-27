@@ -1,7 +1,9 @@
 package com.example.backend.serviceImpl;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.example.backend.model.INVENTORY_STATE;
@@ -88,10 +90,13 @@ public class ShelfService implements com.example.backend.service.ShelfService{
             List<Shelf> shelfs = shelfRepository.findByproductId(existingShelf.getProductId());
             int totalQuantity = 0;
             for(Shelf i : shelfs){
+                if(!Objects.equals(i.getShelfCode(), existingShelf.getShelfCode()))
                 totalQuantity += i.getQuantity();
             }
-            if(updatedShelf.getQuantity() <= existingShelf.getCapacity() &&productRepository.findById(updatedShelf.getProductId()).get().getInventory_quantity() - totalQuantity >= updatedShelf.getQuantity() ){
+
+            if(updatedShelf.getQuantity() <= existingShelf.getCapacity() && productRepository.findById(existingShelf.getProductId()).get().getInventory_quantity() - totalQuantity >= updatedShelf.getQuantity() ){
                 updatequantityShelf(shelfId,updatedShelf.getQuantity());
+                existingShelf.setQuantity(updatedShelf.getQuantity());
                 existingShelf.setShelfCode(updatedShelf.getShelfCode());
                 return shelfRepository.save(existingShelf);
  
@@ -155,8 +160,6 @@ public class ShelfService implements com.example.backend.service.ShelfService{
                 throw new Exception("INVENTORY CLOSE");
             }
             int totalQuantitybefore = shelf.getQuantity();
-            shelf.setQuantity(quantity);
-
             if(inventory != null){
                 int sub_quantity = quantity - totalQuantitybefore;
                 int quantity_inventory = inventory.getQuantity() + sub_quantity;
