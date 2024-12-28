@@ -1,11 +1,10 @@
 package com.example.backend.serviceImpl;
 
-import com.example.backend.model.ORDER_ITEM_STATE;
-import com.example.backend.model.OrderItem;
-import com.example.backend.model.PRODUCT_STATUS;
-import com.example.backend.model.Product;
+import com.example.backend.model.*;
 import com.example.backend.repository.OrderItemRepository;
 import com.example.backend.repository.ProductRepository;
+import com.example.backend.repository.ShelfRepository;
+import com.example.backend.request.OrderItemRequest;
 import com.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +23,9 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ShelfRepository shelfRepository;
 
     @Override
     public OrderItem createOrderItem(OrderItem orderItem) throws Exception {
@@ -45,17 +47,50 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
         newOrderItem.setQuantity(orderItem.getQuantity());
         newOrderItem.setProduct_id(orderItem.getProduct_id());
         newOrderItem.setOrderItemCode(orderItem.getOrderItemCode());
+        newOrderItem.setShelfCode(orderItem.getShelfCode());
+
         int totalPrice = orderItem.getQuantity()*existProduct.get().getPrice();
 
         //check if product quantity in inventory equal with orderItem
         if(existProduct.get().getInventory_quantity() == orderItem.getQuantity()){
             existProduct.get().setInventory_quantity(0);
-            Optional<Product> product = productService.getProductById(orderItem.getProduct_id());
             existProduct.get().setProductStatus(PRODUCT_STATUS.OUT_STOCK);
+            int quantity = orderItem.getQuantity();
+            for(String shelfCode : orderItem.getShelfCode()){
+                Shelf shelf = shelfRepository.findByshelfCode(shelfCode);
+                if(quantity > shelf.getQuantity()){
+                    quantity -= shelf.getQuantity();
+                    shelf.setQuantity(0);
+                    shelfRepository.save(shelf);
+                }
+
+                if(quantity <= shelf.getQuantity()){
+                    shelf.setQuantity(shelf.getQuantity() - quantity);
+                    quantity = 0;
+                    shelfRepository.save(shelf);
+                }
+            }
             productRepository.save(existProduct.get());
+
         } else {
             existProduct.get().setInventory_quantity(existProduct.get().getInventory_quantity() - orderItem.getQuantity());
+            int quantity = orderItem.getQuantity();
+            for(String shelfCode : orderItem.getShelfCode()){
+                Shelf shelf = shelfRepository.findByshelfCode(shelfCode);
+                if(quantity > shelf.getQuantity()){
+                    quantity -= shelf.getQuantity();
+                    shelf.setQuantity(0);
+                    shelfRepository.save(shelf);
+                }
+
+                if(quantity <= shelf.getQuantity()){
+                    shelf.setQuantity(shelf.getQuantity() - quantity);
+                    quantity = 0;
+                    shelfRepository.save(shelf);
+                }
+            }
             productService.updateProduct(existProduct.get().getId(), existProduct.get());
+            List<Shelf> shelves = shelfRepository.findByproductId(existProduct.get().getId());
         }
         newOrderItem.setTotalPrice(totalPrice);
         return orderItemRepository.save(newOrderItem);
@@ -83,11 +118,41 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
         //check if product quantity in inventory equal with orderItem
         if(existProduct.get().getInventory_quantity() == orderItem.getQuantity()){
             existProduct.get().setInventory_quantity(0);
-            Optional<Product> product = productService.getProductById(orderItem.getProduct_id());
             existProduct.get().setProductStatus(PRODUCT_STATUS.OUT_STOCK);
+            int quantity = orderItem.getQuantity();
+            for(String shelfCode : orderItem.getShelfCode()){
+                Shelf shelf = shelfRepository.findByshelfCode(shelfCode);
+                if(quantity > shelf.getQuantity()){
+                    quantity -= shelf.getQuantity();
+                    shelf.setQuantity(0);
+                    shelfRepository.save(shelf);
+                }
+
+                if(quantity <= shelf.getQuantity()){
+                    shelf.setQuantity(shelf.getQuantity() - quantity);
+                    quantity = 0;
+                    shelfRepository.save(shelf);
+                }
+            }
             productRepository.save(existProduct.get());
+
         } else {
             existProduct.get().setInventory_quantity(existProduct.get().getInventory_quantity() - orderItem.getQuantity());
+            int quantity = orderItem.getQuantity();
+            for(String shelfCode : orderItem.getShelfCode()){
+                Shelf shelf = shelfRepository.findByshelfCode(shelfCode);
+                if(quantity > shelf.getQuantity()){
+                    quantity -= shelf.getQuantity();
+                    shelf.setQuantity(0);
+                    shelfRepository.save(shelf);
+                }
+
+                if(quantity <= shelf.getQuantity()){
+                    shelf.setQuantity(shelf.getQuantity() - quantity);
+                    quantity = 0;
+                    shelfRepository.save(shelf);
+                }
+            }
             productService.updateProduct(existProduct.get().getId(), existProduct.get());
         }
         existOrderItem.setTotalPrice(totalPrice);

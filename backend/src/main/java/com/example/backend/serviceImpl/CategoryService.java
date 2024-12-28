@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class CategoryService implements com.example.backend.service.CategoryService {
     @Autowired
@@ -42,5 +44,10 @@ public class CategoryService implements com.example.backend.service.CategoryServ
             categoryName.add(category.getCategoryName());
         }
         return categoryName;
+    }
+
+    @Override
+    public Optional<Category> getCategoryById(String id) {
+        return categoryRepository.findById(id);
     }
 }

@@ -24,11 +24,11 @@ import ApiService from "../../Service/ApiService";
 
 const columns = [
   { id: "id", label: "ID", minWidth: 30 },
-  { id: "nameInventory", label: "Tên kệ hàng", maxWidth: 140 },
-  { id: "typeInventory", label: "Loại kệ", maxWidth: 140 },
-  { id: "status", label: "Tình trạng", minWidth: 140 },
+  { id: "shelfCode", label: "Tên kệ hàng", maxWidth: 140 },
+  { id: "inventoryId", label: "Kho hàng", maxWidth: 140 },
+  { id: "productId", label: "Loại sản phẩm", maxWidth: 140 },
   { id: "quantity", label: "Tổng sản phẩm", minWidth: 140 },
-  { id: "capacity_shelf", label: "Sức chứa (sản phẩm)", maxWidth: 100 },
+  { id: "capacity", label: "Sức chứa (sản phẩm)", maxWidth: 100 },
 ];
 
 const style = {
@@ -42,27 +42,26 @@ const style = {
   p: 4,
 };
 
-const TableInventory = () => {
+const TableShelf = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [inventorys, setInventorys] = useState([]);
+  const [shelfs, setShelfs] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({});
 
-  const fetchInventorys = async () => {
+  const fetchShelfs = async () => {
     try {
-      const response = await ApiService.getAllInventory();
-      setInventorys(response);
-      setInventorys([])
+      const response = await ApiService.getAllShelf();
+      setShelfs(response);
     } catch (error) {
-      console.error("Lỗi khi tải thông tin các Inventory", error.message);
+      console.error("Lỗi khi tải thông tin các Shelf", error.message);
     }
   };
 
   useEffect(() => {
-    fetchInventorys();
+    fetchShelfs();
   }, []);
 
   const handleOpenMenu = (event, row) => {
@@ -85,27 +84,27 @@ const TableInventory = () => {
 
   const handleSaveUpdate = async () => {
     try {
-      await ApiService.updateInventory(editData.id, editData);
+      await ApiService.updateShelf(editData.id, editData);
       alert("Cập nhật thành công!");
-      setInventorys((prev) =>
+      setShelfs((prev) =>
         prev.map((item) => (item.id === editData.id ? editData : item))
       );
       setIsEditModalOpen(false);
     } catch (error) {
-      alert("Lỗi khi cập nhật kho hàng!");
+      alert("Lỗi khi cập nhật kệ hàng!");
     }
   };
 
   const handleDelete = async () => {
     if (selectedRow && selectedRow.id) {
-      const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa kho hàng "${selectedRow.nameInventory}"?`);
+      const confirmDelete = window.confirm(`Bạn có chắc chắn muốn xóa kệ hàng "${selectedRow.shelfCode}"?`);
       if (confirmDelete) {
         try {
-          await ApiService.deleteInventory(selectedRow.id);
-          alert("Kho hàng đã được xóa thành công!");
-          setInventorys((prev) => prev.filter((item) => item.id !== selectedRow.id));
+          await ApiService.deleteShelf(selectedRow.id);
+          alert("Kệ hàng đã được xóa thành công!");
+          setShelfs((prev) => prev.filter((item) => item.id !== selectedRow.id));
         } catch (error) {
-          alert("Lỗi khi xóa kho hàng. Vui lòng thử lại.");
+          alert("Lỗi khi xóa kệ hàng. Vui lòng thử lại.");
         } finally {
           handleCloseMenu();
         }
@@ -137,7 +136,7 @@ const TableInventory = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {inventorys
+            {shelfs
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
@@ -158,7 +157,7 @@ const TableInventory = () => {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={inventorys.length}
+        count={shelfs.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -172,33 +171,33 @@ const TableInventory = () => {
         <Fade in={isEditModalOpen}>
           <Box sx={style}>
             <Typography sx={{ fontWeight: "bold", fontSize: "20px", marginBottom: "1rem" }}>
-              Cập nhật kho hàng
+              Cập nhật kệ hàng
             </Typography>
             <Stack spacing={2}>
               <TextField
-                label="Tên kho hàng"
-                value={editData.nameInventory || ""}
-                onChange={(e) => setEditData({ ...editData, nameInventory: e.target.value })}
+                label="Tên kệ hàng"
+                value={editData.shelfCode || ""}
+                onChange={(e) => setEditData({ ...editData, shelfCode: e.target.value })}
               />
               <TextField
-                label="Loại kho hàng"
-                value={editData.typeInventory || ""}
-                onChange={(e) => setEditData({ ...editData, typeInventory: e.target.value })}
+                label="Kho hàng"
+                value={editData.inventoryId || ""}
+                onChange={(e) => setEditData({ ...editData, inventoryId: e.target.value })}
               />
               <TextField
-                label="Tình trạng"
-                value={editData.status || ""}
-                onChange={(e) => setEditData({ ...editData, status: e.target.value })}
+                label="Loại sản phẩm"
+                value={editData.productId || ""}
+                onChange={(e) => setEditData({ ...editData, productId: e.target.value })}
               />
               <TextField
-                label="Tổng số kệ"
-                value={editData.number_shelf || ""}
-                onChange={(e) => setEditData({ ...editData, number_shelf: e.target.value })}
+                label="Tổng sản phẩm"
+                value={editData.quantity || ""}
+                onChange={(e) => setEditData({ ...editData, quantity: e.target.value })}
               />
               <TextField
-                label="Sức chứa sản phẩm"
-                value={editData.capacity_shelf || ""}
-                onChange={(e) => setEditData({ ...editData, capacity_shelf: e.target.value })}
+                label="Sức chứa (sản phẩm)"
+                value={editData.capacity || ""}
+                onChange={(e) => setEditData({ ...editData, capacity: e.target.value })}
               />
               <Button sx={{backgroundColor:"#243642"}} variant="contained" onClick={handleSaveUpdate}>
                 Lưu
@@ -211,4 +210,4 @@ const TableInventory = () => {
   );
 };
 
-export default TableInventory;
+export default TableShelf;

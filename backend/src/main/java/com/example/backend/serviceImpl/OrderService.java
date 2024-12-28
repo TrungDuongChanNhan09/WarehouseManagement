@@ -153,12 +153,13 @@ public class OrderService implements com.example.backend.service.OrderService {
     }
 
     @Override
-    public List<Integer> getOrderQuantity() {
+    public List<OrderQuantity> getOrderQuantity() {
         int on_pending = 0;
         int confirmed = 0;
         int delivered = 0;
         int on_going = 0;
         int cancel = 0;
+        List<OrderQuantity> orderQuantities = new ArrayList<>();
         for(Order order : orderRepository.findAll()){
             if(order.getOrderState() == ORDER_STATE.ON_GOING){
                 on_going += 1;
@@ -176,12 +177,32 @@ public class OrderService implements com.example.backend.service.OrderService {
                 confirmed += 1;
             }
         }
-        List<Integer> quantity = new ArrayList<>();
-        quantity.add(on_going);
-        quantity.add(delivered);
-        quantity.add(cancel);
-        quantity.add(on_pending);
-        quantity.add(confirmed);
-        return quantity;
+
+        OrderQuantity orderQuantity = new OrderQuantity();
+        orderQuantity.setStatus("on_going");
+        orderQuantity.setQuantity(on_going);
+
+        OrderQuantity orderQuantity1 = new OrderQuantity();
+        orderQuantity1.setStatus("delivered");
+        orderQuantity1.setQuantity(delivered);
+
+        OrderQuantity orderQuantity2 = new OrderQuantity();
+        orderQuantity2.setStatus("cancelled");
+        orderQuantity2.setQuantity(cancel);
+
+        OrderQuantity orderQuantity3 = new OrderQuantity();
+        orderQuantity3.setStatus("pending");
+        orderQuantity3.setQuantity(on_pending);
+
+        OrderQuantity orderQuantity4 = new OrderQuantity();
+        orderQuantity4.setStatus("confirmed");
+        orderQuantity4.setQuantity(confirmed);
+
+        orderQuantities.add(orderQuantity);
+        orderQuantities.add(orderQuantity1);
+        orderQuantities.add(orderQuantity2);
+        orderQuantities.add(orderQuantity3);
+        orderQuantities.add(orderQuantity4);
+        return orderQuantities;
     }
 }

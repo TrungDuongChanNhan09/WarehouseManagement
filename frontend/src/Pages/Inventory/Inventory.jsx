@@ -132,7 +132,6 @@ const Inventory = () => {
                             inputProps={{ 'aria-label': 'search' }}
                             />
                         </Search>
-
                         <Stack className="filter-bar" direction={"row"} alignItems={"center"}> 
                             <FormControl sx={{width:"170px", marginLeft:"0.5rem", marginRight: "0.5rem"}}>
                                 {/* <SortIcon/> */}
@@ -161,9 +160,7 @@ const Inventory = () => {
                             </Button>
                         </Stack>
                     </Stack>
-                    
                 </Stack>
-
             </Stack>
             <TableInventory/>
             <Modal
