@@ -243,7 +243,7 @@ const Navbar = () => {
                                 label="Import Shipment"
                                 value="importshipment"
                                 icon={<InputRoundedIcon />}
-                                onClick={() => navigate("/app/importshipment")} 
+                                onClick={() => navigate("/app/importshipment")}
                                 sx={{
                                     display: "flex",
                                     flexDirection: "row",
@@ -258,33 +258,35 @@ const Navbar = () => {
                                         marginRight: "10px",
                                     },
                                     "& .MuiBottomNavigationAction-label": {
-                                        fontSize: "16px", 
+                                        fontSize: "16px",
                                     },
                                 }}
                             />
+                       
                              <BottomNavigationAction 
                                 showLabel={true} 
                                 label="ExportShipment"
                                 value="exportshipment"
                                 icon={<AssignmentIndOutlinedIcon />}
-                                onClick={() => navigate("/app/exportshipment")} 
+                                onClick={() => navigate("/app/exportshipment")}
                                 sx={{
                                     display: "flex",
                                     flexDirection: "row",
-                                    justifyContent: "flex-start", 
+                                    justifyContent: "flex-start",
                                     marginTop: "1rem",
                                     fontSize: "24px",
                                     padding: "0.5rem",
                                     flexGrow: 1,
                                     "& .MuiSvgIcon-root": {
-                                        fontSize: "24px", 
-                                        marginRight: "10px", 
+                                        fontSize: "24px",
+                                        marginRight: "10px",
                                     },
                                     "& .MuiBottomNavigationAction-label": {
-                                        fontSize: "16px", 
+                                        fontSize: "16px",
                                     },
                                 }}
                             />
+
                         </BottomNavigation>
                     </Stack>
                 
