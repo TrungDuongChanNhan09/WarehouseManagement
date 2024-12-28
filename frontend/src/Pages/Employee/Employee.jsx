@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Employee.scss";
 import {
   Container,
@@ -19,92 +19,113 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
+  Alert,
+  DialogConfirm,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import AppBarMenu from "../../Component/AppBar/AppBar";
+import ApiService from "../../Service/ApiService.jsx";
 
 const Employee = () => {
+  const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openDialog, setOpenDialog] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // State for confirm delete dialog
+  const [employeeToDelete, setEmployeeToDelete] = useState(null); // Employee selected for deletion
   const [newEmployee, setNewEmployee] = useState({
-    employeeId: "",
-    warehouseId: "",
     userName: "",
-    email: "",
-    address: "",
-    image: "",
+    fullName: "",
+    password: "",
     role: "",
   });
-  const [editEmployee, setEditEmployee] = useState({
-    employeeId: "",
-    warehouseId: "",
-    userName: "",
-    email: "",
-    address: "",
-    image: "",
-    role: "",
-  });
-  const [imagePreview, setImagePreview] = useState(null);
-  const [editImagePreview, setEditImagePreview] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(""); // State to hold error messages
 
-  const mockEmployees = [
-    {
-      id: 1,
-      employeeId: "NV001",
-      warehouseId: "A1",
-      email: "john@example.com",
-      userName: "John Doe",
-      address: "New York",
-      role: "ADMIN",
-    },
-  ];
+  // Fetch employees from API when the component mounts
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const data = await ApiService.getAllEmployees(); // Fetching employee data
+        setEmployees(data); // Storing fetched data in the state
+      } catch (error) {
+        console.error("Error fetching employee data:", error);
+      }
+    };
+    fetchEmployees();
+  }, []);
 
-  const filteredEmployees = mockEmployees.filter((emp) =>
-    emp.userName.toLowerCase().includes(search.toLowerCase())
+  // Filter employees by search term
+  const filteredEmployees = employees.filter((employee) =>
+    employee.fullName.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Handle page change for pagination
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  // Handle change in rows per page for pagination
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  const handleAddEmployee = () => {
-    console.log(newEmployee);
-    setOpenDialog(false);
-  };
+  // Add a new employee
+  const handleAddEmployee = async () => {
+    // Kiểm tra nếu có trường thông tin nào trống
+    if (
+      !newEmployee.userName ||
+      !newEmployee.fullName ||
+      !newEmployee.password ||
+      !newEmployee.role
+    ) {
+      setErrorMessage("Vui lòng nhập đầy đủ thông tin!");
+      return; // Dừng nếu có trường bị trống
+    }
 
-  const handleEditEmployee = () => {
-    console.log(editEmployee);
-    setOpenEditDialog(false);
-  };
+    // Tạo đối tượng dữ liệu theo kiểu yêu cầu
+    const formData = {
+      username: newEmployee.userName, // Đặt tên theo đúng kiểu dữ liệu yêu cầu
+      fullName: newEmployee.fullName,
+      password: newEmployee.password,
+      role: newEmployee.role,
+    };
 
-  const handleImageChange = (e, setEmployee, setPreview) => {
-    const file = e.target.files[0];
-    if (file) {
-      setEmployee((prev) => ({ ...prev, image: file }));
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+    try {
+      await ApiService.addEmployee(formData); // Gọi API thêm nhân viên
+      setOpenDialog(false);
+      setEmployees(await ApiService.getAllEmployees()); // Làm mới danh sách nhân viên
+      setErrorMessage(""); // Reset error message after success
+    } catch (error) {
+      console.error("Error adding employee:", error);
+      setErrorMessage("Lỗi khi thêm nhân viên. Vui lòng thử lại.");
     }
   };
 
-  const handleOpenEditDialog = (employee) => {
-    setEditEmployee(employee);
-    setEditImagePreview(employee.image || null);
-    setOpenEditDialog(true);
+  // Confirm delete action
+  const handleConfirmDelete = async () => {
+    if (employeeToDelete) {
+      try {
+        await ApiService.deleteEmployee(employeeToDelete); // Gọi API xóa nhân viên
+        setEmployees(await ApiService.getAllEmployees()); // Làm mới danh sách nhân viên sau khi xóa
+        setOpenConfirmDialog(false); // Đóng dialog confirm
+      } catch (error) {
+        console.error("Error deleting employee:", error);
+        setOpenConfirmDialog(false);
+      }
+    }
+  };
+
+  // Handle edit action
+  const handleEdit = (id) => {
+    console.log("Edit employee with ID:", id);
+  };
+
+  // Handle delete action
+  const handleDelete = (id) => {
+    setEmployeeToDelete(id); // Lưu ID nhân viên sẽ bị xóa
+    setOpenConfirmDialog(true); // Mở dialog xác nhận xóa
   };
 
   return (
@@ -158,12 +179,11 @@ const Employee = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Mã Nhân Viên</TableCell>
-              <TableCell>Mã Kho</TableCell>
-              <TableCell>Tên</TableCell>
+              <TableCell>Tên Nhân Viên</TableCell>
+              <TableCell>Giới Tính</TableCell>
+              <TableCell>Ngày Sinh</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Địa Chỉ</TableCell>
-              <TableCell>Vai Trò</TableCell>
+              <TableCell>Vai Trò</TableCell>          
               <TableCell>Hành Động</TableCell>
             </TableRow>
           </TableHead>
@@ -172,20 +192,16 @@ const Employee = () => {
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((employee) => (
                 <TableRow key={employee.id}>
-                  <TableCell>{employee.employeeId}</TableCell>
-                  <TableCell>{employee.warehouseId}</TableCell>
-                  <TableCell>{employee.userName}</TableCell>
+                  <TableCell>{employee.fullName}</TableCell>
+                  <TableCell>{employee.gender}</TableCell>
+                  <TableCell>{new Date(employee.dateOfBirth).toLocaleDateString()}</TableCell>
                   <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.address}</TableCell>
-                  <TableCell>{employee.role}</TableCell>
+                  <TableCell>{employee.role}</TableCell>             
                   <TableCell>
-                    <IconButton
-                      color="default"
-                      onClick={() => handleOpenEditDialog(employee)}
-                    >
+                    <IconButton onClick={() => handleEdit(employee.id)}>
                       <Edit />
                     </IconButton>
-                    <IconButton color="default">
+                    <IconButton onClick={() => handleDelete(employee.id)}>
                       <Delete />
                     </IconButton>
                   </TableCell>
@@ -195,7 +211,7 @@ const Employee = () => {
         </Table>
       </TableContainer>
 
-      {/* Pagination Section */}
+      {/* Pagination */}
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
@@ -208,165 +224,74 @@ const Employee = () => {
 
       {/* Add Employee Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle>Thêm Nhân Viên Mới</DialogTitle>
+        <DialogTitle>Thêm Tài Khoản Nhân Viên Mới</DialogTitle>
         <DialogContent>
-      
+          {errorMessage && <Alert severity="error">{errorMessage}</Alert>} {/* Display error message */}
           <TextField
-            label="Mã Kho"
+            label="Tên Nhân Viên"
             fullWidth
             margin="normal"
-            value={newEmployee.warehouseId}
-            onChange={(e) =>
-              setNewEmployee({ ...newEmployee, warehouseId: e.target.value })
-            }
+            value={newEmployee.fullName}
+            onChange={(e) => {
+              setNewEmployee({ ...newEmployee, fullName: e.target.value });
+            }}
           />
           <TextField
-            label="Tên"
+            label="Tên Tài Khoản"
             fullWidth
             margin="normal"
             value={newEmployee.userName}
-            onChange={(e) =>
-              setNewEmployee({ ...newEmployee, userName: e.target.value })
-            }
+            onChange={(e) => {
+              setNewEmployee({ ...newEmployee, userName: e.target.value });
+            }}
           />
           <TextField
-            label="Email"
+            label="Mật Khẩu"
+            type="password"
             fullWidth
             margin="normal"
-            value={newEmployee.email}
-            onChange={(e) =>
-              setNewEmployee({ ...newEmployee, email: e.target.value })
-            }
+            value={newEmployee.password}
+            onChange={(e) => {
+              setNewEmployee({ ...newEmployee, password: e.target.value });
+            }}
           />
           <TextField
-            label="Địa Chỉ"
+            label="Vai Trò"
             fullWidth
             margin="normal"
-            value={newEmployee.address}
-            onChange={(e) =>
-              setNewEmployee({ ...newEmployee, address: e.target.value })
-            }
+            value={newEmployee.role}
+            onChange={(e) => {
+              setNewEmployee({ ...newEmployee, role: e.target.value });
+            }}
           />
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Vai Trò</InputLabel>
-            <Select
-              value={newEmployee.role}
-              onChange={(e) =>
-                setNewEmployee({ ...newEmployee, role: e.target.value })
-              }
-              label="Vai Trò"
-            >
-              <MenuItem value="ADMIN">ADMIN</MenuItem>
-              <MenuItem value="STAFF">STAFF</MenuItem>
-            </Select>
-          </FormControl>
-          <Button variant="contained" component="label" sx={{ marginTop: "15px" }}>
-            Upload Hình Ảnh
-            <input
-              type="file"
-              hidden
-              accept="image/*"
-              onChange={(e) =>
-                handleImageChange(e, setNewEmployee, setImagePreview)
-              }
-            />
-          </Button>
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              alt="Preview"
-              style={{ marginTop: "10px", width: "100px", height: "100px" }}
-            />
-          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)} color="default">
             Hủy
           </Button>
           <Button onClick={handleAddEmployee} color="primary">
-            Thêm Nhân Viên
+            Thêm Tài Khoản
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Edit Employee Dialog */}
-      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-        <DialogTitle>Chỉnh Sửa Thông Tin Nhân Viên</DialogTitle>
+      {/* Confirm Delete Dialog */}
+      <Dialog
+        open={openConfirmDialog}
+        onClose={() => setOpenConfirmDialog(false)}
+      >
+        <DialogTitle>Xác Nhận Xóa</DialogTitle>
         <DialogContent>
-          <TextField
-            label="Mã Kho"
-            fullWidth
-            margin="normal"
-            value={editEmployee.warehouseId}
-            onChange={(e) =>
-              setEditEmployee({ ...editEmployee, warehouseId: e.target.value })
-            }
-          />
-          <TextField
-            label="Tên"
-            fullWidth
-            margin="normal"
-            value={editEmployee.userName}
-            onChange={(e) =>
-              setEditEmployee({ ...editEmployee, userName: e.target.value })
-            }
-          />
-          <TextField
-            label="Email"
-            fullWidth
-            margin="normal"
-            value={editEmployee.email}
-            onChange={(e) =>
-              setEditEmployee({ ...editEmployee, email: e.target.value })
-            }
-          />
-          <TextField
-            label="Địa Chỉ"
-            fullWidth
-            margin="normal"
-            value={editEmployee.address}
-            onChange={(e) =>
-              setEditEmployee({ ...editEmployee, address: e.target.value })
-            }
-          />
-          <FormControl fullWidth margin="normal">
-            <InputLabel>Vai Trò</InputLabel>
-            <Select
-              value={editEmployee.role}
-              onChange={(e) =>
-                setEditEmployee({ ...editEmployee, role: e.target.value })
-              }
-              label="Vai Trò"
-            >
-              <MenuItem value="ADMIN">ADMIN</MenuItem>
-              <MenuItem value="STAFF">STAFF</MenuItem>
-            </Select>
-          </FormControl>
-          <Button variant="contained" component="label" sx={{ marginTop: "15px" }}>
-            Upload Hình Ảnh
-            <input
-              type="file"
-              hidden
-              accept="image/*"
-              onChange={(e) =>
-                handleImageChange(e, setEditEmployee, setEditImagePreview)
-              }
-            />
-          </Button>
-          {editImagePreview && (
-            <img
-              src={editImagePreview}
-              alt="Preview"
-              style={{ marginTop: "10px", width: "100px", height: "100px" }}
-            />
-          )}
+          <Typography variant="body1">
+            Bạn có chắc chắn muốn xóa nhân viên này không?
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)} color="default">
+          <Button onClick={() => setOpenConfirmDialog(false)} color="default">
             Hủy
           </Button>
-          <Button onClick={handleEditEmployee} color="primary">
-            Lưu Thay Đổi
+          <Button onClick={handleConfirmDelete} color="primary">
+            Xóa
           </Button>
         </DialogActions>
       </Dialog>

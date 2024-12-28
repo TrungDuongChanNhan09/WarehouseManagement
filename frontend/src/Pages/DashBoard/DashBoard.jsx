@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useState } from "react";
 import './DashBoard.css'
 import { Container, Stack, Typography } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
@@ -15,8 +16,9 @@ import LocalShippingOutlined from "@mui/icons-material/LocalShippingOutlined";
 import CancelOutlined from "@mui/icons-material/CancelOutlined";
 import DoneAllOutlined from "@mui/icons-material/DoneAllOutlined";
 import AssignmentTurnedInOutlined from "@mui/icons-material/AssignmentTurnedInOutlined";
-
 import { BarChart } from '@mui/x-charts/BarChart';
+
+import ApiService from "../../Service/ApiService.jsx";
 
 const chartSetting = {
     xAxis: [
@@ -120,6 +122,19 @@ function valueFormatter(value) {
   }
 
 const DashBoard = () => {
+    const [quantityProduct, setQuantityProduct] = useState([]);
+    const fetchQuantityProduct = async () => {
+      try {
+        const response = await ApiService.getAllQuantityProduct();
+        setQuantityProduct(response);
+      } catch (error) {
+        console.error("Lỗi khi tải thông tin đơn hàng theo trạng thái", error.message);
+      }
+    };
+
+    useEffect(() => {
+      fetchQuantityProduct();
+    }, []);
     return(
         <Container maxWidth="xl" className="Dashboard" sx={{ width: "100%" , height: "100%", display: "flex", flexDirection: "column" }}>
             <PrimarySearchAppBar />

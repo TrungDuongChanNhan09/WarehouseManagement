@@ -1,7 +1,8 @@
 package com.example.backend.model;
-import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import lombok.Data;
 @Data
 @Document(
     "shelf"
@@ -14,5 +15,4 @@ public class Shelf {
     private String productId;
     private int quantity;
     private int capacity;
-
 }

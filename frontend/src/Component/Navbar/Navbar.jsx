@@ -49,7 +49,7 @@ const Navbar = () => {
                     />
                 </Stack>
 
-                <Stack justifyContent={"space-between"} sx={{width: "100%",height:"80vh",marginTop:"3rem", padding: "0.7rem"}}>
+                <Stack sx={{width: "100%",padding: "0.7rem"}}>
                     <Stack>
                         {/* <Button className="btn-add-order" sx={{padding: "10px", borderRadius:"10px", width: "175px", border: "2px solid #387478", margin: "1.5rem 1rem 1rem 1rem"}}>
                             <AddIcon sx={{color: "black"}}/>
@@ -69,8 +69,11 @@ const Navbar = () => {
                             sx={{
                                 display: "flex",
                                 flexDirection: "column",
-                                height: "30vh",
+                                height: "65vh",
                                 width: "100%",
+                                marginBottom:"1.5rem",
+                                overflowY: "auto", // Thêm tính năng cuộn dọc
+                                scrollbarWidth: "thin", // Tùy chọn (nếu muốn cuộn nhỏ gọn)
                             }}
                         >
                             <BottomNavigationAction 
@@ -84,7 +87,7 @@ const Navbar = () => {
                                     display: "flex",
                                     flexDirection: "row",
                                     justifyContent: "flex-start", 
-                                    marginTop: "1rem",
+                                    marginTop: "2.2rem",
                                     padding: "0.5rem",
                                     fontSize: "24px",
                                     flexGrow: 1,
@@ -240,7 +243,7 @@ const Navbar = () => {
                                 label="Import Shipment"
                                 value="importshipment"
                                 icon={<InputRoundedIcon />}
-                                onClick={() => navigate("/app/importshipment")} 
+                                onClick={() => navigate("/app/importshipment")}
                                 sx={{
                                     display: "flex",
                                     flexDirection: "row",
@@ -259,29 +262,35 @@ const Navbar = () => {
                                     },
                                 }}
                             /> 
+                                        fontSize: "16px",
+                                    },
+                                }}
+                            />
+                       
                              <BottomNavigationAction 
                                 showLabel={true} 
                                 label="ExportShipment"
                                 value="exportshipment"
                                 icon={<AssignmentIndOutlinedIcon />}
-                                onClick={() => navigate("/app/exportshipment")} 
+                                onClick={() => navigate("/app/exportshipment")}
                                 sx={{
                                     display: "flex",
                                     flexDirection: "row",
-                                    justifyContent: "flex-start", 
+                                    justifyContent: "flex-start",
                                     marginTop: "1rem",
                                     fontSize: "24px",
                                     padding: "0.5rem",
                                     flexGrow: 1,
                                     "& .MuiSvgIcon-root": {
-                                        fontSize: "24px", 
-                                        marginRight: "10px", 
+                                        fontSize: "24px",
+                                        marginRight: "10px",
                                     },
                                     "& .MuiBottomNavigationAction-label": {
-                                        fontSize: "16px", 
+                                        fontSize: "16px",
                                     },
                                 }}
                             />
+
                         </BottomNavigation>
                     </Stack>
                 
