@@ -46,7 +46,7 @@ public class AdminOrderController {
     }
 
     @GetMapping("/getOrderQuantity")
-    public ResponseEntity<List<OrderQuantity>> getOrderQuantity(@RequestHeader("Authorization") String jwt) throws Exception{
+    public ResponseEntity<OrderQuantity> getOrderQuantity(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(orderService.getOrderQuantity(), HttpStatus.OK);
     }

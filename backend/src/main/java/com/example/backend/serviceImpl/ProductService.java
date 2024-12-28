@@ -52,7 +52,7 @@ public class ProductService implements com.example.backend.service.ProductServic
         newProduct.setExpiration_date(product.getExpiration_date());
         newProduct.setImage(product.getImage());
         newProduct.setDescription(product.getDescription());
-        newProduct.setInventory_quantity(newProduct.getInventory_quantity());
+        newProduct.setInventory_quantity(product.getInventory_quantity());
         newProduct.setPrice(product.getPrice());
         return productRepository.save(newProduct);
     }
