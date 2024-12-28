@@ -115,6 +115,39 @@ export default class ApiService {
             throw error;
         }
     }
+    static async updateOrder(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/order/updateOrder/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    static async getProduct() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách sản phẩm:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async deleteOrder(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/order/deleteOrder/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi xóa đơn:", error.response?.data || error.message);
+            throw error;
+        }
+    }
     //order items
     
     static async getOrderItemById(id) {
@@ -125,6 +158,40 @@ export default class ApiService {
             return response.data; 
         } catch (error) {
             console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async addOrderItem(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/orderItem`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi thêm gói hàng:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async updateOrderItem(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/orderItem/updateOrderItem/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    
+    static async deleteOrderItem(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/orderItem/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi xóa orderitem:", error.response?.data || error.message);
             throw error;
         }
     }
