@@ -1,13 +1,13 @@
 .Navbar{
-    width: 13vw;
+    width: 16%;
     max-width: 13vw;
     min-width: 190px;
-    border-right: 5px solid #297342;
-    padding: 1rem;
+    border-right: 1px solid #387478;
+    // padding: 1rem;
     .MuiBottomNavigationAction-root.Mui-selected {
-        color: #297342 !important; /* Đổi màu thành red hoặc màu khác */
+        color: #E2F1E7 !important; /* Đổi màu thành red hoặc màu khác */
         font-weight: bold;
-        background-color: #E2F1E7;
+        background-color: #243642;
         border-radius: 0.5rem;
     }
     // border-radius: 0.5rem;

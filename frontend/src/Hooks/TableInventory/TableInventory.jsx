@@ -172,7 +172,7 @@ const TableInventory = () => {
         <Fade in={isEditModalOpen}>
           <Box sx={style}>
             <Typography sx={{ fontWeight: "bold", fontSize: "20px", marginBottom: "1rem" }}>
-              Cập nhật kho hàng
+              Thông tin kho hàng
             </Typography>
             <Stack spacing={2}>
               <TextField
@@ -200,8 +200,13 @@ const TableInventory = () => {
                 value={editData.capacity_shelf || ""}
                 onChange={(e) => setEditData({ ...editData, capacity_shelf: e.target.value })}
               />
+              <TextField
+                label="Mô tả"
+                value={editData.typeInventoryDescription || ""}
+                onChange={(e) => setEditData({ ...editData, typeInventoryDescription: e.target.value })}
+              />
               <Button sx={{backgroundColor:"#243642"}} variant="contained" onClick={handleSaveUpdate}>
-                Lưu
+                Cập nhật
               </Button>
             </Stack>
           </Box>

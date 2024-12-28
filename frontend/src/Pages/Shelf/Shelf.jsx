@@ -75,38 +75,36 @@ const Shelf = () => {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const [inventoryDetails, setInventoryDetails] = useState({
-        typeInventory: "",
-        nameInventory: "",
-        typeInventoryDescription: "",
-        status: "",
-        number_shelf: 0,
-        capacity_shelf: 0,
+    const [shelfDetails, setShelfDetails] = useState({
+        nameShelf: "",
+        inventoryId:"",
+        productId: "",
+        quantity: 0,
+        capacity: 0,
     });
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setInventoryDetails(prevState => ({
+        setShelfDetails(prevState => ({
             ...prevState,
             [name]: value,
         }));
     };
 
-    const handleAddInventory = async () => {
+    const handleAddShelf = async () => {
         if (
-            !inventoryDetails.nameInventory || 
-            !inventoryDetails.typeInventory || 
-            !inventoryDetails.number_shelf || 
-            !inventoryDetails.status || 
-            !inventoryDetails.capacity_shelf || 
-            !inventoryDetails.typeInventoryDescription
+            !shelfDetails.nameShelf || 
+            !shelfDetails.inventoryId || 
+            !shelfDetails.productId || 
+            !shelfDetails.quantity || 
+            !shelfDetails.capacity 
         ) {
             console.error("Dữ liệu không đầy đủ");
             return; // Không gửi yêu cầu nếu thiếu dữ liệu
         }
         
         try {
-            const response = await ApiService.addInventory(inventoryDetails);
+            const response = await ApiService.addShelf(shelfDetails)
             setOpen(false)
             Alert("Thêm kệ hàng thành công")
         } catch (error) {
@@ -164,6 +162,60 @@ const Shelf = () => {
 
             </Stack>
             <TableShelf/>
+
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                open={open}
+                onClose={handleClose}
+                closeAfterTransition
+                
+            >
+                <Fade in={open}>
+                    <Box sx={style}>
+                        {/* <Stack className="template-add-iventory" direction={"column"} alignItems={"center"}> */}
+                            <Typography 
+                                sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"200px", marginBottom:"1rem"}} 
+                                variant="p">
+                                    Thêm kệ hàng
+                            </Typography>
+                            <Stack sx={{ marginTop:"0.5rem"}} className="body-infor" flexWrap="wrap" direction={"row"} alignItems={"center"}>
+                                <TextField 
+                                    sx={{margin:"1rem", width:"100%"}} 
+                                    id="outlined-basic" 
+                                    label="Tên kệ hàng" 
+                                    variant="outlined"
+                                    name="nameInventory"
+                                    value={shelfDetails.nameShelf}
+                                    onChange={handleChange}
+                                     />
+                                <TextField 
+                                    sx={{margin:"1rem", width:"100%"}} 
+                                    id="outlined-basic" 
+                                    label="Loại kho hàng" variant="outlined" 
+                                    name="typeInventory"
+                                    value={shelfDetails.productId}
+                                    onChange={handleChange}
+                                    />
+                                
+                                
+                            </Stack>
+                            <Stack direction={"column"} alignItems={"center"}>
+
+                                <Button 
+                                    onClick={() => {
+                                        handleAddShelf();
+                                    }}
+                                    className="btn-setting" 
+                                    sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
+                                    Thêm kệ hàng
+                                </Button>
+                            </Stack>
+
+                        {/* </Stack> */}
+                    </Box>
+                </Fade>
+            </Modal>
         </Container>
     )
 }
