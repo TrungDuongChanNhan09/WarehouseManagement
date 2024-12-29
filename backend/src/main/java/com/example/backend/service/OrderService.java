@@ -22,4 +22,5 @@ public interface OrderService {
     List<Order> getOrderByState(ORDER_STATE orderState);
     List<Order> getOrderByStatus(ORDER_STATUS orderStatus);
     OrderQuantity getOrderQuantity();
+    Order getOrderByOrderCode(String orderCode);
 }

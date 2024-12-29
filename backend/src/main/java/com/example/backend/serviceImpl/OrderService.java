@@ -185,4 +185,9 @@ public class OrderService implements com.example.backend.service.OrderService {
 
         return orderQuantity;
     }
+
+    @Override
+    public Order getOrderByOrderCode(String orderCode) {
+        return orderRepository.findByorderCode(orderCode);
+    }
 }
