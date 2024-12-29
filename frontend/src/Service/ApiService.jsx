@@ -157,6 +157,19 @@ export default class ApiService {
         }
     }
 
+    static async searchShelf(keyword) {
+        try {
+          const response = await axios.get(`${this.BASE_URL}/api/shelf/searchByName/${keyword}`, {
+            headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+          });
+          return response.data;  
+        } catch (error) {
+            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
 
 
 
