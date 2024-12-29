@@ -43,7 +43,7 @@ const style = {
   p: 4,
 };
 
-const TableInventory = () => {
+const TableInventory = (filteredInventorys) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -51,6 +51,7 @@ const TableInventory = () => {
   const [inventorys, setInventorys] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({});
+  const [role, setRole] = useState(localStorage.getItem('role') || '');
 
   const fetchInventorys = async () => {
     try {
@@ -133,11 +134,14 @@ const TableInventory = () => {
                   {column.label}
                 </TableCell>
               ))}
+
+           
               <TableCell align="center">Tùy chọn</TableCell>
+            
             </TableRow>
           </TableHead>
           <TableBody>
-            {inventorys
+            {(filteredInventorys.length > 0 ? filteredInventorys : inventorys)
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
@@ -164,10 +168,12 @@ const TableInventory = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
+       {(role === "ROLE_ADMIN") && (
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
         <MenuItem onClick={handleUpdate}>Cập nhật</MenuItem>
         <MenuItem onClick={handleDelete}>Xóa</MenuItem>
       </Menu>
+       )}
       <Modal open={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
         <Fade in={isEditModalOpen}>
           <Box sx={style}>

@@ -29,6 +29,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [valuePath, setValuePath] = useState(location.pathname);
+    const [role, setRole] = useState(localStorage.getItem('role') || '');
 
     useEffect(() => {
         setValuePath(location.pathname);
@@ -63,6 +64,7 @@ const Navbar = () => {
                                 }}
                             >Tạo đơn hàng</Typography>
                         </Button> */}
+                        
                         <BottomNavigation
                             value={value}
                             onChange={handleChange}
@@ -76,6 +78,7 @@ const Navbar = () => {
                                 scrollbarWidth: "thin", // Tùy chọn (nếu muốn cuộn nhỏ gọn)
                             }}
                         >
+                            {(role === "ROLE_ADMIN") && (
                             <BottomNavigationAction 
                                 showLabel={true} 
                                 label="Dashboard"
@@ -87,7 +90,7 @@ const Navbar = () => {
                                     display: "flex",
                                     flexDirection: "row",
                                     justifyContent: "flex-start", 
-                                    marginTop: "2.2rem",
+                                    marginTop: "3.5rem",
                                     padding: "0.5rem",
                                     fontSize: "24px",
                                     flexGrow: 1,
@@ -99,7 +102,8 @@ const Navbar = () => {
                                         fontSize: "16px", 
                                     },
                                 }}
-                            />
+                            />)}
+                             {(role === "ROLE_ADMIN") && (
                              <BottomNavigationAction 
                                 showLabel={true} 
                                 label="Order"
@@ -122,7 +126,8 @@ const Navbar = () => {
                                         fontSize: "16px", 
                                     },
                                 }}
-                            />
+                            />)}
+                             {(role === "ROLE_ADMIN") && (
                             <BottomNavigationAction 
                                 showLabel={true} 
                                 label="Employee"
@@ -145,7 +150,9 @@ const Navbar = () => {
                                         fontSize: "16px", 
                                     },
                                 }}
-                            />
+                            />)}
+
+                            {(role === "ROLE_ADMIN" || role === "ROLE_STAFF") && (
                             <BottomNavigationAction
                                 showLabel={true}
                                 label="Inventory"
@@ -168,7 +175,8 @@ const Navbar = () => {
                                         fontSize: "16px", 
                                     },
                                 }}
-                            />
+                            />)}
+                             {(role === "ROLE_ADMIN") && (
                             <BottomNavigationAction
                                 showLabel={true}
                                 label="Category"
@@ -191,7 +199,8 @@ const Navbar = () => {
                                         fontSize: "16px", 
                                     },
                                 }}
-                            />
+                            />)}
+                             {(role === "ROLE_ADMIN" || role === "ROLE_STAFF") && (
                             <BottomNavigationAction
                                 showLabel={true}
                                 label="Shelf"
@@ -214,7 +223,7 @@ const Navbar = () => {
                                         fontSize: "16px", 
                                     },
                                 }}
-                            />
+                            />)}
                             <BottomNavigationAction
                                 showLabel={true}
                                 label="Product"
@@ -238,6 +247,7 @@ const Navbar = () => {
                                     },
                                 }}
                             />
+                             {(role === "ROLE_ADMIN") && (
                             <BottomNavigationAction
                                 showLabel={true}
                                 label="Import Shipment"
@@ -258,11 +268,12 @@ const Navbar = () => {
                                         marginRight: "10px",
                                     },
                                     "& .MuiBottomNavigationAction-label": {
-                                        fontSize: "16px",
+                                        fontSize: "16px", 
                                     },
                                 }}
-                            />
-                       
+                            /> )}
+                                    
+                                {(role === "ROLE_ADMIN") && (
                              <BottomNavigationAction 
                                 showLabel={true} 
                                 label="ExportShipment"
@@ -286,6 +297,7 @@ const Navbar = () => {
                                     },
                                 }}
                             />
+                                )}
 
                         </BottomNavigation>
                     </Stack>

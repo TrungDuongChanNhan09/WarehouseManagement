@@ -5,7 +5,6 @@ import { Container, Stack, StepConnector, Button, TextField, Divider, Alert } fr
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
 import {Typography} from "@mui/material";
 import InputBase from '@mui/material/InputBase';
-import SearchIcon from '@mui/icons-material/Search';
 import { styled, alpha } from '@mui/material/styles';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -20,6 +19,8 @@ import Fade from '@mui/material/Fade';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import ApiService from "../../Service/ApiService.jsx";
+import SearchIcon from '@mui/icons-material/Search';
+import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -77,6 +78,7 @@ const Inventory = () => {
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [inventorys, setInventorys] = useState([]);
     const [inventoryDetails, setInventoryDetails] = useState({
         typeInventory: "",
         nameInventory: "",
@@ -110,11 +112,28 @@ const Inventory = () => {
         try {
             const response = await ApiService.addInventory(inventoryDetails);
             setOpen(false)
+            setInventorys(response)
             Alert("Thêm kho hàng thành công")
         } catch (error) {
             console.error("Lỗi khi thêm kho hàng:", error);
         }
     };
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredInventorys, setFilteredInventorys] = useState([]);
+
+    const handleSearch = async () => {
+        if (!searchTerm.trim()) return;
+      
+        try {
+          const results = await ApiService.searchInventory(searchTerm);
+          setFilteredInventorys(results); 
+        } catch (error) {
+          console.error("Lỗi khi tìm kiếm kho hàng:", error);
+        }
+    };
+      
+
     return(
         <Container maxWidth="xl" className="Dashboard">
             <PrimarySearchAppBar/>
@@ -130,8 +149,11 @@ const Inventory = () => {
                             <StyledInputBase sx={{height:"50px"}}
                             placeholder="Tìm kiếm"
                             inputProps={{ 'aria-label': 'search' }}
+                            onChange={(e) => setSearchTerm(e.target.value)} 
+                            value={searchTerm}
                             />
                         </Search>
+                        
                         <Stack className="filter-bar" direction={"row"} alignItems={"center"}> 
                             <FormControl sx={{width:"170px", marginLeft:"0.5rem", marginRight: "0.5rem"}}>
                                 {/* <SortIcon/> */}
@@ -150,7 +172,14 @@ const Inventory = () => {
                                 </Select>
                             </FormControl>
                         </Stack>
-                        <Stack className="btn-add-inventory-bar" direction={"row"} alignItems={"center"}> 
+                        <Button 
+                            onClick={handleSearch}
+                            className="btn-setting" 
+                            sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
+                            <Search sx={{color: "white"}}/>
+                            Tìm kiếm
+                        </Button>
+                        <Stack sx={{marginLeft:"1.5rem"}} className="btn-add-inventory-bar" direction={"row"} alignItems={"center"}> 
                             <Button 
                                 onClick={handleOpen} 
                                 className="btn-setting" 
@@ -162,7 +191,7 @@ const Inventory = () => {
                     </Stack>
                 </Stack>
             </Stack>
-            <TableInventory/>
+            <TableInventory inventorys={filteredInventorys.length > 0 ? filteredInventorys : inventorys} />
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"

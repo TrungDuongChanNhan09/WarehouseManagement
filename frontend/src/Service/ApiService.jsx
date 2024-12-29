@@ -159,7 +159,31 @@ export default class ApiService {
             throw error;
         }
     }
-    static async getProductById(id) {
+
+    static async searchShelf(keyword) {
+        try {
+          const response = await axios.get(`${this.BASE_URL}/api/shelf/searchByName/${keyword}`, {
+            headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+          });
+          return response.data;  
+        } catch (error) {
+            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+
+
+
+    
+
+    // Phát
+
+
+    // Tân
+    //order
+    static async getAllOrders() {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/prduct/getById/${id}`, {
                 headers: this.getHeader(),
