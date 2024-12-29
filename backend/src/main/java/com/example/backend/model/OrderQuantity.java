@@ -4,6 +4,9 @@ import lombok.Data;
 
 @Data
 public class OrderQuantity {
-    private String status;
-    private int quantity;
+    private int confirmedQuantity;
+    private int deliveredQuantity;
+    private int pendingQuantity;
+    private int cancelQuantity;
+    private int onGoingQuantity;
 }

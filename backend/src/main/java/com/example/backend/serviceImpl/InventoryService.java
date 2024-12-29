@@ -35,8 +35,9 @@ public class InventoryService implements com.example.backend.service.InventorySe
         Inventory existingInventory = inventoryRepository.findBynameInventory(item.getNameInventory());
         if(existingInventory != null)
             throw new Exception("Inventory is already exist");
-        else
+        else{
             return inventoryRepository.save(item);
+        }
     }
 
     @Override
@@ -74,6 +75,10 @@ public class InventoryService implements com.example.backend.service.InventorySe
     public void deleteInventory(String inventoryId){
         
         inventoryRepository.deleteById(inventoryId);
+        List<Shelf> shelves = shelfRepository.findByinventoryid(inventoryId);
+        for (Shelf i : shelves){
+            shelfRepository.deleteById(i.getId());
+        }
     }
 
     @Override

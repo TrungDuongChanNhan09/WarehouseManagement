@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import './Shelf.css'
 import { Container, Stack, StepConnector, Button, TextField, Divider, Alert } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
@@ -22,39 +22,6 @@ import Box from '@mui/material/Box';
 import ApiService from "../../Service/ApiService.jsx";
 
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'black',
-    width: '100%',
-    backgroundColor: 'white',
-    '& .MuiInputBase-input': {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create('width'),
-      [theme.breakpoints.up('sm')]: {
-        width: '12ch',
-        '&:focus': {
-          width: '20ch',
-        },
-      },
-    },
-}));
-
-const Search = styled('div')(({ theme }) => ({
-position: 'relative',
-borderRadius: theme.shape.borderRadius,
-backgroundColor: alpha(theme.palette.common.white, 0.15),
-'&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-},
-marginLeft: 0,
-width: '100%',
-[theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(1),
-    width: 'auto',
-},
-}));
-
 const style = {
     position: 'absolute',
     top: '47%',
@@ -67,52 +34,69 @@ const style = {
 };
 
 const Shelf = () => {
-    const [age, setAge] = React.useState('');
+    const [search, setSearch] = useState("");
+  const [shelfs, setShelfs] = useState([]);
+  const [filteredShelfs, setFilteredShelfs] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newShelfData, setNewShelfData] = useState({
+    shelfCode: "",
+    inventoryid: "",
+    productId: "",
+    quantity: 0,
+    capacity: 0,
+  });
 
-    const handleChangeSearchFilter = (event) => {
-        setAge(event.target.value);
+  const [role, setRole] = useState(localStorage.getItem('role') || '');
+
+  useEffect(() => {
+    const fetchShelfs = async () => {
+      try {
+        const response = await ApiService.getAllShelf();
+        setShelfs(response);
+        setFilteredShelfs(response);
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu kệ hàng", error.message);
+      }
     };
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-    const [inventoryDetails, setInventoryDetails] = useState({
-        typeInventory: "",
-        nameInventory: "",
-        typeInventoryDescription: "",
-        status: "",
-        number_shelf: 0,
-        capacity_shelf: 0,
+
+    fetchShelfs();
+  }, []);
+
+  const handleSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearch(value);
+    const filtered = shelfs.filter((shelf) =>
+      shelf.shelfCode.toLowerCase().includes(value)
+    );
+    setFilteredShelfs(filtered);
+  };
+
+  const handleOpenAddModal = () => {
+    setIsAddModalOpen(true);
+  };
+
+  const handleCloseAddModal = () => {
+    setIsAddModalOpen(false);
+    setNewShelfData({
+      shelfCode: "",
+      inventoryid: "",
+      productId: "",
+      quantity: 0,
+      capacity: 0,
     });
+  };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setInventoryDetails(prevState => ({
-            ...prevState,
-            [name]: value,
-        }));
-    };
-
-    const handleAddInventory = async () => {
-        if (
-            !inventoryDetails.nameInventory || 
-            !inventoryDetails.typeInventory || 
-            !inventoryDetails.number_shelf || 
-            !inventoryDetails.status || 
-            !inventoryDetails.capacity_shelf || 
-            !inventoryDetails.typeInventoryDescription
-        ) {
-            console.error("Dữ liệu không đầy đủ");
-            return; // Không gửi yêu cầu nếu thiếu dữ liệu
-        }
-        
-        try {
-            const response = await ApiService.addInventory(inventoryDetails);
-            setOpen(false)
-            Alert("Thêm kệ hàng thành công")
-        } catch (error) {
-            console.error("Lỗi khi thêm kệ hàng", error);
-        }
-    };
+  const handleAddNewShelf = async () => {
+    try {
+      const response = await ApiService.addShelf(newShelfData);
+      alert("Thêm kệ hàng mới thành công!");
+      setShelfs((prev) => [...prev, response]);
+      setFilteredShelfs((prev) => [...prev, response]);
+      handleCloseAddModal();
+    } catch (error) {
+      alert("Lỗi khi thêm kệ hàng mới. Vui lòng thử lại.");
+    }
+  };
     return(
         <Container maxWidth="xl" className="Shelf">
             <PrimarySearchAppBar/>
@@ -123,48 +107,108 @@ const Shelf = () => {
                         variant="p">
                             Quản lý kệ hàng
                     </Typography>
-                    <Stack direction={"row"} alignItems={"center"}>
-                        <Search>
-                            <StyledInputBase sx={{height:"50px"}}
-                            placeholder="Tìm kiếm"
-                            inputProps={{ 'aria-label': 'search' }}
-                            />
-                        </Search>
-
-                        <Stack className="filter-bar" direction={"row"} alignItems={"center"}> 
-                            <FormControl sx={{width:"170px", marginLeft:"0.5rem", marginRight: "0.5rem"}}>
-                                {/* <SortIcon/> */}
-                                <InputLabel id="demo-simple-select-label">Lọc theo</InputLabel>
-                                <Select
-                                sx={{backgroundColor:"white"}}
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={age}
-                                    label="Age"
-                                    onChange={handleChangeSearchFilter}
-                                >
-                                <MenuItem value={10}>Lớn đến nhỏ</MenuItem>
-                                <MenuItem value={20}>Nhỏ đến lớn</MenuItem>
-                                <MenuItem value={30}>Thirty</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Stack>
-                        <Stack className="btn-add-inventory-bar" direction={"row"} alignItems={"center"}> 
-                            <Button 
-                                onClick={handleOpen} 
-                                className="btn-setting" 
-                                sx={{color: "white", height:"50px", backgroundColor: "#243642"}} variant="contained">
-                                <Add sx={{color: "white"}}/>
-                                Thêm kệ hàng
-                            </Button>
-                        </Stack>
+                    <Stack direction="row" spacing={2} sx={{ marginBottom: "10px" }}>
+                    <TextField
+                        placeholder="Tìm kiếm theo tên kệ hàng"
+                        variant="outlined"
+                        value={search}
+                        onChange={handleSearch}
+                        sx={{ width: "40%" }}
+                    />
+                    <Button
+                        sx={{
+                        backgroundColor: "#243642",
+                        color: "white",
+                        ":hover": {
+                            backgroundColor: "#1A2B36",
+                        },
+                        }}
+                        variant="contained"
+                        onClick={handleOpenAddModal}
+                    >
+                        Thêm kệ hàng
+                    </Button>
                     </Stack>
                     
                 </Stack>
 
             </Stack>
-            <TableShelf/>
+            <TableShelf searchShelfs={filteredShelfs} />
+      <Modal open={isAddModalOpen} onClose={handleCloseAddModal}>
+        <Fade in={isAddModalOpen}>
+          <Box sx={style}>
+            <Typography
+              sx={{
+                fontWeight: "bold",
+                fontSize: "20px",
+                marginBottom: "1rem",
+              }}
+            >
+              Thêm kệ hàng mới
+            </Typography>
+            <Stack spacing={2}>
+              <TextField
+                label="Tên kệ hàng"
+                value={newShelfData.shelfCode}
+                onChange={(e) =>
+                  setNewShelfData({ ...newShelfData, shelfCode: e.target.value })
+                }
+              />
+              <TextField
+                label="Kho hàng"
+                value={newShelfData.inventoryid}
+                onChange={(e) =>
+                  setNewShelfData({
+                    ...newShelfData,
+                    inventoryid: e.target.value,
+                  })
+                }
+              />
+              <TextField
+                label="Loại sản phẩm"
+                value={newShelfData.productId}
+                onChange={(e) =>
+                  setNewShelfData({ ...newShelfData, productId: e.target.value })
+                }
+              />
+              <TextField
+                label="Tổng sản phẩm"
+                type="number"
+                value={newShelfData.quantity}
+                onChange={(e) =>
+                  setNewShelfData({
+                    ...newShelfData,
+                    quantity: parseInt(e.target.value, 10),
+                  })
+                }
+              />
+              <TextField
+                label="Sức chứa (sản phẩm)"
+                type="number"
+                value={newShelfData.capacity}
+                onChange={(e) =>
+                  setNewShelfData({
+                    ...newShelfData,
+                    capacity: parseInt(e.target.value, 10),
+                  })
+                }
+              />
+              <Button
+                sx={{
+                  backgroundColor: "#243642",
+                }}
+                variant="contained"
+                onClick={handleAddNewShelf}
+              >
+                Lưu
+              </Button>
+            </Stack>
+          </Box>
+        </Fade>
+      </Modal>
         </Container>
     )
 }
 export default Shelf
+
+

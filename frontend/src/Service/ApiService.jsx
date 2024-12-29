@@ -40,7 +40,7 @@ export default class ApiService {
     }
     static async getAllInventory() {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/admin/inventory`, {
+            const response = await axios.get(`${this.BASE_URL}/api/inventory`, {
                 headers: this.getHeader()  
             });
             return response.data;
@@ -49,9 +49,9 @@ export default class ApiService {
         }
     }
 
-    static async getAllShelf() {
+    static async getAllQuantityProduct(){
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/order/getOrderQuantity`, {
                 headers: this.getHeader()  
             });
             return response.data;
@@ -69,6 +69,19 @@ export default class ApiService {
             return response.data;
         } catch (error) {
             throw error;  
+        }
+    }
+    
+    static async searchInventory(keyword) {
+        try {
+          const response = await axios.get(`${this.BASE_URL}/api/inventory/searchByName/${keyword}`, {
+            headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+          });
+          return response.data;  
+        } catch (error) {
+            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
+            throw error;
         }
     }
 
@@ -95,6 +108,69 @@ export default class ApiService {
             throw error;  
         }
     }
+
+    static async getAllShelf() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addShelf(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/shelf`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    static async deleteShelf(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/shelf/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    static async updateShelf(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/shelf/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async searchShelf(keyword) {
+        try {
+          const response = await axios.get(`${this.BASE_URL}/api/shelf/searchByName/${keyword}`, {
+            headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+          });
+          return response.data;  
+        } catch (error) {
+            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+
+
+
     
 
     // Phát
@@ -218,10 +294,35 @@ export default class ApiService {
     }
 
     // Tân
+    //order
+    static async getAllOrders() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/order`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách nhân viên:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    //order items
+    
+    static async getOrderItemById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/orderItem/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
     //employee
     static async getAllEmployees() {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/admin/user`, {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/user/getAll`, {
                 headers: this.getHeader(),
             });
             return response.data;
@@ -232,7 +333,7 @@ export default class ApiService {
     }
     static async addEmployee(formData) {
         try {
-            const response = await axios.post(`${this.BASE_URL}/api/admin/user`, formData, {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/user/createUserAccount`, formData, {
                 headers: this.getHeader(),
             });
             return response.data;
@@ -241,21 +342,21 @@ export default class ApiService {
             throw error;
         }
     }
-    static async updateEmployee(id, formData) {
-        try {
-            const response = await axios.put(`${this.BASE_URL}/api/admin/user/${id}`, formData, {
-                headers: this.getHeader(),
-            });
-            return response.data;
-        } catch (error) {
-            console.error("Lỗi khi cập nhật thông tin nhân viên:", error.response?.data || error.message);
-            throw error;
-        }
-    }
+    // static async updateEmployee(id, formData) {
+    //     try {
+    //         const response = await axios.put(`${this.BASE_URL}/api/admin/user/${id}`, formData, {
+    //             headers: this.getHeader(),
+    //         });
+    //         return response.data;
+    //     } catch (error) {
+    //         console.error("Lỗi khi cập nhật thông tin nhân viên:", error.response?.data || error.message);
+    //         throw error;
+    //     }
+    // }
 
     static async deleteEmployee(id) {
         try {
-            const response = await axios.delete(`${this.BASE_URL}/api/admin/user/${id}`, {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/user/${id}/delete`, {
                 headers: this.getHeader(),
             });
             return response.data;
@@ -265,7 +366,7 @@ export default class ApiService {
         }
     }
     //Category
-    static async getAllCategorys() {
+    static async getAllCategory() {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/category`, {
                 headers: this.getHeader(),
@@ -298,7 +399,7 @@ export default class ApiService {
             throw error;
         }
     }
-    static async deleteEmployee(id) {
+    static async deleteCategory(id) {
         try {
             const response = await axios.delete(`${this.BASE_URL}/api/admin/category/${id}`, {
                 headers: this.getHeader(),

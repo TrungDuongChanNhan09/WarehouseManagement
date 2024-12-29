@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useState } from "react";
 import './DashBoard.css'
 import { Container, Stack, Typography } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
@@ -15,8 +16,9 @@ import LocalShippingOutlined from "@mui/icons-material/LocalShippingOutlined";
 import CancelOutlined from "@mui/icons-material/CancelOutlined";
 import DoneAllOutlined from "@mui/icons-material/DoneAllOutlined";
 import AssignmentTurnedInOutlined from "@mui/icons-material/AssignmentTurnedInOutlined";
-
 import { BarChart } from '@mui/x-charts/BarChart';
+
+import ApiService from "../../Service/ApiService.jsx";
 
 const chartSetting = {
     xAxis: [
@@ -120,6 +122,21 @@ function valueFormatter(value) {
   }
 
 const DashBoard = () => {
+    const [quantityProduct, setQuantityProduct] = useState([]);
+    const [totalProduct, setTotalProduct] = useState(0);
+    const fetchQuantityProduct = async () => {
+      try {
+        const response = await ApiService.getAllQuantityProduct();
+        setQuantityProduct(response);
+        setTotalProduct(response.cancelQuantity + response.confirmedQuantity + response.deliveredQuantity + response.onGoingQuantity + response.pendingQuantity);
+      } catch (error) {
+        console.error("Lỗi khi tải thông tin đơn hàng theo trạng thái", error.message);
+      }
+    };
+
+    useEffect(() => {
+      fetchQuantityProduct();
+    }, []);
     return(
         <Container maxWidth="xl" className="Dashboard" sx={{ width: "100%" , height: "100%", display: "flex", flexDirection: "column" }}>
             <PrimarySearchAppBar />
@@ -152,7 +169,7 @@ const DashBoard = () => {
                             <Typography 
                             sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px", width:"200px"}} 
                             variant="p">
-                                Tổng đơn hàng: 0
+                                Tổng đơn hàng: {totalProduct}
                             </Typography>
                            
                         </Stack>
@@ -161,7 +178,7 @@ const DashBoard = () => {
                             <Typography 
                             sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px", width:"200px"}} 
                             variant="p">
-                                Đang xử lý: 0
+                                Đang xử lý: {quantityProduct.pendingQuantity}
                             </Typography>
                         </Stack>
                         <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", width:"250px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
@@ -169,7 +186,7 @@ const DashBoard = () => {
                             <Typography 
                             sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px", width:"200px"}} 
                             variant="p">
-                                Đã xác nhận: 0
+                                Đã xác nhận: {quantityProduct.confirmedQuantity}
                             </Typography>
                         </Stack>
                         <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px",width:"250px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
@@ -177,7 +194,7 @@ const DashBoard = () => {
                             <Typography 
                             sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px", width:"200px"}} 
                             variant="p">
-                                Đang giao hàng: 0
+                                Đang giao hàng: {quantityProduct.onGoingQuantity}
                             </Typography>
                         </Stack>
                         <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", width:"250px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
@@ -185,7 +202,7 @@ const DashBoard = () => {
                             <Typography 
                             sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px", width:"200px"}} 
                             variant="p">
-                                Đã hủy: 0
+                                Đã hủy: {quantityProduct.cancelQuantity}
                             </Typography>
                         </Stack>
                         <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px",width:"250px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
@@ -193,7 +210,7 @@ const DashBoard = () => {
                             <Typography 
                             sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px", width:"200px"}} 
                             variant="p">
-                                Đã giao hàng: 0
+                                Đã giao hàng: {quantityProduct.deliveredQuantity}
                             </Typography>
                         </Stack>
                     </Stack>
