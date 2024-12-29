@@ -5,10 +5,13 @@ import com.example.backend.model.User;
 import com.example.backend.request.OrderItemRequest;
 import com.example.backend.request.OrderStateRequest;
 import com.example.backend.request.OrderStatusRequest;
+import com.example.backend.respone.ApiOrderRespone;
 import com.example.backend.service.OrderService;
 import com.example.backend.service.ProductService;
 import com.example.backend.serviceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.BooleanOperators;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,8 +66,11 @@ public class OrderController {
     }
 
     @GetMapping("/getOrderByOrderCode/{orderCode}")
-    public ResponseEntity<Order> getOrderByOrderCode(@RequestHeader("Authorization") String jwt, @PathVariable String orderCode) throws Exception{
+    public ResponseEntity<ApiOrderRespone> getOrderByOrderCode(@RequestHeader("Authorization") String jwt, @PathVariable String orderCode) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
-        return new ResponseEntity<>(orderService.getOrderByOrderCode(orderCode), HttpStatus.OK);
+        ApiOrderRespone apiOrderRespone = new ApiOrderRespone();
+        apiOrderRespone.setData(orderService.getOrderByOrderCode(orderCode));
+        apiOrderRespone.setMessage("Lấy order bằng order code thành công");
+        return new ResponseEntity<>(apiOrderRespone, HttpStatus.OK);
     }
 }
