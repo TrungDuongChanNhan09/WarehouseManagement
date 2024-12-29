@@ -1,9 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Collapse, Box, Typography } from '@mui/material';
 import { ExpandMore, ExpandLess, Edit, Delete } from '@mui/icons-material';
+import ApiService from "../../Service/ApiService";  // Assuming this is where your API service is located
 
 const OrderTable = ({ orders, searchQuery, statusFilter }) => {
   const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [updatedOrders, setUpdatedOrders] = useState(orders);  // State to store updated orders with item details
+
+  // Fetch order items details based on provided orderItem_code and orderItem_quantity
+  useEffect(() => {
+    const fetchOrderItems = async () => {
+      const updatedOrdersList = [...orders];  // Copy orders to avoid direct mutation
+
+      // Loop through each order to add order item details
+      for (let order of updatedOrdersList) {
+        // Check if we have orderItem_code and orderItem_quantity
+        if (order.orderItem_code && order.orderItem_code.length > 0) {
+          // Process each order item code and quantity
+          order.orderItems = order.orderItem_code.map((orderItemCode, index) => ({
+            orderItemId: `${order.id}-${index}`,
+            orderItemCode,  // Use orderItem_code as item code
+            quantity: order.orderItem_quantity[index],
+            totalPrice: 0, // Can calculate if you have prices for items
+          }));
+        }
+      }
+
+      // Update the state with the updated order list
+      setUpdatedOrders(updatedOrdersList);
+    };
+
+    // Run the fetch process if orders change
+    fetchOrderItems();
+  }, [orders]);  // Dependency array ensures this effect runs when orders change
 
   // Toggle row expand/collapse
   const handleExpandRow = (orderId) => {
@@ -11,11 +40,11 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
   };
 
   // Filter orders based on search query and status
-  const filteredOrders = orders.filter(
+  const filteredOrders = updatedOrders.filter(
     (order) =>
-      (order.customer?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.status?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (statusFilter ? order.status === statusFilter : true)
+      (order.delivery_Address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.orderStatus?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (statusFilter ? order.orderStatus === statusFilter : true)
   );
 
   return (
@@ -25,7 +54,7 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
           <TableRow>
             <TableCell></TableCell>
             <TableCell>ID</TableCell>
-            <TableCell>Customer</TableCell>
+            <TableCell>Địa chỉ</TableCell>
             <TableCell>Date Order</TableCell>
             <TableCell>Value</TableCell>
             <TableCell>Status</TableCell>
@@ -43,10 +72,10 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
                   </IconButton>
                 </TableCell>
                 <TableCell>{order.id}</TableCell>
-                <TableCell>{order.customer}</TableCell>
-                <TableCell>{order.date}</TableCell>
-                <TableCell>{order.value}</TableCell>
-                <TableCell>{order.status}</TableCell>
+                <TableCell>{order.delivery_Address}</TableCell>
+                <TableCell>{order.created_at}</TableCell>
+                <TableCell>{order.orderPrice} VND</TableCell>
+                <TableCell>{order.orderStatus}</TableCell>
                 <TableCell>
                   <IconButton onClick={() => handleEdit(order.id)}>
                     <Edit />
@@ -68,17 +97,17 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
                       <Table size="small">
                         <TableHead>
                           <TableRow>
-                            <TableCell>Order Item ID</TableCell>
-                            <TableCell>Product ID</TableCell>
-                            <TableCell>Quantity</TableCell>
-                            <TableCell>Total Price</TableCell>
+                            <TableCell>ID Gói hàng</TableCell>
+                            <TableCell>Tên gói hàng</TableCell> {/* Using orderItemCode */}
+                            <TableCell>Số lượng</TableCell>
+                            <TableCell>Tổng giá</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {order.orderItems?.map((item) => (
                             <TableRow key={item.orderItemId}>
                               <TableCell>{item.orderItemId}</TableCell>
-                              <TableCell>{item.productId}</TableCell>
+                              <TableCell>{item.orderItemCode}</TableCell> {/* Display the orderItemCode */}
                               <TableCell>{item.quantity}</TableCell>
                               <TableCell>{item.totalPrice} VND</TableCell>
                             </TableRow>
@@ -100,12 +129,10 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
 // Example of handleEdit and handleDelete functions
 const handleEdit = (orderId) => {
   console.log('Edit Order:', orderId);
-  // Add logic to open an edit modal or navigate to an edit page
 };
 
 const handleDelete = (orderId) => {
   console.log('Delete Order:', orderId);
-  // Add logic to handle deleting the order (e.g., make API call)
 };
 
 export default OrderTable;

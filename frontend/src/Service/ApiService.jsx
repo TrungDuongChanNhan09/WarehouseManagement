@@ -40,7 +40,7 @@ export default class ApiService {
     }
     static async getAllInventory() {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/inventory`, {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/inventory`, {
                 headers: this.getHeader()  
             });
             return response.data;
@@ -49,9 +49,9 @@ export default class ApiService {
         }
     }
 
-    static async getAllQuantityProduct(){
+    static async getAllShelf() {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/admin/order/getOrderQuantity`, {
+            const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
                 headers: this.getHeader()  
             });
             return response.data;
@@ -71,19 +71,6 @@ export default class ApiService {
             return response.data;
         } catch (error) {
             throw error;  
-        }
-    }
-    
-    static async searchInventory(keyword) {
-        try {
-          const response = await axios.get(`${this.BASE_URL}/api/inventory/searchByName/${keyword}`, {
-            headers: this.getHeader(),
-                'Content-Type': 'application/json' 
-          });
-          return response.data;  
-        } catch (error) {
-            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
-            throw error;
         }
     }
 
@@ -110,56 +97,6 @@ export default class ApiService {
             throw error;  
         }
     }
-
-    static async getAllShelf() {
-        try {
-            const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
-                headers: this.getHeader()  
-            });
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    static async addShelf(formData) {
-        try {
-            const response = await axios.post(`${this.BASE_URL}/api/shelf`, formData, {
-                headers: this.getHeader(),
-                'Content-Type': 'application/json' 
-            });
-            return response.data;
-        } catch (error) {
-            throw error;  
-        }
-    }
-    static async deleteShelf(id) {
-        try {
-            const response = await axios.delete(`${this.BASE_URL}/api/shelf/${id}`, {
-                headers: this.getHeader(),
-            });
-            return response.data; 
-        } catch (error) {
-            console.error("Lỗi khi xóa:", error.response?.data || error.message);
-            throw error;
-        }
-    }
-
-    static async updateShelf(id, formData) {
-        try {
-            const response = await axios.put(`${this.BASE_URL}/api/shelf/${id}`, formData, {
-                headers: this.getHeader(),
-                'Content-Type': 'application/json' 
-            });
-            return response.data;
-        } catch (error) {
-            throw error;  
-        }
-    }
-
-
-
-
     
 
     // Phát
@@ -208,6 +145,28 @@ export default class ApiService {
             return response.data;
         } catch (error) {
             console.error("Lỗi khi xóa đơn:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getOrderById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/order/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getProductById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/prduct/getById/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
             throw error;
         }
     }
@@ -328,5 +287,49 @@ export default class ApiService {
             throw error;
         }
     }
-    //Order
+    //Export
+    static async getAllExport() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/export`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách xuất:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async addExport(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/export`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi thêm danh mục:", error.response?.data || error.message);
+            throw error;
+        }
+    }   
+    static async deleteExport(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/export/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi xóa danh mục:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async updateExport(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/export/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
 }

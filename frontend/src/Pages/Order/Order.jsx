@@ -57,13 +57,13 @@ const OrderPage = () => {
         // Map API data to match the expected format
         const formattedOrders = orderData.map((order) => ({
           id: order.id,
-          customer: order.userId,  // Assuming userId is the customer
+          customer: order.userId, 
           address: order.delivery_Address,
           orderItems: order.orderItem_code.map((code, index) => ({
             orderItemId: `${code}-${index}`,  // Unique item ID
             productId: code,
             quantity: order.orderItem_quantity,
-            totalPrice: order.orderPrice, // Assuming total price per order (can adjust if per item needed)
+            totalPrice: order.orderPrice, 
           })),
           status: order.orderStatus,
           date: new Date(order.created_at).toLocaleDateString(),  // Convert date to readable format

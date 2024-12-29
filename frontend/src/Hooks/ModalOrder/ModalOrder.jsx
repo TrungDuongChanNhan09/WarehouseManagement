@@ -34,42 +34,48 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
   }, []);
 
   const handleAddOrderItem = (product) => {
-    const existingItem = newOrder.orderItems.find(
-      (item) => item.id === product.id
-    );
-    if (existingItem) {
-      // Update quantity if the item is already in the order
-      setNewOrder({
-        ...newOrder,
-        orderItems: newOrder.orderItems.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1, totalPrice: item.totalPrice + product.price }
-            : item
-        ),
-      });
-    } else {
-      // Add new item to the order
-      setNewOrder({
-        ...newOrder,
-        orderItems: [
-          ...newOrder.orderItems,
-          { ...product, quantity: 1, totalPrice: product.price },
-        ],
-      });
-    }
-  };
+    // Create a new order item for the selected product
+    const newItem = {
+      orderItem_id: "",  // Initially empty for user to fill
+      orderItemCode: "",  // Empty for the user to fill manually
+      quantity: 1,
+      totalPrice: product.price,
+      productName: product.productName,
+      price: product.price,
+      product_id: product.id,
+      orderItemState: "IN_ORDER",
+    };
 
-  const handleRemoveOrderItem = (productId) => {
+    // Add the new order item to the order
     setNewOrder({
       ...newOrder,
-      orderItems: newOrder.orderItems.filter((item) => item.id !== productId),
+      orderItems: [...newOrder.orderItems, newItem], // Add new item to the order
     });
   };
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleRemoveOrderItem = (orderItemCode) => {
+    setNewOrder({
+      ...newOrder,
+      orderItems: newOrder.orderItems.filter((item) => item.orderItemCode !== orderItemCode),
+    });
+  };
+
+  const handleQuantityChange = (orderItemCode, newQuantity) => {
     const updatedItems = newOrder.orderItems.map((item) =>
-      item.id === productId
-        ? { ...item, quantity: newQuantity, totalPrice: item.price * newQuantity }
+      item.orderItemCode === orderItemCode
+        ? { ...item, quantity: newQuantity, totalPrice: newQuantity * item.price }
+        : item
+    );
+    setNewOrder({
+      ...newOrder,
+      orderItems: updatedItems,
+    });
+  };
+
+  const handleOrderItemChange = (orderItemCode, field, value) => {
+    const updatedItems = newOrder.orderItems.map((item) =>
+      item.orderItemCode === orderItemCode
+        ? { ...item, [field]: value }
         : item
     );
     setNewOrder({
@@ -80,13 +86,70 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
 
   const handleSubmitOrder = async () => {
     try {
-      const response = await ApiService.addOrder(newOrder); // Assuming addOrder method exists
+      // Log order items before sending the request to the API
+      console.log("Order Items: ", newOrder.orderItems);
+
+      // Step 1: Create order items first (submit orderItems)
+      const orderItemResponses = await Promise.all(
+        newOrder.orderItems.map(async (item) => {
+          // Log each individual order item
+          console.log("Processing Order Item: ", item);
+
+          const orderItemData = {
+            orderItem_id: item.orderItem_id || null,
+            orderItemCode: item.orderItemCode,
+            product_id: item.product_id,
+            quantity: item.quantity,
+            totalPrice: item.totalPrice,
+            orderItemState: item.orderItemState,
+          };
+
+          if (!orderItemData.orderItemCode) {
+            console.error("Order item code is missing");
+            throw new Error("Order item code is missing");
+          }
+
+          // Call the API to add the order item
+          const response = await ApiService.addOrderItem(orderItemData);
+          // Update the orderItem_id after the API call returns
+          setNewOrder({
+            ...newOrder,
+            orderItems: newOrder.orderItems.map((orderItem) =>
+              orderItem.orderItemCode === item.orderItemCode
+                ? { ...orderItem, orderItem_id: response.orderItem_id }
+                : orderItem
+            ),
+          });
+        })
+      );
+
+      // Step 2: Now create the order with orderItem codes and other details
+      const orderData = {
+        orderItemCodes: newOrder.orderItems.map((item) => item.orderItemCode),
+        deliveryAddress: newOrder.address,
+        orderCode: newOrder.orderCode,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Log the final order data before submission
+      console.log("Final Order Data: ", orderData);
+
+      // Call API to create the order
+      const response = await ApiService.addOrder(orderData);
       setOrders((prevOrders) => [...prevOrders, response]);
+
+      // Close modal after submitting
       handleCloseModal();
     } catch (error) {
       console.error("Error submitting order", error);
     }
   };
+
+  const totalAmount = newOrder.orderItems.reduce(
+    (total, item) => total + item.totalPrice,
+    0
+  );
 
   return (
     <Modal open={openModal} onClose={handleCloseModal} closeAfterTransition>
@@ -135,7 +198,9 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
                     <Table size="small">
                       <TableHead>
                         <TableRow>
-                          <TableCell>Sản phẩm</TableCell>
+                          <TableCell>Order Item ID</TableCell>
+                          <TableCell>Mã Gói Hàng (Order Item Code)</TableCell>
+                          <TableCell>Tên sản phẩm</TableCell>
                           <TableCell>Số lượng</TableCell>
                           <TableCell>Tổng giá</TableCell>
                           <TableCell>Hành động</TableCell>
@@ -144,23 +209,34 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
                       <TableBody>
                         {newOrder.orderItems.map((item, index) => (
                           <TableRow key={index}>
+                            <TableCell>
+                              <TextField
+                                value={item.orderItem_id}
+                                onChange={(e) =>
+                                  handleOrderItemChange(item.orderItemCode, "orderItem_id", e.target.value)
+                                }
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <TextField
+                                value={item.orderItemCode}
+                                onChange={(e) =>
+                                  handleOrderItemChange(item.orderItemCode, "orderItemCode", e.target.value)
+                                }
+                              />
+                            </TableCell>
                             <TableCell>{item.productName}</TableCell>
                             <TableCell>
                               <TextField
                                 type="number"
                                 value={item.quantity}
-                                onChange={(e) =>
-                                  handleQuantityChange(item.id, parseInt(e.target.value, 10))
-                                }
+                                onChange={(e) => handleQuantityChange(item.orderItemCode, parseInt(e.target.value, 10))}
                                 sx={{ width: "60px" }}
                               />
                             </TableCell>
                             <TableCell>{item.totalPrice} VND</TableCell>
                             <TableCell>
-                              <Button
-                                color="error"
-                                onClick={() => handleRemoveOrderItem(item.id)}
-                              >
+                              <Button color="error" onClick={() => handleRemoveOrderItem(item.orderItemCode)}>
                                 Xóa
                               </Button>
                             </TableCell>
@@ -202,7 +278,7 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
                           <TableRow key={product.id}>
                             <TableCell>{product.productName}</TableCell>
                             <TableCell>{product.price} VND</TableCell>
-                            <TableCell>{product.inventory_quantity}</TableCell> {/* Display inventory quantity */}
+                            <TableCell>{product.inventory_quantity}</TableCell>
                             <TableCell>
                               <Button
                                 variant="contained"
@@ -210,8 +286,6 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
                                 onClick={() =>
                                   handleAddOrderItem({
                                     ...product,
-                                    quantity: 1, // Default quantity is 1
-                                    totalPrice: product.price,
                                   })
                                 }
                               >
@@ -226,7 +300,10 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
               </Box>
             </Box>
           </Stack>
+
+          {/* Display total price */}
           <Box sx={{ marginTop: 4, textAlign: "right" }}>
+            <Typography variant="h6">Tổng giá: {totalAmount} VND</Typography>
             <Button variant="contained" color="primary" onClick={handleSubmitOrder}>
               Lưu đơn hàng
             </Button>

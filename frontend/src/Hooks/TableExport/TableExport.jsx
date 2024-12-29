@@ -1,20 +1,8 @@
-import React from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
-  Collapse,
-  Box,
-  Typography,
-  Paper,
-} from "@mui/material";
+import React, { useState } from "react";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Collapse, IconButton, Box, Typography, Paper } from "@mui/material";
 import { ExpandMore, ExpandLess, Edit, Delete } from "@mui/icons-material";
 
-const ExportShipmentTable = ({ shipments, expandedShipmentId, handleExpandRow, handleOpenModal, handleDeleteShipment }) => {
+const TableExport = ({ exportShipments, expandedShipmentId, onRowExpand, onEdit, onDelete }) => {
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -30,31 +18,31 @@ const ExportShipmentTable = ({ shipments, expandedShipmentId, handleExpandRow, h
           </TableRow>
         </TableHead>
         <TableBody>
-          {shipments.map((shipment) => (
-            <React.Fragment key={shipment.export_id}>
+          {exportShipments.map((shipment) => (
+            <React.Fragment key={shipment.id}>
               <TableRow hover>
                 <TableCell>
-                  <IconButton onClick={() => handleExpandRow(shipment.export_id)}>
-                    {expandedShipmentId === shipment.export_id ? <ExpandLess /> : <ExpandMore />}
+                  <IconButton onClick={() => onRowExpand(shipment.id)}>
+                    {expandedShipmentId === shipment.id ? <ExpandLess /> : <ExpandMore />}
                   </IconButton>
                 </TableCell>
-                <TableCell>{shipment.export_id}</TableCell>
+                <TableCell>{shipment.id}</TableCell>
                 <TableCell>{shipment.export_address}</TableCell>
-                <TableCell>{shipment.export_state}</TableCell>
-                <TableCell>{shipment.created_At}</TableCell>
-                <TableCell>{shipment.updated_At}</TableCell>
+                <TableCell>{shipment.exportState}</TableCell>
+                <TableCell>{shipment.createdAt || "Chưa có ngày tạo"}</TableCell>
+                <TableCell>{shipment.updatedAt || "Chưa có ngày cập nhật"}</TableCell>
                 <TableCell>
-                  <IconButton onClick={() => handleOpenModal(shipment)}>
+                  <IconButton onClick={() => onEdit(shipment)}>
                     <Edit />
                   </IconButton>
-                  <IconButton sx={{ ml: 1 }} onClick={() => handleDeleteShipment(shipment.export_id)}>
+                  <IconButton sx={{ ml: 1 }} onClick={() => onDelete(shipment.id)}>
                     <Delete />
                   </IconButton>
                 </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
-                  <Collapse in={expandedShipmentId === shipment.export_id} timeout="auto" unmountOnExit>
+                  <Collapse in={expandedShipmentId === shipment.id} timeout="auto" unmountOnExit>
                     <Box margin={1}>
                       <Typography variant="h6" gutterBottom>
                         Các Đơn Hàng trong Xuất Hàng
@@ -67,10 +55,10 @@ const ExportShipmentTable = ({ shipments, expandedShipmentId, handleExpandRow, h
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {shipment.order_ids.map((orderId, index) => (
-                            <TableRow key={orderId}>
-                              <TableCell>{orderId}</TableCell>
-                              <TableCell>{shipment.order_quantity}</TableCell>
+                          {shipment.orders?.map((order) => (
+                            <TableRow key={order.id}>
+                              <TableCell>{order.id}</TableCell>
+                              <TableCell>{order.quantity}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -87,4 +75,4 @@ const ExportShipmentTable = ({ shipments, expandedShipmentId, handleExpandRow, h
   );
 };
 
-export default ExportShipmentTable;
+export default TableExport;
