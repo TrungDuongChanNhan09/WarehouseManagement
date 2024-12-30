@@ -13,4 +13,5 @@ public interface OrderItemService {
     Optional<OrderItem> getOrderItemById(String id);
     List<OrderItem> getAllOrderItem();
     List<String> getAllOrderItemCode();
+    OrderItem getOrderByOrderItemCode(String orderItemCode);
 }
