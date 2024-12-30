@@ -5,6 +5,7 @@ import com.example.backend.repository.ExportRepository;
 import com.example.backend.repository.OrderRepository;
 import com.example.backend.request.ExportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.BooleanOperators;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -53,6 +54,9 @@ public class ExportService implements com.example.backend.service.ExportService 
         else if (export.getUpdated_at().compareTo(currentDate) > 0) {
             throw new IllegalArgumentException("Ngày nhập không được lớn hơn ngày hiện tại.");
         }
+        if(existingExport.getExportState() != EXPORT_STATE.PENDING){
+            throw new Exception("Khong cho phep chinh sua thong tin export");
+        }
         existingExport.setExport_address(export.getExport_address());
         existingExport.setOrderCode(export.getOrderCode());
         existingExport.setOrderQuantity(export.getOrderCode().size());
@@ -69,6 +73,14 @@ public class ExportService implements com.example.backend.service.ExportService 
 
     @Override
     public void deleteExport(String exportId) {
+        Export export = exportRepository.findById(exportId).orElse(null);
+        if(export.getExportState() == EXPORT_STATE.PENDING){
+            for(String orderCode : export.getOrderCode()){
+                Order order = orderRepository.findByorderCode(orderCode);
+                order.setOrderStatus(ORDER_STATUS.OUT_EXPORT);
+                orderRepository.save(order);
+            }
+        }
         exportRepository.deleteById(exportId);
     }
 

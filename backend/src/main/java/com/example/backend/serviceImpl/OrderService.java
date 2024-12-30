@@ -130,6 +130,8 @@ public class OrderService implements com.example.backend.service.OrderService {
         return orderRepository.save(existingOrder);
     }
 
+
+
     @Override
     public List<Order> getOrderByState(ORDER_STATE orderState) {
         List<Order> orders = new ArrayList<>();
@@ -189,5 +191,15 @@ public class OrderService implements com.example.backend.service.OrderService {
     @Override
     public Order getOrderByOrderCode(String orderCode) {
         return orderRepository.findByorderCode(orderCode);
+    }
+
+    @Override
+    public Order updateOrderStatus(OrderStatusRequest status, String orderId) throws Exception {
+        Order existingOrder = orderRepository.findById(orderId).orElse(null);
+        if(existingOrder == null){
+            throw new Exception("Order not found");
+        }
+        existingOrder.setOrderStatus(status.getOrderStatus());
+        return orderRepository.save(existingOrder);
     }
 }

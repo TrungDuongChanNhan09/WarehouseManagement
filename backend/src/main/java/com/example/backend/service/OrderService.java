@@ -23,4 +23,5 @@ public interface OrderService {
     List<Order> getOrderByStatus(ORDER_STATUS orderStatus);
     OrderQuantity getOrderQuantity();
     Order getOrderByOrderCode(String orderCode);
+    Order updateOrderStatus(OrderStatusRequest status, String orderId) throws Exception;
 }

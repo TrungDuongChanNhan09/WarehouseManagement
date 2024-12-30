@@ -62,7 +62,7 @@ public class OrderItemController {
     }
 
     @GetMapping("/getOrderItemByOrderCode/{orderCode}")
-    public ResponseEntity<OrderItem> getOrderByStatus(@RequestHeader("Authorization") String jwt, @PathVariable String orderCode) throws Exception{
+    public ResponseEntity<OrderItem> getOrderItemByOrderItemCode(@RequestHeader("Authorization") String jwt, @PathVariable String orderCode) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(orderItemService.getOrderByOrderItemCode(orderCode), HttpStatus.OK);
     }
