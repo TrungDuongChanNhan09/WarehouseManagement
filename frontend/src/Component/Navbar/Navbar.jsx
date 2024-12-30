@@ -298,6 +298,7 @@ const Navbar = () => {
                                     },
                                 }}
                             />
+                            )}
                             <BottomNavigationAction
                                 showLabel={true}
                                 label="Supplier"
