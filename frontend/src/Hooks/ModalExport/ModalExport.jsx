@@ -1,82 +1,173 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Fade, Box, TextField, Button, Typography, Checkbox, Table, TableBody, TableCell, TableHead, TableRow, Paper } from "@mui/material";
-import ApiService from "../../Service/ApiService";
+import {
+  Modal,
+  Fade,
+  Box,
+  Typography,
+  TextField,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
+} from "@mui/material";
+import ApiService from "../../Service/ApiService.jsx";
 
 const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
-  const [orders, setOrders] = useState([]);
-  const [selectedOrders, setSelectedOrders] = useState([]);
+  const [orders, setOrders] = useState([]); // All available orders
+  const [selectedOrderIds, setSelectedOrderIds] = useState([]); // List of selected order IDs for export
   const [exportAddress, setExportAddress] = useState("");
   const [exportState, setExportState] = useState("PENDING");
+  const [selectedOrders, setSelectedOrders] = useState([]); // To hold the full order details after fetching
 
   useEffect(() => {
-    // Lấy danh sách đơn hàng từ API
+    // Fetch all orders for selection
     const fetchOrders = async () => {
       try {
-        const data = await ApiService.getAllOrders(); // Gọi API lấy danh sách đơn hàng
-        // Lọc các đơn hàng có trạng thái OUT_EXPORT
-        const filteredOrders = data.filter(order => order.orderStatus === "OUT_EXPORT");
-        setOrders(filteredOrders);
+        const data = await ApiService.getAllOrders(); // Fetch all orders from API
+        console.log("Fetched Orders:", data); // Log fetched orders for debugging
+
+        // Kiểm tra xem dữ liệu có hợp lệ không
+        if (data && Array.isArray(data)) {
+          // Filter orders that are marked as "OUT_EXPORT"
+          const filteredOrders = data.filter(order => order.orderStatus === "OUT_EXPORT");
+          setOrders(filteredOrders);
+        } else {
+          console.error("Dữ liệu không hợp lệ:", data);
+        }
       } catch (error) {
-        console.error("Lỗi khi lấy đơn hàng:", error);
+        console.error("Lỗi khi lấy danh sách đơn hàng:", error);
       }
     };
+
     fetchOrders();
 
-    // Nếu đang chỉnh sửa, load dữ liệu của xuất hàng vào modal
     if (shipment) {
       setExportAddress(shipment.export_address || "");
       setExportState(shipment.exportState || "PENDING");
 
-      // Đặt các đơn hàng đã chọn (dựa vào orderCode từ shipment)
-      setSelectedOrders(shipment.orderCode || []);
+      // Set the selected order IDs
+      setSelectedOrderIds(shipment.orderCode || []);
+    } else {
+      // Reset the selected orders when no shipment is passed
+      setSelectedOrders([]);
+      setExportAddress("");
+      setExportState("PENDING");
     }
-  }, [shipment]);
+  }, [shipment]); // Re-run whenever the shipment prop changes
 
-  const handleSelectOrder = (orderId) => {
-    setSelectedOrders((prevSelectedOrders) =>
-      prevSelectedOrders.includes(orderId)
-        ? prevSelectedOrders.filter((id) => id !== orderId)
-        : [...prevSelectedOrders, orderId]
-    );
+  useEffect(() => {
+    // Log selected orders when they change
+    console.log("Selected Orders:", selectedOrders); // Log full details of selected orders
+
+    // Fetch the full details for selected orders whenever the selectedOrderIds change
+    const fetchSelectedOrderDetails = async () => {
+      if (selectedOrderIds.length === 0) {
+        setSelectedOrders([]);
+        return;
+      }
+
+      try {
+        const orderDetails = await Promise.all(
+          selectedOrderIds.map(async (orderCode) => {
+            const response = await ApiService.getOrderByOrderCode(orderCode); // Fetch order by orderCode
+            console.log("Fetched Order Details Response:", response); // Log the full response for debugging
+
+            if (response && response.data) {
+              return response.data; // Return only the 'data' part of the response
+            } else {
+              console.error("Dữ liệu không hợp lệ cho orderCode:", orderCode);
+              return null; // Return null if data is invalid
+            }
+          })
+        );
+
+        // Lọc ra các order hợp lệ
+        setSelectedOrders(orderDetails.filter(order => order !== null));
+
+      } catch (error) {
+        console.error("Error fetching order details:", error);
+      }
+    };
+
+    fetchSelectedOrderDetails();
+  }, [selectedOrderIds]); // Re-run whenever selectedOrderIds changes
+
+  const handleAddOrder = async (orderCode) => {
+    if (!selectedOrderIds.includes(orderCode)) {
+      setSelectedOrderIds((prevSelected) => [...prevSelected, orderCode]);
+    }
+  };
+
+  const handleRemoveOrder = async (orderCode) => {
+    const updatedOrderIds = selectedOrderIds.filter(code => code !== orderCode);
+    setSelectedOrderIds(updatedOrderIds);
+    try {
+      const response = await ApiService.getOrderByOrderCode(orderCode);
+      const orderId = response.data.id;
+      const formData = { orderStatus: "OUT_EXPORT" };
+      await ApiService.updateOrderStatus(orderId, formData);
+      console.log(`Order ${orderId} status updated to OUT_EXPORT`);
+
+      // Reload all orders to reflect updated status
+      const updatedOrders = await ApiService.getAllOrders();
+      const filteredOrders = updatedOrders.filter(order => order.orderStatus === "OUT_EXPORT");
+      setOrders(filteredOrders); // Update orders with filtered list
+    } catch (error) {
+      console.error(`Error updating order status for ${orderCode}:`, error);
+    }
   };
 
   const handleSubmit = async () => {
-    // Lấy mã đơn hàng đã chọn
-    const orderCodes = selectedOrders.map((orderId) => {
-      const order = orders.find((order) => order.id === orderId);
-      return order ? order.orderCode : null;
-    }).filter(code => code !== null);
+    if (selectedOrderIds.length === 0) {
+      console.error("No orders selected, cannot submit export.");
+      return; // Prevent submission if no orders are selected
+    }
 
     const newExport = {
-      orderCode: orderCodes, 
-      exportState: exportState, 
-      export_address: exportAddress, 
-      created_at: shipment ? shipment.createdAt : new Date().toISOString(), // Nếu sửa thì giữ ngày tạo cũ
+      orderCode: selectedOrderIds, // Only passing orderCodes
+      exportState: exportState,
+      export_address: exportAddress,
+      created_at: shipment ? shipment.createdAt : new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     try {
+      let response;
       if (shipment) {
-        // Cập nhật xuất hàng nếu đang sửa
-        await ApiService.updateExport(shipment.id, newExport); 
-        console.log("Cập nhật xuất hàng thành công.");
+        response = await ApiService.updateExport(shipment.id, newExport);
       } else {
-        // Thêm mới xuất hàng nếu không có xuất hàng nào
-        await ApiService.addExport(newExport);
-        console.log("Tạo xuất hàng mới thành công.");
+        response = await ApiService.addExport(newExport); 
       }
-      onSubmit(); // Callback sau khi thành công
-      onClose(); // Đóng modal
+      console.log("Export Response:", response);
+      onSubmit(); 
+      onClose(); 
     } catch (error) {
       console.error("Lỗi khi tạo hoặc cập nhật xuất hàng:", error);
     }
   };
 
+  const handleClose = () => {
+    // Reset all states when closing
+    setSelectedOrderIds([]);
+    setSelectedOrders([]);
+    setExportAddress("");
+    setExportState("PENDING");
+    onClose();
+  };
+
   return (
-    <Modal open={open} onClose={onClose} closeAfterTransition>
+    <Modal open={open} onClose={handleClose} closeAfterTransition>
       <Fade in={open}>
         <Box sx={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)", width: 1000, bgcolor: "background.paper", boxShadow: 24, p: 4 }}>
           <Typography sx={{ fontWeight: "bold", mb: 2 }}>{shipment ? "Chỉnh Sửa Xuất Hàng" : "Tạo Xuất Hàng"}</Typography>
-          
+
           {/* Địa chỉ xuất hàng */}
           <TextField
             fullWidth
@@ -86,49 +177,96 @@ const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
             sx={{ marginBottom: "1rem" }}
           />
 
-          <Typography sx={{ fontWeight: "bold", mb: 2 }}>Chọn Đơn Hàng</Typography>
-
-          {/* Bảng hiển thị đơn hàng */}
-          <Paper sx={{ maxHeight: 400, overflow: "auto" }}>
+          {/* Selected orders */}
+          <Typography sx={{ fontWeight: "bold", mb: 2 }}>Đơn Hàng Đã Chọn</Typography>
+          <Paper sx={{ maxHeight: 300, overflow: "auto" }}>
             <Table stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedOrders.length === orders.length}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedOrders(orders.map((order) => order.id));
-                        } else {
-                          setSelectedOrders([]);
-                        }
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>Order ID</TableCell>
-                  <TableCell>Số lượng</TableCell>
+                  <TableCell>Mã Đơn Hàng</TableCell>
+                  <TableCell>Địa Chỉ Giao Hàng</TableCell>
+                  <TableCell>Hành Động</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {orders.map((order) => (
+                {selectedOrders.map((order) => (
                   <TableRow key={order.id}>
+                    <TableCell>{order.orderCode}</TableCell>
+                    <TableCell>{order.delivery_Address}</TableCell>
                     <TableCell>
-                      <Checkbox
-                        checked={selectedOrders.includes(order.id)} // Kiểm tra đơn hàng có được chọn không
-                        onChange={() => handleSelectOrder(order.id)} // Xử lý thay đổi lựa chọn
-                      />
+                      <Button variant="outlined" color="error" onClick={() => handleRemoveOrder(order.orderCode)}>
+                        Xóa
+                      </Button>
                     </TableCell>
-                    <TableCell>{order.id}</TableCell>
-                    <TableCell>{order.quantity}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </Paper>
 
+          {/* Export State */}
+          {shipment && (
+            <FormControl fullWidth sx={{ marginTop: "1rem" }}>
+              <InputLabel>Trạng Thái Xuất Hàng</InputLabel>
+              <Select
+                value={exportState}
+                onChange={(e) => setExportState(e.target.value)}
+              >
+                <MenuItem value="PENDING">Chờ xử lý</MenuItem>
+                <MenuItem value="IN_PROGRESS">Đang xử lý</MenuItem>
+                <MenuItem value="COMPLETED">Hoàn thành</MenuItem>
+              </Select>
+            </FormControl>
+          )}
+
+          {/* All available orders */}
+          <Typography sx={{ fontWeight: "bold", mb: 2, marginTop: "2rem" }}>Chọn Đơn Hàng</Typography>
+          <Paper sx={{ maxHeight: 400, overflow: "auto" }}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Mã Đơn Hàng</TableCell>
+                  <TableCell>Địa Chỉ Giao Hàng</TableCell>
+                  <TableCell>Hành Động</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {orders.map((order) => (
+                  <TableRow key={order.id}>
+                    <TableCell>{order.orderCode}</TableCell>
+                    <TableCell>{order.delivery_Address}</TableCell>
+                    <TableCell>
+                      {selectedOrderIds.includes(order.orderCode) ? (
+                        <Button variant="outlined" color="error" onClick={() => handleRemoveOrder(order.orderCode)}>
+                          Xóa
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="contained" 
+                          sx={{ backgroundColor: "#243642", color: "white", "&:hover": { backgroundColor: "#1a2a33" } }} 
+                          onClick={() => handleAddOrder(order.orderCode)}
+                        >
+                          Thêm
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Paper>
+
+          {/* Submit Button */}
           <Box sx={{ marginTop: "2rem", textAlign: "right" }}>
-            <Button variant="contained" sx={{ backgroundColor: "#243642", color: "white" }} onClick={handleSubmit}>
-              {shipment ? "Cập Nhật Xuất Hàng" : "Tạo Xuất Hàng"}
+            <Button variant="outlined" color="error" onClick={handleClose}>
+              Đóng
+            </Button>
+            <Button 
+              variant="contained" 
+              sx={{ backgroundColor: "#243642", color: "white", "&:hover": { backgroundColor: "#1a2a33" }, marginLeft: "1rem" }} 
+              onClick={handleSubmit}
+            >
+              Lưu
             </Button>
           </Box>
         </Box>

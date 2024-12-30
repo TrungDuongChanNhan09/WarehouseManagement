@@ -115,9 +115,31 @@ export default class ApiService {
             throw error;
         }
     }
+    static async addOrder(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/order`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi thêm gói hàng:", error.response?.data || error.message);
+            throw error;
+        }
+    }
     static async updateOrder(id, formData) {
         try {
             const response = await axios.put(`${this.BASE_URL}/api/order/updateOrder/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    static async updateOrderStatus(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/order/updateOrderStatus/${id}`, formData, {
                 headers: this.getHeader(),
                 'Content-Type': 'application/json' 
             });
@@ -159,6 +181,17 @@ export default class ApiService {
             throw error;
         }
     }
+    static async getOrderByOrderCode(code) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/order/getOrderByOrderCode/${code}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin bằng code:", error.response?.data || error.message);
+            throw error;
+        }
+    }
 
     static async searchShelf(keyword) {
         try {
@@ -172,20 +205,9 @@ export default class ApiService {
             throw error;
         }
     }
-
-
-
-
-    
-
-    // Phát
-
-
-    // Tân
-    //order
-    static async getAllOrders() {
+    static async getProductById(id) {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/prduct/getById/${id}`, {
+            const response = await axios.get(`${this.BASE_URL}/api/product/${id}`, {
                 headers: this.getHeader(),
             });
             return response.data; 
@@ -194,6 +216,18 @@ export default class ApiService {
             throw error;
         }
     }
+    static async getShelfByProductName(name) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/shelf/allShelfCode/${name}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi lấy thông tin kệ:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    
     //order items
     
     static async getOrderItemById(id) {

@@ -3,6 +3,7 @@ import { Container, Stack, Button, Typography, FormControl, Select, MenuItem, In
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
 import OrderTable from "../../Hooks/TableOrder/TableOrder.jsx";
 import OrderModal from "../../Hooks/ModalOrder/ModalOrder.jsx";
+import OrderUpdateModal from "../../Hooks/ModalUpdateOrder/ModalUpdateOrder.jsx";
 import { styled, alpha } from "@mui/material/styles";
 import Add from "@mui/icons-material/Add";
 import ApiService from "../../Service/ApiService.jsx";
@@ -43,39 +44,37 @@ const OrderPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [openModal, setOpenModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [newOrder, setNewOrder] = useState({
     customer: "",
     address: "",
     orderItems: [],
   });
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [orders, setOrders] = useState([]);
 
+  // Fetch orders on page load
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const orderData = await ApiService.getAllOrders(); 
-        // Map API data to match the expected format
-        const formattedOrders = orderData.map((order) => ({
-          id: order.id,
-          customer: order.userId, 
-          address: order.delivery_Address,
-          orderItems: order.orderItem_code.map((code, index) => ({
-            orderItemId: `${code}-${index}`,  // Unique item ID
-            productId: code,
-            quantity: order.orderItem_quantity,
-            totalPrice: order.orderPrice, 
-          })),
-          status: order.orderStatus,
-          date: new Date(order.created_at).toLocaleDateString(),  // Convert date to readable format
-          value: order.orderPrice,
-        }));
-        setOrders(formattedOrders); 
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-      }
-    };
     fetchOrders();
   }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const orderData = await ApiService.getAllOrders();
+      const formattedOrders = orderData.map((order) => ({
+        id: order.id,
+        orderCode: order.orderCode,
+        address: order.delivery_Address,
+        orderItems: order.orderItems || [],
+        status: order.orderStatus,
+        date: new Date(order.created_at).toLocaleDateString(),
+        value: order.orderPrice,
+      }));
+      setOrders(formattedOrders);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
 
   const handleOpenModal = () => {
     setNewOrder({
@@ -96,6 +95,16 @@ const OrderPage = () => {
     setStatusFilter(e.target.value);
   };
 
+  const handleOpenUpdateModal = (order) => {
+    setSelectedOrder(order); // set the selected order for updating
+    setOpenUpdateModal(true); // open update modal
+  };
+
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+    setSelectedOrder(null); // reset selected order when closing modal
+  };
+
   return (
     <Container maxWidth="lg">
       <PrimarySearchAppBar />
@@ -109,10 +118,7 @@ const OrderPage = () => {
         }}
       >
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
-          <Typography
-            sx={{ fontWeight: "bold", fontSize: "20px", paddingLeft: "20px", flex: "1" }}
-            variant="p"
-          >
+          <Typography sx={{ fontWeight: "bold", fontSize: "20px", paddingLeft: "20px", flex: "1" }} variant="p">
             Quản lý Đơn Hàng
           </Typography>
 
@@ -163,13 +169,25 @@ const OrderPage = () => {
         </Stack>
       </Stack>
 
-      <OrderTable orders={orders} searchQuery={searchQuery} statusFilter={statusFilter} />
+      <OrderTable
+        orders={orders}
+        searchQuery={searchQuery}
+        statusFilter={statusFilter}
+        handleOpenUpdateModal={handleOpenUpdateModal}
+      />
 
       <OrderModal
         openModal={openModal}
         handleCloseModal={handleCloseModal}
         newOrder={newOrder}
         setNewOrder={setNewOrder}
+        fetchOrders={fetchOrders}
+      />
+
+      <OrderUpdateModal
+        openUpdateModal={openUpdateModal}
+        handleCloseUpdateModal={handleCloseUpdateModal}
+        selectedOrder={selectedOrder}
         setOrders={setOrders}
       />
     </Container>

@@ -1,38 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Collapse, Box, Typography } from '@mui/material';
-import { ExpandMore, ExpandLess, Edit, Delete } from '@mui/icons-material';
-import ApiService from "../../Service/ApiService";  // Assuming this is where your API service is located
+import React, { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Collapse,
+  Box,
+  Typography,
+} from "@mui/material";
+import { ExpandMore, ExpandLess, Edit, Delete } from "@mui/icons-material";
 
-const OrderTable = ({ orders, searchQuery, statusFilter }) => {
+const OrderTable = ({ orders, searchQuery, statusFilter, handleOpenUpdateModal }) => {
   const [expandedOrderId, setExpandedOrderId] = useState(null);
-  const [updatedOrders, setUpdatedOrders] = useState(orders);  // State to store updated orders with item details
-
-  // Fetch order items details based on provided orderItem_code and orderItem_quantity
-  useEffect(() => {
-    const fetchOrderItems = async () => {
-      const updatedOrdersList = [...orders];  // Copy orders to avoid direct mutation
-
-      // Loop through each order to add order item details
-      for (let order of updatedOrdersList) {
-        // Check if we have orderItem_code and orderItem_quantity
-        if (order.orderItem_code && order.orderItem_code.length > 0) {
-          // Process each order item code and quantity
-          order.orderItems = order.orderItem_code.map((orderItemCode, index) => ({
-            orderItemId: `${order.id}-${index}`,
-            orderItemCode,  // Use orderItem_code as item code
-            quantity: order.orderItem_quantity[index],
-            totalPrice: 0, // Can calculate if you have prices for items
-          }));
-        }
-      }
-
-      // Update the state with the updated order list
-      setUpdatedOrders(updatedOrdersList);
-    };
-
-    // Run the fetch process if orders change
-    fetchOrderItems();
-  }, [orders]);  // Dependency array ensures this effect runs when orders change
 
   // Toggle row expand/collapse
   const handleExpandRow = (orderId) => {
@@ -40,11 +22,11 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
   };
 
   // Filter orders based on search query and status
-  const filteredOrders = updatedOrders.filter(
+  const filteredOrders = orders.filter(
     (order) =>
-      (order.delivery_Address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.orderStatus?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (statusFilter ? order.orderStatus === statusFilter : true)
+      (order.orderCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.status?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (statusFilter ? order.status === statusFilter : true)
   );
 
   return (
@@ -53,12 +35,12 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
         <TableHead>
           <TableRow>
             <TableCell></TableCell>
-            <TableCell>ID</TableCell>
+            <TableCell>Mã đơn hàng</TableCell>
             <TableCell>Địa chỉ</TableCell>
-            <TableCell>Date Order</TableCell>
-            <TableCell>Value</TableCell>
-            <TableCell>Status</TableCell>
-            <TableCell>Action</TableCell>
+            <TableCell>Ngày đặt hàng</TableCell>
+            <TableCell>Giá trị</TableCell>
+            <TableCell>Trạng thái</TableCell>
+            <TableCell>Hành động</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -71,13 +53,13 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
                     {expandedOrderId === order.id ? <ExpandLess /> : <ExpandMore />}
                   </IconButton>
                 </TableCell>
-                <TableCell>{order.id}</TableCell>
-                <TableCell>{order.delivery_Address}</TableCell>
-                <TableCell>{order.created_at}</TableCell>
-                <TableCell>{order.orderPrice} VND</TableCell>
-                <TableCell>{order.orderStatus}</TableCell>
+                <TableCell>{order.orderCode}</TableCell>
+                <TableCell>{order.address}</TableCell>
+                <TableCell>{order.date}</TableCell>
+                <TableCell>{order.value} VND</TableCell>
+                <TableCell>{order.status}</TableCell>
                 <TableCell>
-                  <IconButton onClick={() => handleEdit(order.id)}>
+                  <IconButton onClick={() => handleOpenUpdateModal(order)}>
                     <Edit />
                   </IconButton>
                   <IconButton onClick={() => handleDelete(order.id)}>
@@ -92,13 +74,13 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
                   <Collapse in={expandedOrderId === order.id} timeout="auto" unmountOnExit>
                     <Box margin={1}>
                       <Typography variant="h6" gutterBottom>
-                        Order Items
+                        Chi tiết gói hàng
                       </Typography>
                       <Table size="small">
                         <TableHead>
                           <TableRow>
-                            <TableCell>ID Gói hàng</TableCell>
-                            <TableCell>Tên gói hàng</TableCell> {/* Using orderItemCode */}
+                            <TableCell>Mã gói hàng</TableCell>
+                            <TableCell>Mã kệ</TableCell>
                             <TableCell>Số lượng</TableCell>
                             <TableCell>Tổng giá</TableCell>
                           </TableRow>
@@ -107,7 +89,7 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
                           {order.orderItems?.map((item) => (
                             <TableRow key={item.orderItemId}>
                               <TableCell>{item.orderItemId}</TableCell>
-                              <TableCell>{item.orderItemCode}</TableCell> {/* Display the orderItemCode */}
+                              <TableCell>{item.shelfCode}</TableCell>
                               <TableCell>{item.quantity}</TableCell>
                               <TableCell>{item.totalPrice} VND</TableCell>
                             </TableRow>
@@ -126,13 +108,8 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
   );
 };
 
-// Example of handleEdit and handleDelete functions
-const handleEdit = (orderId) => {
-  console.log('Edit Order:', orderId);
-};
-
 const handleDelete = (orderId) => {
-  console.log('Delete Order:', orderId);
+  console.log("Xóa đơn hàng:", orderId);
 };
 
 export default OrderTable;

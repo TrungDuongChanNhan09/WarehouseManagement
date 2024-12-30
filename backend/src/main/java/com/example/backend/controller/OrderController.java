@@ -30,9 +30,13 @@ public class OrderController {
     private ProductService productService;
 
     @PostMapping("")
-    public ResponseEntity<Order> createOrder(@RequestHeader("Authorization") String jwt, @RequestBody OrderItemRequest order) throws Exception{
+    public ResponseEntity<ApiOrderRespone> createOrder(@RequestHeader("Authorization") String jwt, @RequestBody OrderItemRequest order) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
-        return new ResponseEntity<>(orderService.createOrder(order, jwt), HttpStatus.CREATED);
+        ApiOrderRespone apiOrderRespone = new ApiOrderRespone();
+        Order order1 = orderService.createOrder(order, jwt);
+        apiOrderRespone.setData(order1);
+        apiOrderRespone.setMessage(user.getUserName() + " tạo đơn hàng " + order1.getOrderCode());
+        return new ResponseEntity<>(apiOrderRespone, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
@@ -42,9 +46,13 @@ public class OrderController {
     }
 
     @PutMapping("/updateOrder/{id}")
-    public ResponseEntity<Order> updateOrder(@RequestHeader("Authorization") String jwt, @PathVariable String id, OrderItemRequest order) throws Exception{
+    public ResponseEntity<ApiOrderRespone> updateOrder(@RequestHeader("Authorization") String jwt, @PathVariable String id, OrderItemRequest order) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
-        return new ResponseEntity<>(orderService.updateOrder(order, id), HttpStatus.OK);
+        ApiOrderRespone apiOrderRespone = new ApiOrderRespone();
+        Order order1 = orderService.updateOrder(order, id);
+        apiOrderRespone.setData(order1);
+        apiOrderRespone.setMessage(user.getUserName() + " cập nhật đơn hàng " + order1.getOrderCode());
+        return new ResponseEntity<>(apiOrderRespone, HttpStatus.OK);
     }
 
     @GetMapping("/getOrder")
