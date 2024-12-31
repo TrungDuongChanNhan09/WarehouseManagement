@@ -49,7 +49,36 @@ export default class ApiService {
         }
     }
 
+<<<<<<< HEAD
     static async getAllShelf() {
+=======
+    static async getSingleInventory(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/inventory/${id}`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    static async getSingleProduct(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getById/${id}`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    
+
+    static async getAllQuantityProduct(){
+>>>>>>> 082d4822912c2a3c547be9e28986eb5348519a79
         try {
             const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
                 headers: this.getHeader()  
@@ -73,6 +102,13 @@ export default class ApiService {
             throw error;  
         }
     }
+<<<<<<< HEAD
+=======
+
+
+    
+    
+>>>>>>> 082d4822912c2a3c547be9e28986eb5348519a79
 
     static async deleteInventory(id) {
         try {
@@ -97,6 +133,136 @@ export default class ApiService {
             throw error;  
         }
     }
+<<<<<<< HEAD
+=======
+
+    static async getAllShelf() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    static async getInforUser(){
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/getInformation`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addShelf(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/shelf`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    static async deleteShelf(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/shelf/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    static async updateShelf(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/shelf/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async searchShelf(keyword) {
+        try {
+          const response = await axios.get(`${this.BASE_URL}/api/shelf/searchByName/${keyword}`, {
+            headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+          });
+          return response.data;  
+        } catch (error) {
+            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    static async searchInventory(keyword) {
+        try {
+          const response = await axios.get(`${this.BASE_URL}/api/inventory/searchByName/${keyword}`, {
+            headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+          });
+          return response.data;  
+        } catch (error) {
+            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    static async updateInforUser(formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/updateInfor`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    // static async uploadImage(formData) {
+    //     try {
+    //         const response = await axios.post(`${this.BASE_URL}/upload/image`, formData, {
+    //             headers: this.getHeader(),
+    //             'Content-Type': 'multipart/form-data' 
+    //         });
+    //         return response.data;
+    //     } catch (error) {
+    //         throw error;  
+    //     }
+    // }
+
+    static async uploadImage(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/upload/image`, formData, {
+                // headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+
+
+
+
+
+
+
+
+>>>>>>> 082d4822912c2a3c547be9e28986eb5348519a79
     
 
     // Phát

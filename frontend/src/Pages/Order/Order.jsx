@@ -177,13 +177,15 @@ const OrderPage = () => {
         handleOpenUpdateModal={handleOpenUpdateModal}
       />
 
-      <OrderModal
-        openModal={openModal}
-        handleCloseModal={handleCloseModal}
-        newOrder={newOrder}
-        setNewOrder={setNewOrder}
-        fetchOrders={fetchOrders}
-      />
+<OrderModal 
+  openModal={openModal} 
+  handleCloseModal={handleCloseModal} 
+  newOrder={newOrder} 
+  setNewOrder={setNewOrder} 
+  setOrders={setOrders} 
+  fetchOrders={fetchOrders}
+/>
+
 
       <OrderUpdateModal
         openUpdateModal={openUpdateModal}
