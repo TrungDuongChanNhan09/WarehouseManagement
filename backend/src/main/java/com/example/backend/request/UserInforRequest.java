@@ -11,4 +11,5 @@ public class UserInforRequest {
     private Timestamp dateOfBirth;
     private String address;
     private String email;
+    private String image;
 }

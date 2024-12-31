@@ -53,6 +53,7 @@ public class InventoryService implements com.example.backend.service.InventorySe
             if(updatedInventory.getNumber_shelf() < shelfs.size()){
                 throw new Exception("Số lượng shelf đang chứa hàng đang lớn hơn số lượng shelf muốn sửa");
             }
+            existingInventory.setStatus(updatedInventory.getStatus());
             existingInventory.setNameInventory(updatedInventory.getNameInventory());
             existingInventory.setTypeInventory(updatedInventory.getTypeInventory());
             existingInventory.setTypeInventoryDescription(updatedInventory.getTypeInventoryDescription());
