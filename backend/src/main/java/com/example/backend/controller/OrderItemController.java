@@ -1,8 +1,10 @@
 package com.example.backend.controller;
 
+import com.example.backend.model.Order;
 import com.example.backend.model.OrderItem;
 import com.example.backend.model.User;
 import com.example.backend.request.OrderItemRequest;
+import com.example.backend.request.OrderStatusRequest;
 import com.example.backend.service.OrderItemService;
 import com.example.backend.serviceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,5 +59,11 @@ public class OrderItemController {
     public ResponseEntity<List<String>> getOrderItemCode(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(orderItemService.getAllOrderItemCode(), HttpStatus.OK);
+    }
+
+    @GetMapping("/getOrderItemByOrderCode/{orderCode}")
+    public ResponseEntity<OrderItem> getOrderItemByOrderItemCode(@RequestHeader("Authorization") String jwt, @PathVariable String orderCode) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(orderItemService.getOrderByOrderItemCode(orderCode), HttpStatus.OK);
     }
 }

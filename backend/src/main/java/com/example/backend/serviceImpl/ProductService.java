@@ -102,7 +102,7 @@ public class ProductService implements com.example.backend.service.ProductServic
         List<Product> products = productRepository.findAll();
         List<Product> filterProduct = new ArrayList<>();
         for (Product product : products){
-            if(product.getCategoryId().equals(supplier.getId())){
+            if(product.getSupplierId().equals(supplier.getId())){
                 filterProduct.add(product);
             }
         }

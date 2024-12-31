@@ -55,6 +55,7 @@ public class UserService implements com.example.backend.service.UserService {
         user.setIdentification(userInforRequest.getIdentification());
         user.setAddress(userInforRequest.getAddress());
         user.setEmail(userInforRequest.getEmail());
+        user.setImage(userInforRequest.getImage());
         return userRepository.save(user);
     }
 

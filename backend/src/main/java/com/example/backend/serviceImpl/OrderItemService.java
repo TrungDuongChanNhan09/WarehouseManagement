@@ -94,7 +94,7 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
                     quantity -= shelf.getQuantity();
                     shelf.setQuantity(0);
                     shelf.setProductId(null);
-                    shelfRepository.save(shelf);
+                    shelfRepository.deleteById(shelf.getId());
                 }
 
                 if(quantity < shelf.getQuantity()){
@@ -219,5 +219,10 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
             }
         }
         return orderItemCode;
+    }
+
+    @Override
+    public OrderItem getOrderByOrderItemCode(String orderItemCode) {
+        return orderItemRepository.findByorderItemCode(orderItemCode);
     }
 }
