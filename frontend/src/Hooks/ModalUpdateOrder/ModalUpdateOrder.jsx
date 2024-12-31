@@ -17,116 +17,119 @@ import {
 } from "@mui/material";
 import ApiService from "../../Service/ApiService";
 
-const OrderUpdateModal = ({
-  openModal,
-  handleCloseModal,
-  selectedOrder,
-  setOrders,
-}) => {
+const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
   const [orderDetails, setOrderDetails] = useState({
     orderCode: "",
-    address: "",
-    status: "PENDING",
-    orderItems: [],
+    orderPrice: 0,
+    orderStatus: "PENDING",
+    orderItem_code: [], 
+    orderItem_quantity: 0,
+    delivery_Address: "",
+    created_at: "",
+    update_at: "",
   });
+
   const [orderItems, setOrderItems] = useState([]);
   const [shelves, setShelves] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchOrderData = async () => {
+      if (!selectedOrder) {
+        console.log("No order selected, skipping fetch.");
+        return;
+      }
+
       try {
-        const products = await ApiService.getProduct();
-        setOrderItems(products);
+        console.log("Fetching data for order ID:", selectedOrder.id);
+
+        setOrderDetails(selectedOrder);
+
+        // Fetch order items details (like product_name, product_price)
+        const fetchedOrderItems = [];
+        for (const itemCode of selectedOrder.orderItem_code) {
+          const orderItemDetails = await ApiService.getOrderItemByCode(itemCode);
+          fetchedOrderItems.push(orderItemDetails);
+        }
+        setOrderItems(fetchedOrderItems);
+
+        // Fetch product details for each order item
+        const productDetails = [];
+        for (const item of fetchedOrderItems) {
+          const product = await ApiService.getProductById(item.product_id); // Get product details by product_id
+          productDetails.push({
+            ...item,
+            productName: product.productName,
+            productPrice: product.price,
+          });
+        }
+        setOrderItems(productDetails);
+
+        // Fetch shelves data for each product in order
+        const shelvesData = [];
+        for (const item of selectedOrder.orderItem_code) {
+          const shelvesResponse = await ApiService.getShelfByProductName(item);
+          if (shelvesResponse) {
+            shelvesData.push(...shelvesResponse);
+          }
+        }
+        setShelves(shelvesData);
       } catch (error) {
-        console.error("Error fetching products", error);
+        console.error("Error fetching order data", error);
       }
     };
 
-    const fetchShelves = async () => {
-        try {
-          const shelves = await ApiService.getShelfByProductName(selectedOrder?.productName || "");
-          setShelves(shelves);
-        } catch (error) {
-          console.error("Error fetching shelves", error);
-        }
-      };
-      
-
-    fetchProducts();
     if (selectedOrder) {
-      setOrderDetails(selectedOrder);
-      fetchShelves();
+      fetchOrderData();
     }
   }, [selectedOrder]);
 
-  const handleOrderItemChange = (orderItemCode, field, value) => {
-    const updatedItems = orderDetails.orderItems.map((item) =>
-      item.orderItemCode === orderItemCode
-        ? { ...item, [field]: value }
-        : item
+  // Handle changes in order item selection (quantity or shelf code)
+  const handleOrderItemChange = (itemCode, field, value) => {
+    const updatedItems = orderDetails.orderItem_code.map((item, index) =>
+      item === itemCode ? { ...item, [field]: value } : item
     );
     setOrderDetails({
       ...orderDetails,
-      orderItems: updatedItems,
+      orderItem_code: updatedItems,
     });
   };
 
-  const handleAddOrderItem = (product) => {
-    const newItem = {
-      orderItemCode: "",
-      quantity: 1,
-      totalPrice: product.price,
-      productName: product.productName,
-      price: product.price,
-      shelfCode: "",
-      productId: product.id,
-    };
+  // Handle removal of an order item
+  const handleRemoveOrderItem = (itemCode) => {
     setOrderDetails({
       ...orderDetails,
-      orderItems: [...orderDetails.orderItems, newItem],
+      orderItem_code: orderDetails.orderItem_code.filter((item) => item !== itemCode),
     });
   };
 
-  const handleRemoveOrderItem = (orderItemCode) => {
-    setOrderDetails({
-      ...orderDetails,
-      orderItems: orderDetails.orderItems.filter(
-        (item) => item.orderItemCode !== orderItemCode
-      ),
-    });
-  };
-
+  // Submit the order update
   const handleSubmitOrder = async () => {
     try {
       const orderData = {
         ...orderDetails,
-        orderItems: orderDetails.orderItems.map((item) => ({
-          orderItemCode: item.orderItemCode,
-          productId: item.productId,
-          quantity: item.quantity,
-          shelfCode: item.shelfCode,
-          totalPrice: item.totalPrice,
+        orderItem_code: orderDetails.orderItem_code.map((item) => ({
+          orderItemCode: item,
+          quantity: orderDetails.orderItem_quantity, // Assume single quantity for all items
         })),
       };
 
-      if (selectedOrder) {
+      if (selectedOrder.id) {
+        // Update existing order
         await ApiService.updateOrder(selectedOrder.id, orderData);
-      } else {
-        const response = await ApiService.addOrder(orderData);
-        setOrders((prevOrders) => [...prevOrders, response]);
       }
 
-      handleCloseModal();
+      handleCloseModal(); // Close the modal after submission
     } catch (error) {
       console.error("Error submitting order", error);
     }
   };
 
-  const totalAmount = orderDetails.orderItems.reduce(
-    (total, item) => total + item.totalPrice,
-    0
-  );
+  // Calculate total order price based on item quantities and prices
+  const totalAmount = orderDetails.orderItem_code.reduce((total, itemCode) => {
+    const product = orderItems.find(item => item.productCode === itemCode);
+    return product ? total + (product.price * orderDetails.orderItem_quantity) : total;
+  }, 0);
 
   return (
     <Modal open={openModal} onClose={handleCloseModal} closeAfterTransition>
@@ -147,7 +150,7 @@ const OrderUpdateModal = ({
           }}
         >
           <Typography variant="h6" sx={{ marginBottom: 2 }}>
-            {selectedOrder ? "Cập nhật Đơn Hàng" : "Tạo Đơn Hàng"}
+            Cập nhật Đơn Hàng
           </Typography>
           <Stack direction="row" spacing={4} sx={{ flexWrap: "wrap" }}>
             <Box sx={{ width: "100%", md: "50%", marginBottom: 2 }}>
@@ -163,9 +166,9 @@ const OrderUpdateModal = ({
               <TextField
                 fullWidth
                 label="Địa chỉ"
-                value={orderDetails.address}
+                value={orderDetails.delivery_Address}
                 onChange={(e) =>
-                  setOrderDetails({ ...orderDetails, address: e.target.value })
+                  setOrderDetails({ ...orderDetails, delivery_Address: e.target.value })
                 }
                 sx={{ marginBottom: 2 }}
               />
@@ -173,9 +176,9 @@ const OrderUpdateModal = ({
                 fullWidth
                 select
                 label="Trạng thái"
-                value={orderDetails.status}
+                value={orderDetails.orderStatus}
                 onChange={(e) =>
-                  setOrderDetails({ ...orderDetails, status: e.target.value })
+                  setOrderDetails({ ...orderDetails, orderStatus: e.target.value })
                 }
                 sx={{ marginBottom: 2 }}
               >
@@ -186,7 +189,7 @@ const OrderUpdateModal = ({
                 ))}
               </TextField>
 
-              {orderDetails.orderItems.length > 0 && (
+              {orderDetails.orderItem_code.length > 0 && (
                 <Box sx={{ maxHeight: 400, overflowY: "auto" }}>
                   <TableContainer>
                     <Table size="small">
@@ -201,64 +204,60 @@ const OrderUpdateModal = ({
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {orderDetails.orderItems.map((item, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <TextField
-                                value={item.orderItemCode}
-                                onChange={(e) =>
-                                  handleOrderItemChange(
-                                    item.orderItemCode,
-                                    "orderItemCode",
-                                    e.target.value
-                                  )
-                                }
-                              />
-                            </TableCell>
-                            <TableCell>{item.productName}</TableCell>
-                            <TableCell>
-                              <TextField
-                                select
-                                value={item.shelfCode}
-                                onChange={(e) =>
-                                  handleOrderItemChange(
-                                    item.orderItemCode,
-                                    "shelfCode",
-                                    e.target.value
-                                  )
-                                }
-                              >
-                                {shelves.map((shelf) => (
-                                  <MenuItem key={shelf.code} value={shelf.code}>
-                                    {shelf.code}
+                        {orderDetails.orderItem_code.map((itemCode, index) => {
+                          const product = orderItems.find((p) => p.productCode === itemCode);
+                          return (
+                            <TableRow key={index}>
+                              <TableCell>
+                                <TextField
+                                  value={itemCode}
+                                  onChange={(e) =>
+                                    handleOrderItemChange(itemCode, "orderItemCode", e.target.value)
+                                  }
+                                />
+                              </TableCell>
+                              <TableCell>{product?.productName}</TableCell>
+                              <TableCell>
+                                <TextField
+                                  select
+                                  value={product.shelfCode || ""}
+                                  onChange={(e) =>
+                                    handleOrderItemChange(itemCode, "shelfCode", e.target.value || null)
+                                  }
+                                >
+                                  <MenuItem value="">
+                                    <em>Chọn kệ</em>
                                   </MenuItem>
-                                ))}
-                              </TextField>
-                            </TableCell>
-                            <TableCell>
-                              <TextField
-                                type="number"
-                                value={item.quantity}
-                                onChange={(e) =>
-                                  handleOrderItemChange(
-                                    item.orderItemCode,
-                                    "quantity",
-                                    parseInt(e.target.value, 10)
-                                  )
-                                }
-                              />
-                            </TableCell>
-                            <TableCell>{item.totalPrice} VND</TableCell>
-                            <TableCell>
-                              <Button
-                                color="error"
-                                onClick={() => handleRemoveOrderItem(item.orderItemCode)}
-                              >
-                                Xóa
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                                  {shelves.map((shelf) => (
+                                    <MenuItem key={shelf.code} value={shelf.code}>
+                                      {shelf.code}
+                                    </MenuItem>
+                                  ))}
+                                </TextField>
+                              </TableCell>
+                              <TableCell>
+                                <TextField
+                                  type="number"
+                                  value={orderDetails.orderItem_quantity}
+                                  onChange={(e) =>
+                                    setOrderDetails({
+                                      ...orderDetails,
+                                      orderItem_quantity: parseInt(e.target.value, 10),
+                                    })
+                                  }
+                                />
+                              </TableCell>
+                              <TableCell>
+                                {product?.productPrice * orderDetails.orderItem_quantity} VND
+                              </TableCell>
+                              <TableCell>
+                                <Button color="error" onClick={() => handleRemoveOrderItem(itemCode)}>
+                                  Xóa
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </TableContainer>
@@ -280,32 +279,18 @@ const OrderUpdateModal = ({
                     <TableHead>
                       <TableRow>
                         <TableCell>Tên sản phẩm</TableCell>
-                        <TableCell>Giá</TableCell>
                         <TableCell>Số lượng trong kho</TableCell>
-                        <TableCell>Thêm</TableCell>
+                        <TableCell>Giá</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {orderItems
-                        .filter((product) =>
-                          product.productName
-                            .toLowerCase()
-                            .includes(searchQuery.toLowerCase())
-                        )
+                        .filter((product) => product.productName.toLowerCase().includes(searchQuery.toLowerCase()))
                         .map((product) => (
-                          <TableRow key={product.id}>
+                          <TableRow key={product.productCode}>
                             <TableCell>{product.productName}</TableCell>
-                            <TableCell>{product.price} VND</TableCell>
                             <TableCell>{product.inventory_quantity}</TableCell>
-                            <TableCell>
-                              <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => handleAddOrderItem(product)}
-                              >
-                                Thêm
-                              </Button>
-                            </TableCell>
+                            <TableCell>{product.productPrice}</TableCell>
                           </TableRow>
                         ))}
                     </TableBody>
@@ -315,12 +300,14 @@ const OrderUpdateModal = ({
             </Box>
           </Stack>
 
-          <Box sx={{ marginTop: 4, textAlign: "right" }}>
-            <Typography variant="h6">Tổng giá: {totalAmount} VND</Typography>
-            <Button variant="contained" color="primary" onClick={handleSubmitOrder}>
-              {selectedOrder ? "Cập nhật đơn hàng" : "Lưu đơn hàng"}
+          <Stack direction="row" spacing={2} sx={{ marginTop: 4 }}>
+            <Button variant="contained" onClick={handleSubmitOrder}>
+              Cập nhật đơn hàng
             </Button>
-          </Box>
+            <Button variant="outlined" onClick={handleCloseModal}>
+              Hủy
+            </Button>
+          </Stack>
         </Box>
       </Fade>
     </Modal>

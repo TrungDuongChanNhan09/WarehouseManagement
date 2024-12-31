@@ -65,7 +65,7 @@ const OrderPage = () => {
         id: order.id,
         orderCode: order.orderCode,
         address: order.delivery_Address,
-        orderItems: order.orderItems || [],
+        orderItemCodes: order.orderItem_code || [],  // Chứa các mã gói hàng
         status: order.orderStatus,
         date: new Date(order.created_at).toLocaleDateString(),
         value: order.orderPrice,
@@ -75,6 +75,7 @@ const OrderPage = () => {
       console.error("Error fetching orders:", error);
     }
   };
+  
 
   const handleOpenModal = () => {
     setNewOrder({
@@ -189,6 +190,7 @@ const OrderPage = () => {
         handleCloseUpdateModal={handleCloseUpdateModal}
         selectedOrder={selectedOrder}
         setOrders={setOrders}
+        fetchOrders={fetchOrders}
       />
     </Container>
   );

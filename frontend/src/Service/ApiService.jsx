@@ -207,7 +207,7 @@ export default class ApiService {
     }
     static async getProductById(id) {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/product/${id}`, {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getById/${id}`, {
                 headers: this.getHeader(),
             });
             return response.data; 
@@ -238,6 +238,17 @@ export default class ApiService {
             return response.data; 
         } catch (error) {
             console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getOrderItemByCode(code) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/orderItem/getOrderItemByOrderCode/${code}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin items:", error.response?.data || error.message);
             throw error;
         }
     }

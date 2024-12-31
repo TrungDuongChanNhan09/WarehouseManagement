@@ -125,16 +125,6 @@ const ExportShipment = () => {
     if (!confirmation) return; // If user cancels the deletion, return early.
 
     try {
-      // First, update the orders related to this export shipment to "OUT_EXPORT"
-      const orders = exportShipments.find(shipment => shipment.id === shipmentId)?.orders || [];
-
-      // Update each order state to OUT_EXPORT
-      for (let order of orders) {
-        await ApiService.updateOrderStatus(order.id, { status: "OUT_EXPORT" });
-        console.log(`Order ${order.id} status updated to OUT_EXPORT`);
-      }
-
-      // Now delete the export shipment after updating orders
       await ApiService.deleteExport(shipmentId);
       setExportShipments((prev) => prev.filter((shipment) => shipment.id !== shipmentId)); // Update shipment list
       console.log("Export shipment deleted.");
