@@ -125,6 +125,7 @@ const ExportShipment = () => {
     if (!confirmation) return; // If user cancels the deletion, return early.
 
     try {
+
       await ApiService.deleteExport(shipmentId);
       setExportShipments((prev) => prev.filter((shipment) => shipment.id !== shipmentId)); // Update shipment list
       console.log("Export shipment deleted.");

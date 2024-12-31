@@ -106,19 +106,23 @@ const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
   };
 
   const handleRemoveOrder = async (orderCode) => {
-    const updatedOrderIds = selectedOrderIds.filter(code => code !== orderCode);
-    setSelectedOrderIds(updatedOrderIds);
     try {
+      const updatedOrderIds = selectedOrderIds.filter((code) => code !== orderCode);
+      setSelectedOrderIds(updatedOrderIds);
+
+      // Cập nhật trạng thái đơn hàng sau khi xóa
       const response = await ApiService.getOrderByOrderCode(orderCode);
       const orderId = response.data.id;
+      
       const formData = { orderStatus: "OUT_EXPORT" };
       await ApiService.updateOrderStatus(orderId, formData);
+
       console.log(`Order ${orderId} status updated to OUT_EXPORT`);
 
-      // Reload all orders to reflect updated status
+      // Làm mới danh sách orders
       const updatedOrders = await ApiService.getAllOrders();
-      const filteredOrders = updatedOrders.filter(order => order.orderStatus === "OUT_EXPORT");
-      setOrders(filteredOrders); // Update orders with filtered list
+      const filteredOrders = updatedOrders.filter((order) => order.orderStatus === "OUT_EXPORT");
+      setOrders([...filteredOrders]); // Đảm bảo React nhận diện thay đổi state
     } catch (error) {
       console.error(`Error updating order status for ${orderCode}:`, error);
     }
@@ -129,21 +133,24 @@ const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
       console.error("No orders selected, cannot submit export.");
       return; // Prevent submission if no orders are selected
     }
-
+  
     const newExport = {
-      orderCode: selectedOrderIds, // Only passing orderCodes
+      orderCode: selectedOrderIds,
       exportState: exportState,
       export_address: exportAddress,
-      created_at: shipment ? shipment.createdAt : new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      created_at: shipment ? shipment.createdAt : new Date().toISOString(), // Giữ nguyên created_at nếu có shipment
+      updated_at: new Date().toISOString(), // Cập nhật ngày sửa
     };
-
+  
+    // Log the export data before submitting
+    console.log("Export Data to be submitted:", newExport);
+  
     try {
       let response;
       if (shipment) {
         response = await ApiService.updateExport(shipment.id, newExport);
       } else {
-        response = await ApiService.addExport(newExport); 
+        response = await ApiService.addExport(newExport);
       }
       console.log("Export Response:", response);
       onSubmit(); 
@@ -152,7 +159,6 @@ const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
       console.error("Lỗi khi tạo hoặc cập nhật xuất hàng:", error);
     }
   };
-
   const handleClose = () => {
     // Reset all states when closing
     setSelectedOrderIds([]);
