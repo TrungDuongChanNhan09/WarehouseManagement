@@ -222,6 +222,28 @@ export default class ApiService {
             throw error;
         }
     }
+    
+    static async getProductBySupplierName(supplierName) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getBySupplier/${supplierName}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getAllCategorys() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/category`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 
     static async getCategoryById(id) {
         try {
@@ -233,7 +255,7 @@ export default class ApiService {
             throw error;
         }
     }
-
+    
     //Supplier
     static async getAllSupplier() {
         try {
@@ -293,6 +315,55 @@ export default class ApiService {
         }
     }
 
+    //ImportShipments
+    static async getAllImportShipments() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/importshipments`, {
+                headers: this.getHeader()
+            });
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addImportShipment(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/importshipments`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json'
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    //ImportShipmentItems
+
+    static async getImportShipmentItemsById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/importShipmentItems/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response; 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addImportShipmentItems(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/importShipmentItems`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json'
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    
     // Tân
     //order
     static async getAllOrders() {

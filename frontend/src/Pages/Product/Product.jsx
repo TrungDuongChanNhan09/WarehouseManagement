@@ -54,9 +54,9 @@ const columns = [
   { id: 'action', label: '', align: 'center' },
 ];
 
-function createData(productName, categoryId, supplierId, inventory_quantity, price, production_date, expiration_date) {
-  return {productName, categoryId, supplierId, inventory_quantity, price, production_date, expiration_date};
-}
+// function createData(productName, categoryId, supplierId, inventory_quantity, price, production_date, expiration_date) {
+//   return {productName, categoryId, supplierId, inventory_quantity, price, production_date, expiration_date};
+// }
 
 // const rows = [
 //     createData('P1', 'Máy Khoan', 'Tools', 'Bosch', 10, 1000000, new Date(2024, 11, 23), new Date(2026, 0, 1)),
@@ -181,7 +181,6 @@ const Product = () => {
             })
         );
 
-        console.log(updatedRows);
         setRows(updatedRows);
       } catch (error) {
         console.error("Lỗi khi tải thông tin các Product", error.message);
@@ -398,8 +397,8 @@ const Product = () => {
                                     </Select>
                                 </FormControl>
                                 <TextField sx={{margin:"1%", width:"31%" }} onChange={handleChange} defaultValue={selectedRow?.unit || ''} name="unit" label="Đơn vị" variant="outlined" />
-                                <TextField sx={{margin:"1%", width:"31%" }} onChange={handleChange} defaultValue={selectedRow?.inventory_quantity || ''} name="inventory_quantity" label="Số lượng" variant="outlined" />
-                                <TextField sx={{margin:"1%", width:"32%" }} onChange={handleChange} defaultValue={selectedRow?.price || ''} name="price" label="Giá" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"31%" }} onChange={handleChange} defaultValue={selectedRow?.inventory_quantity || 0} name="inventory_quantity" label="Số lượng" variant="outlined" />
+                                <TextField sx={{margin:"1%", width:"32%" }} onChange={handleChange} defaultValue={selectedRow?.price || 0} name="price" label="Giá" variant="outlined" />
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DesktopDatePicker 
                                         views={['year', 'month', 'day']} 
@@ -407,7 +406,7 @@ const Product = () => {
                                         onChange={(newValue) => {
                                             handleChangeProductionDate(newValue);
                                         }}
-                                        defaultValue={dayjs(selectedRow?.production_date || '')}
+                                        defaultValue={selectedRow?.production_date ? dayjs(selectedRow?.production_date) : null}
                                         label="Ngày sản xuất" 
                                         format="DD/MM/YYYY"
                                     />
@@ -415,11 +414,11 @@ const Product = () => {
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DesktopDatePicker 
                                         views={['year', 'month', 'day']} 
-                                        sx={{margin:"1%", width:"48%" }} 
+                                        sx={{margin:"1%", width:"48%" }}
                                         onChange={(newValue) => {
                                             handleChangeExpirationDate(newValue);
                                         }}
-                                        defaultValue={dayjs(selectedRow?.expiration_date || '')}
+                                        defaultValue={selectedRow?.expiration_date ? dayjs(selectedRow.expiration_date) : null}
                                         label="Ngày hết hạn" 
                                         format="DD/MM/YYYY"
                                     />
