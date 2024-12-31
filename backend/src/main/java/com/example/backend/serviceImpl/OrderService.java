@@ -95,6 +95,10 @@ public class OrderService implements com.example.backend.service.OrderService {
 
     @Override
     public void deleteOrder(String id) {
+        Order order = orderRepository.findById(id).orElse(null);
+        for(String i : order.getOrderItem_code()){
+            orderItemRepository.deleteByorderItemCode(i);
+        }
         orderRepository.deleteById(id);
     }
 
