@@ -49,6 +49,31 @@ export default class ApiService {
         }
     }
 
+    static async getSingleInventory(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/inventory/${id}`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    static async getSingleProduct(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getById/${id}`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    
+
     static async getAllQuantityProduct(){
         try {
             const response = await axios.get(`${this.BASE_URL}/api/admin/order/getOrderQuantity`, {
@@ -73,19 +98,10 @@ export default class ApiService {
             throw error;  
         }
     }
+
+
     
-    static async searchInventory(keyword) {
-        try {
-          const response = await axios.get(`${this.BASE_URL}/api/inventory/searchByName/${keyword}`, {
-            headers: this.getHeader(),
-                'Content-Type': 'application/json' 
-          });
-          return response.data;  
-        } catch (error) {
-            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
-            throw error;
-        }
-    }
+    
 
     static async deleteInventory(id) {
         try {
@@ -114,6 +130,18 @@ export default class ApiService {
     static async getAllShelf() {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
+                headers: this.getHeader()  
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+
+    static async getInforUser(){
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/getInformation`, {
                 headers: this.getHeader()  
             });
             return response.data;
@@ -169,6 +197,58 @@ export default class ApiService {
             throw error;
         }
     }
+
+    static async searchInventory(keyword) {
+        try {
+          const response = await axios.get(`${this.BASE_URL}/api/inventory/searchByName/${keyword}`, {
+            headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+          });
+          return response.data;  
+        } catch (error) {
+            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    static async updateInforUser(formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/updateInfor`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    // static async uploadImage(formData) {
+    //     try {
+    //         const response = await axios.post(`${this.BASE_URL}/upload/image`, formData, {
+    //             headers: this.getHeader(),
+    //             'Content-Type': 'multipart/form-data' 
+    //         });
+    //         return response.data;
+    //     } catch (error) {
+    //         throw error;  
+    //     }
+    // }
+
+    static async uploadImage(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/upload/image`, formData, {
+                // headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+
+
+
+
 
 
 

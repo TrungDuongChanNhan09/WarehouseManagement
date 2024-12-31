@@ -34,7 +34,7 @@ const style = {
 };
 
 const Shelf = () => {
-    const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [shelfs, setShelfs] = useState([]);
   const [filteredShelfs, setFilteredShelfs] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -134,78 +134,78 @@ const Shelf = () => {
 
             </Stack>
             <TableShelf searchShelfs={filteredShelfs} />
-      <Modal open={isAddModalOpen} onClose={handleCloseAddModal}>
-        <Fade in={isAddModalOpen}>
-          <Box sx={style}>
-            <Typography
-              sx={{
-                fontWeight: "bold",
-                fontSize: "20px",
-                marginBottom: "1rem",
-              }}
-            >
-              Thêm kệ hàng mới
-            </Typography>
-            <Stack spacing={2}>
-              <TextField
-                label="Tên kệ hàng"
-                value={newShelfData.shelfCode}
-                onChange={(e) =>
-                  setNewShelfData({ ...newShelfData, shelfCode: e.target.value })
-                }
-              />
-              <TextField
-                label="Kho hàng"
-                value={newShelfData.inventoryid}
-                onChange={(e) =>
-                  setNewShelfData({
-                    ...newShelfData,
-                    inventoryid: e.target.value,
-                  })
-                }
-              />
-              <TextField
-                label="Loại sản phẩm"
-                value={newShelfData.productId}
-                onChange={(e) =>
-                  setNewShelfData({ ...newShelfData, productId: e.target.value })
-                }
-              />
-              <TextField
-                label="Tổng sản phẩm"
-                type="number"
-                value={newShelfData.quantity}
-                onChange={(e) =>
-                  setNewShelfData({
-                    ...newShelfData,
-                    quantity: parseInt(e.target.value, 10),
-                  })
-                }
-              />
-              <TextField
-                label="Sức chứa (sản phẩm)"
-                type="number"
-                value={newShelfData.capacity}
-                onChange={(e) =>
-                  setNewShelfData({
-                    ...newShelfData,
-                    capacity: parseInt(e.target.value, 10),
-                  })
-                }
-              />
-              <Button
-                sx={{
-                  backgroundColor: "#243642",
-                }}
-                variant="contained"
-                onClick={handleAddNewShelf}
-              >
-                Lưu
-              </Button>
-            </Stack>
-          </Box>
-        </Fade>
-      </Modal>
+          <Modal open={isAddModalOpen} onClose={handleCloseAddModal}>
+            <Fade in={isAddModalOpen}>
+              <Box sx={style}>
+                <Typography
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "20px",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  Thêm kệ hàng mới
+                </Typography>
+                <Stack spacing={2}>
+                  <TextField
+                    label="Tên kệ hàng"
+                    value={newShelfData.shelfCode}
+                    onChange={(e) =>
+                      setNewShelfData({ ...newShelfData, shelfCode: e.target.value })
+                    }
+                  />
+                  <TextField
+                    label="Kho hàng"
+                    value={newShelfData.inventoryid}
+                    onChange={(e) =>
+                      setNewShelfData({
+                        ...newShelfData,
+                        inventoryid: e.target.value,
+                      })
+                    }
+                  />
+                  <TextField
+                    label="Loại sản phẩm"
+                    value={newShelfData.productId}
+                    onChange={(e) =>
+                      setNewShelfData({ ...newShelfData, productId: e.target.value })
+                    }
+                  />
+                  <TextField
+                    label="Tổng sản phẩm"
+                    type="number"
+                    value={newShelfData.quantity}
+                    onChange={(e) =>
+                      setNewShelfData({
+                        ...newShelfData,
+                        quantity: parseInt(e.target.value, 10),
+                      })
+                    }
+                  />
+                  <TextField
+                    label="Sức chứa (sản phẩm)"
+                    type="number"
+                    value={newShelfData.capacity}
+                    onChange={(e) =>
+                      setNewShelfData({
+                        ...newShelfData,
+                        capacity: parseInt(e.target.value, 10),
+                      })
+                    }
+                  />
+                  <Button
+                    sx={{
+                      backgroundColor: "#243642",
+                    }}
+                    variant="contained"
+                    onClick={handleAddNewShelf}
+                  >
+                    Lưu
+                  </Button>
+                </Stack>
+              </Box>
+            </Fade>
+          </Modal>
         </Container>
     )
 }

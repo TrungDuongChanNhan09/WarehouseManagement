@@ -52,19 +52,7 @@ const Navbar = () => {
 
                 <Stack sx={{width: "100%",padding: "0.7rem"}}>
                     <Stack>
-                        {/* <Button className="btn-add-order" sx={{padding: "10px", borderRadius:"10px", width: "175px", border: "2px solid #387478", margin: "1.5rem 1rem 1rem 1rem"}}>
-                            <AddIcon sx={{color: "black"}}/>
-                            <Typography
-                                variant="p"
-                                align="left"
-                                sx={{
-                                    width:"135px",
-                                    color: "black",
-                                    marginLeft:"10px"
-                                }}
-                            >Tạo đơn hàng</Typography>
-                        </Button> */}
-                        
+                    
                         <BottomNavigation
                             value={value}
                             onChange={handleChange}
