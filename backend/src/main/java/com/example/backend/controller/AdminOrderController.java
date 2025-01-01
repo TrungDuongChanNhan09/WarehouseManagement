@@ -50,4 +50,10 @@ public class AdminOrderController {
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(orderService.getOrderQuantity(), HttpStatus.OK);
     }
+
+    @PutMapping("/updateOrderState/{id}")
+    public ResponseEntity<Order> updateOrderStatus(@RequestHeader("Authorization") String jwt, @PathVariable String id, @RequestBody OrderStatusRequest status) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(orderService.updateOrderStatus(status, id), HttpStatus.OK);
+    }
 }

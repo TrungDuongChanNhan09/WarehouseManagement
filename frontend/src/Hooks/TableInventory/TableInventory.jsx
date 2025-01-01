@@ -17,13 +17,15 @@ import {
   TableRow,
   Menu,
   MenuItem,
-  IconButton,
+  IconButton, Select
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ApiService from "../../Service/ApiService";
 
+// Các cột trong bảng
 const columns = [
-  { id: "id", label: "ID", minWidth: 30 },
+  { id: "stt", label: "STT", minWidth: 30 },
+  { id: "id", label: "ID", minWidth: 30 }, // Cột ID hiển thị theo dạng "IV01", "IV02", ...
   { id: "nameInventory", label: "Tên kho hàng", maxWidth: 140 },
   { id: "typeInventory", label: "Loại kho hàng", maxWidth: 140 },
   { id: "status", label: "Tình trạng", minWidth: 140 },
@@ -43,7 +45,7 @@ const style = {
   p: 4,
 };
 
-const TableInventory = (filteredInventorys) => {
+const TableInventory = ({ searchInventory }) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -86,6 +88,7 @@ const TableInventory = (filteredInventorys) => {
 
   const handleSaveUpdate = async () => {
     try {
+      console.log(editData);
       await ApiService.updateInventory(editData.id, editData);
       alert("Cập nhật thành công!");
       setInventorys((prev) =>
@@ -123,6 +126,10 @@ const TableInventory = (filteredInventorys) => {
     setPage(0);
   };
 
+  const formatId = (index) => {
+    return `IV${String(index + 1).padStart(2, '0')}`; // Đảm bảo ID có 2 chữ số
+  };
+
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
@@ -134,21 +141,26 @@ const TableInventory = (filteredInventorys) => {
                   {column.label}
                 </TableCell>
               ))}
-
-           
               <TableCell align="center">Tùy chọn</TableCell>
-            
             </TableRow>
           </TableHead>
           <TableBody>
-            {(filteredInventorys.length > 0 ? filteredInventorys : inventorys)
+            {searchInventory
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
+              .map((row, index) => (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-                  {columns.map((column) => {
+                  {/* Cột STT: Hiển thị số thứ tự */}
+                  <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+
+                  {/* Cột ID: Hiển thị theo định dạng IV01, IV02, IV03... */}
+                  <TableCell>{formatId(index)}</TableCell>
+
+                  {/* Các cột còn lại */}
+                  {columns.slice(2).map((column) => { // Bỏ qua cột ID
                     const value = row[column.id];
                     return <TableCell key={column.id}>{value}</TableCell>;
                   })}
+
                   <TableCell align="center">
                     <IconButton onClick={(event) => handleOpenMenu(event, row)}>
                       <MoreVertIcon />
@@ -168,12 +180,12 @@ const TableInventory = (filteredInventorys) => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-       {(role === "ROLE_ADMIN") && (
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
-        <MenuItem onClick={handleUpdate}>Cập nhật</MenuItem>
-        <MenuItem onClick={handleDelete}>Xóa</MenuItem>
-      </Menu>
-       )}
+      {role === "ROLE_ADMIN" && (
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleCloseMenu}>
+          <MenuItem onClick={handleUpdate}>Cập nhật</MenuItem>
+          <MenuItem onClick={handleDelete}>Xóa</MenuItem>
+        </Menu>
+      )}
       <Modal open={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
         <Fade in={isEditModalOpen}>
           <Box sx={style}>
@@ -191,11 +203,15 @@ const TableInventory = (filteredInventorys) => {
                 value={editData.typeInventory || ""}
                 onChange={(e) => setEditData({ ...editData, typeInventory: e.target.value })}
               />
-              <TextField
+              <Select
                 label="Tình trạng"
                 value={editData.status || ""}
                 onChange={(e) => setEditData({ ...editData, status: e.target.value })}
-              />
+                displayEmpty
+              >
+                <MenuItem value="OPEN">OPEN</MenuItem>
+                <MenuItem value="CLOSE">CLOSE</MenuItem>
+              </Select>
               <TextField
                 label="Tổng số kệ"
                 value={editData.number_shelf || ""}
@@ -211,7 +227,7 @@ const TableInventory = (filteredInventorys) => {
                 value={editData.typeInventoryDescription || ""}
                 onChange={(e) => setEditData({ ...editData, typeInventoryDescription: e.target.value })}
               />
-              <Button sx={{backgroundColor:"#243642"}} variant="contained" onClick={handleSaveUpdate}>
+              <Button sx={{ backgroundColor: "#243642" }} variant="contained" onClick={handleSaveUpdate}>
                 Cập nhật
               </Button>
             </Stack>
@@ -223,3 +239,5 @@ const TableInventory = (filteredInventorys) => {
 };
 
 export default TableInventory;
+
+

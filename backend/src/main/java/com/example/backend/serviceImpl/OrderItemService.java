@@ -54,20 +54,19 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
         newOrderItem.setShelfCode(orderItem.getShelfCode());
 
         int totalPrice = orderItem.getQuantity()*existProduct.get().getPrice();
-
+        Optional<Inventory> inventory = inventoryRepository.findById(shelfRepository.findByshelfCode(orderItem.getShelfCode().get(0)).getInventoryid());
         //check if product quantity in inventory equal with orderItem
         if(existProduct.get().getInventory_quantity() == orderItem.getQuantity()){
             existProduct.get().setInventory_quantity(0);
             existProduct.get().setProductStatus(PRODUCT_STATUS.OUT_STOCK);
             int quantity = orderItem.getQuantity();
+
             //update shelf quantity
             for(String shelfCode : orderItem.getShelfCode()){
                 Shelf shelf = shelfRepository.findByshelfCode(shelfCode);
                 if(quantity >= shelf.getQuantity()){
                     quantity -= shelf.getQuantity();
-                    shelf.setQuantity(0);
-                    shelf.setProductId(null);
-                    shelfRepository.save(shelf);
+                    shelfRepository.deleteById(shelf.getId());
                 }
 
                 if(quantity < shelf.getQuantity()){
@@ -76,7 +75,7 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
                     shelfRepository.save(shelf);
                 }
             }
-            Optional<Inventory> inventory = inventoryRepository.findById(shelfRepository.findByshelfCode(orderItem.getShelfCode().get(0)).getInventoryid());
+
             int totalQuantity = 0;
             for (Shelf shelf : shelfRepository.findByinventoryid(inventory.get().getId())){
                 totalQuantity += shelf.getQuantity();
@@ -94,7 +93,7 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
                     quantity -= shelf.getQuantity();
                     shelf.setQuantity(0);
                     shelf.setProductId(null);
-                    shelfRepository.save(shelf);
+                    shelfRepository.deleteById(shelf.getId());
                 }
 
                 if(quantity < shelf.getQuantity()){
@@ -103,7 +102,7 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
                     shelfRepository.save(shelf);
                 }
             }
-            Optional<Inventory> inventory = inventoryRepository.findById(shelfRepository.findByshelfCode(orderItem.getShelfCode().get(0)).getInventoryid());
+
             int totalQuantity = 0;
             for (Shelf shelf : shelfRepository.findByinventoryid(inventory.get().getId())){
                 totalQuantity += shelf.getQuantity();
@@ -134,7 +133,7 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
 
         existOrderItem.setQuantity(orderItem.getQuantity());
         int totalPrice = orderItem.getQuantity()*existProduct.get().getPrice();
-
+        Optional<Inventory> inventory = inventoryRepository.findById(shelfRepository.findByshelfCode(orderItem.getShelfCode().get(0)).getInventoryid());
         //check if product quantity in inventory equal with orderItem
         if(existProduct.get().getInventory_quantity() == orderItem.getQuantity()){
             existProduct.get().setInventory_quantity(0);
@@ -154,7 +153,7 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
                     shelfRepository.save(shelf);
                 }
             }
-            Optional<Inventory> inventory = inventoryRepository.findById(shelfRepository.findByshelfCode(orderItem.getShelfCode().get(0)).getInventoryid());
+
             int totalQuantity = 0;
             for (Shelf shelf : shelfRepository.findByinventoryid(inventory.get().getId())){
                 totalQuantity += shelf.getQuantity();
@@ -181,7 +180,6 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
                     shelfRepository.save(shelf);
                 }
             }
-            Optional<Inventory> inventory = inventoryRepository.findById(shelfRepository.findByshelfCode(orderItem.getShelfCode().get(0)).getInventoryid());
             int totalQuantity = 0;
             for (Shelf shelf : shelfRepository.findByinventoryid(inventory.get().getId())){
                 totalQuantity += shelf.getQuantity();
@@ -219,5 +217,10 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
             }
         }
         return orderItemCode;
+    }
+
+    @Override
+    public OrderItem getOrderByOrderItemCode(String orderItemCode) {
+        return orderItemRepository.findByorderItemCode(orderItemCode);
     }
 }

@@ -9,8 +9,8 @@ import {
   MenuItem,
   Menu,
   Modal,
-  Fade,
-  Backdrop, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText
+  Fade, Grid,
+  Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -20,6 +20,9 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ApiService from "../../Service/ApiService";
+
+import {CircularProgress, Alert} from "@mui/material";
+import { useEffect } from "react";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -80,13 +83,6 @@ const PrimarySearchAppBar = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleLogout = () => {
-    const isLogout = window.confirm("Xác nhận đăng xuất?");
-    if (isLogout) {
-      ApiService.logout();
-      navigate("/login");
-    }
-  };
 
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
@@ -126,16 +122,129 @@ const PrimarySearchAppBar = () => {
 
   const style = {
     position: "absolute",
-    top: "40%",
+    top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: 800,
+    width: "90%", // Tăng chiều rộng Modal
+    maxWidth: "1200px", // Giới hạn chiều rộng tối đa
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
+    borderRadius: "8px",
+  };
+  
+
+  const [formData, setFormData] = useState({
+    gender: "",
+    identification: "",
+    dateOfBirth: "",
+    address: "",
+    email: "",
+    image:"",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
+  const handleSubmit = async () => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    let imageUrl = formData.image;
+    if (selectedFile) {
+      imageUrl = await uploadImage();
+      if (!imageUrl) {
+        alert("Failed to upload the image. Please try again.");
+        setLoading(false);
+        return;
+      }
+    }
+
+    const updatedData = { ...formData, image: imageUrl };
+
+    try {
+      await ApiService.updateInforUser(updatedData);
+      setSuccess(true);
+    } catch (err) {
+      setError(err.response?.data?.message || "Cập nhật thất bại.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [inforUser, setInforUser] = useState(null)
   
+  const [imageFile, setImageFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null); 
+  const [currentImage, setCurrentImage] = useState(null); 
+
+  
+  
+  useEffect(() => {
+    if (open) {
+      const loadUserData = async () => {
+        setLoading(true);
+        try {
+          const response = await ApiService.getInforUser();
+          setInforUser(response);
+      
+          setFormData({
+            gender: response.gender || "",
+            identification: response.identification || "",
+            dateOfBirth: response.dateOfBirth || "",
+            address: response.address || "",
+            email: response.email || "",
+            image: response.image || "", 
+          });
+          setCurrentImage(response.image || ""); 
+        } catch (error) {
+          console.error("Lỗi khi tải thông tin người dùng", error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadUserData();
+    }
+  }, [open]);
+  
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setPreviewImage(URL.createObjectURL(file)); // Tạo URL để xem trước
+    }
+  };
+  
+  const handleImageUpload = async () => {
+    if (!imageFile) {
+      alert("Vui lòng chọn một ảnh để tải lên.");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append("image", imageFile);
+  
+    try {
+      const response = await ApiService.uploadImage(formData);
+      if (response.url) {
+        alert("Tải ảnh thành công!");
+        setFormData({ ...formData, image: response.url }); 
+        setPreviewImage(null); 
+      }
+    } catch (err) {
+      console.error("Lỗi tải ảnh:", err);
+      alert("Tải ảnh thất bại.");
+    }
+  };
+
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -220,23 +329,132 @@ const PrimarySearchAppBar = () => {
                   </ListItem>
                 </List>
               </Box>
-              <Box sx={{ width: "70%", padding: 2 }}>
+              <Box sx={{ width: "80%", padding: 2 }}>
                 {selectedSection === "info" && (
-                  <Stack spacing={2}>
-                    <Typography variant="h6" fontWeight="bold">
-                      Thông tin người dùng
-                    </Typography>
-                    <TextField label="Họ và tên" fullWidth variant="outlined" defaultValue="Nguyễn Văn A" />
-                    <TextField label="Email" fullWidth variant="outlined" defaultValue="nguyenvana@gmail.com" />
-                    <TextField label="Số điện thoại" fullWidth variant="outlined" defaultValue="0123456789" />
-                    <Button
-                      className="btn-setting"
-                      sx={{ color: "white", height: "50px", backgroundColor: "#243642" }}
-                      variant="contained"
-                    >
-                      Cập nhật thông tin
-                    </Button>
-                  </Stack>
+                 
+
+                  <Stack direction="column" spacing={2}>
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  Cập nhật thông tin người dùng
+                </Typography>
+
+                {success && <Alert severity="success">Cập nhật thành công!</Alert>}
+                {error && <Alert severity="error">{error}</Alert>}
+
+                <Box sx={{ textAlign: "center", marginBottom: "16px" }}>
+                  <img
+                    src={previewImage || currentImage} 
+                    alt="User Avatar"
+                    value={inforUser?.image || ""}
+                    style={{
+                      width: "150px",
+                      height: "150px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: "2px solid #ddd",
+                    }}
+                  />
+                </Box>
+
+                <Button variant="outlined" component="label">
+                  Tải ảnh mới
+                  <input type="file" accept="image/*" hidden onChange={handleImageChange} />
+                </Button>
+
+                <Button
+                  onClick={handleImageUpload}
+                  variant="contained"
+                  sx={{color: "white", height:"50px", backgroundColor: "#243642"}}
+                  color="primary"
+                  disabled={loading}
+                >
+                  {loading ? <CircularProgress size={24} /> : "Gửi ảnh"}
+                </Button>
+
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item xs={4}>
+                    <TextField
+                      disabled
+                      label="Tên người dùng"
+                      value={inforUser?.userName || ""}
+                      fullWidth
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      disabled
+                      label="Họ tên đầy đủ"
+                      value={inforUser?.fullName || ""}
+                      fullWidth
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label="Giới tính"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleInputChange}
+                      fullWidth
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label="CMND/CCCD"
+                      name="identification"
+                      value={formData.identification}
+                      onChange={handleInputChange}
+                      fullWidth
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label="Ngày sinh"
+                      name="dateOfBirth"
+                      type="date"
+                      value={formData.dateOfBirth}
+                      onChange={handleInputChange}
+                      fullWidth
+                      InputLabelProps={{ shrink: true }}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label="Địa chỉ"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      fullWidth
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <TextField
+                      label="Email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      fullWidth
+                      variant="outlined"
+                    />
+                  </Grid>
+                </Grid>
+
+                <Button
+                  onClick={handleSubmit}
+                  variant="contained"
+                  color="primary"
+                  disabled={loading}
+                  sx={{color: "white", height:"50px", backgroundColor: "#243642"}}
+                >
+                  {loading ? <CircularProgress size={24} /> : "Cập nhật thông tin"}
+                </Button>
+              </Stack>
+
                 )}
                 {selectedSection === "security" && (
                   <Stack spacing={2}>

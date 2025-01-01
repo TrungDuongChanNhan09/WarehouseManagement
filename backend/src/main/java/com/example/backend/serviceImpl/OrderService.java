@@ -95,6 +95,10 @@ public class OrderService implements com.example.backend.service.OrderService {
 
     @Override
     public void deleteOrder(String id) {
+        Order order = orderRepository.findById(id).orElse(null);
+        for(String i : order.getOrderItem_code()){
+            orderItemRepository.deleteByorderItemCode(i);
+        }
         orderRepository.deleteById(id);
     }
 
@@ -129,6 +133,8 @@ public class OrderService implements com.example.backend.service.OrderService {
         }
         return orderRepository.save(existingOrder);
     }
+
+
 
     @Override
     public List<Order> getOrderByState(ORDER_STATE orderState) {
@@ -189,5 +195,15 @@ public class OrderService implements com.example.backend.service.OrderService {
     @Override
     public Order getOrderByOrderCode(String orderCode) {
         return orderRepository.findByorderCode(orderCode);
+    }
+
+    @Override
+    public Order updateOrderStatus(OrderStatusRequest status, String orderId) throws Exception {
+        Order existingOrder = orderRepository.findById(orderId).orElse(null);
+        if(existingOrder == null){
+            throw new Exception("Order not found");
+        }
+        existingOrder.setOrderStatus(status.getOrderStatus());
+        return orderRepository.save(existingOrder);
     }
 }
