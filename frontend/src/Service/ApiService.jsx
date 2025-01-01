@@ -233,6 +233,17 @@ export default class ApiService {
             throw error;
         }
     }
+    
+    static async getProductById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getById/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            throw error;
+        }
+    }
 
     static async getAllCategorys() {
         try {
@@ -339,6 +350,30 @@ export default class ApiService {
         }
     }
 
+    static async updateImportShipment(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/importshipments/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async deleteImportShipment(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/importshipments/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response; 
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
     //ImportShipmentItems
 
     static async getImportShipmentItemsById(id) {
@@ -360,7 +395,7 @@ export default class ApiService {
             });
             return response;
         } catch (error) {
-            throw error;  
+            throw error;
         }
     }
     

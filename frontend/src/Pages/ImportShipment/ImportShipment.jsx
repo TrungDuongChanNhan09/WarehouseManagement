@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import './ImportShipment.css'
-import { alpha, Box, Button, Collapse, Container, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Paper, Select, Stack, styled, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography } from "@mui/material";
+import { alpha, Alert , Box, Button, Collapse, Container, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Paper, Select, Stack, styled, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Typography, Snackbar } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
@@ -55,8 +55,8 @@ const columns = [
 
 const expandColumns = [
     { id: 'productName', label: 'Tên sản phẩm'},
-    { id: 'quantity', label: 'Số lượng'},
-    { id: 'totalPrice', label: 'Tổng giá trị'},
+    { id: 'quantity', label: 'Số lượng', align: 'center'},
+    { id: 'totalPrice', label: 'Tổng giá trị', align: 'center', format: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value) },
 ]
 
 // function createExpandRows(id, importshipmentId, productName, quantity, totalPrice) {
@@ -112,7 +112,7 @@ export default function ImportShipment() {
     }
 
     const handleChangeCreatedDate = (value) => {
-        refInput.current['createdAt'] = value.$y + "-" + (value.$M + 1) + "-" + value.$D;
+        refInput.current['createdAt'] = `${value.$y}-${(value.$M + 1).toString().padStart(2, '0')}-${value.$D.toString().padStart(2, '0')}`;
         console.log(refInput);
     }
 
@@ -124,6 +124,7 @@ export default function ImportShipment() {
     const handleOpenModalAdd = async () => {
         setOpenModalAdd(true);
         setListSupplier(await ApiService.getAllSupplier());
+        refInput.current = {};
         shipmentItemsFieldRefs.current = {};
         setShipmentItemFields([{ id: Date.now() }]);
     };
@@ -151,18 +152,51 @@ export default function ImportShipment() {
     };
 
     const removeField = (id) => {
+        if (shipmentItemsFields.length === 1) {
+            window.alert('Đơn hàng tối thiểu phải có 1 sản phẩm');
+            return;
+        }
         setShipmentItemFields(shipmentItemsFields.filter((field) => field.id !== id));
         delete shipmentItemsFieldRefs.current[`productName-${id}`];
         delete shipmentItemsFieldRefs.current[`quantity-${id}`];
     };
 
-    const getValues = () => {
+    const getValues = async (importshipmentId) => {
         const values = shipmentItemsFields.map((field) => ({
             productName: shipmentItemsFieldRefs.current[`productName-${field.id}`]?.value || '',
-            quantity: shipmentItemsFieldRefs.current[`quantity-${field.id}`]?.value || '',
+            quantity: shipmentItemsFieldRefs.current[`quantity-${field.id}`]?.value || 0,
         }));
-        console.log(values); // Array of objects with productName and quantity
+
+        const updatedRows = await Promise.all(
+            values.map(async (row) => {
+                try {
+                    const product = await ApiService.getProductById(row.productName);
+                    return {
+                        importshipmentId: importshipmentId,
+                        productName: product?.productName || '',
+                        quantity: row.quantity,
+                        totalPrice: product?.price * row.quantity,
+                    };
+                } catch (error) {
+                    console.error('Lỗi khi lấy dữ liệu:', error);
+                    return {
+                        importshipmentId: '',
+                        productName: '',
+                        quantity: 0,
+                        totalPrice: 0,
+                    };
+                }
+            })
+        );
+        return updatedRows;// Array of objects with productName and quantity
     };
+
+    const isValidImportShipmentItems = () => {
+        return !shipmentItemsFields.some((field) => {
+            return shipmentItemsFieldRefs.current[`productName-${field.id}`]?.value === "" 
+            || shipmentItemsFieldRefs.current[`quantity-${field.id}`]?.value === "";
+        });
+    }
 
     const fetchRows = async () => {
       try {
@@ -214,10 +248,41 @@ export default function ImportShipment() {
     };
 
     const handleAddImportShipment = async () => {
-        //const respond = await ApiService.addImportShipment(refInput.current);
-        // if (respond.status === 201) setOpen(false);
-        // console.log(respond);
+        if (refInput.current['createdAt'] !== undefined && refInput.current['supplierId'] !== undefined && isValidImportShipmentItems()) {
+            const respond = await ApiService.addImportShipment({createdAt: refInput.current['createdAt'], suppiler: refInput.current['supplierId']});
+            const importshipmentId = respond.data['id'];
+
+            const dataImportShipmentItems = await getValues(importshipmentId);
+            for (const item of dataImportShipmentItems) {
+                console.log(item);
+                try {
+                    const respondItems = await ApiService.addImportShipmentItems(item);
+                    console.log(respondItems.data.id);
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            fetchRows();
+            window.alert('Tạo đơn hàng thành công');
+            setOpenModalAdd(false);
+        } else {
+            window.alert('Bạn chưa nhập đủ thông tin');
+        }
     }
+
+    const handleDeleteButton = async (id) => {
+        await ApiService.deleteImportShipment(id);
+        fetchRows();
+    }
+
+    const handleEditButton = async (row) => {
+        // setSelectedRow(row);
+        // setOpenEdit(true);
+        // refInput.current = row;
+        // setListCategory(await ApiService.getAllCategorys());
+        // setListSupplier(await ApiService.getAllSupplier());
+    };
 
     return(
         <Container maxWidth="xl" className="ImportShipment" sx={{ width: "100%", height: "auto", display: "flex", flexDirection: "column"}}>
@@ -331,13 +396,13 @@ export default function ImportShipment() {
                                                     <IconButton
                                                     color="default"
                                                     onClick={() => {
-                                                        props.handleEditButton(row)
+                                                        handleEditButton(row)
                                                     }}>
                                                     <Edit />
                                                     </IconButton>
                                                     <IconButton 
                                                     color="default"
-                                                    onClick={() => {props.handleDeleteButton(row.id) ?? '' }}>
+                                                    onClick={() => {handleDeleteButton(row.id) ?? '' }}>
                                                     <Delete />
                                                     </IconButton>
                                                 </TableCell>
@@ -354,7 +419,7 @@ export default function ImportShipment() {
                                             })}
                                         </TableRow>
                                         <TableRow>
-                                            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
+                                            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={4}>
                                                 <Collapse in={expandedShipmentId === row['id']} timeout="auto" unmountOnExit>
                                                     <Box margin={1}>
                                                         <Typography variant="h6" gutterBottom style={{ fontWeight: 'bold'}}>
@@ -475,9 +540,9 @@ export default function ImportShipment() {
                                             inputRef={(v) => (shipmentItemsFieldRefs.current[`productName-${field.id}`] = v)}
                                             label="Tên sản phẩm"
                                             >
-                                                {listProduct.map((supplier) => {
+                                                {listProduct.map((product) => {
                                                     return (
-                                                        <MenuItem value={supplier.productName}>{supplier.productName}</MenuItem>
+                                                        <MenuItem value={product.id}>{product.productName}</MenuItem>
                                                     );
                                                 })}
                                             </Select>

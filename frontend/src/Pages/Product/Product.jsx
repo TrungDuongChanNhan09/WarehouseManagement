@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import './Product.css'
-import { alpha, Box, Button, Container, Fade, FormControl, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Stack, styled, TextField, Typography } from "@mui/material";
+import { alpha, Box, Button, Container, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Stack, styled, TextField, Typography } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import MyTable from "../../Component/MyTable";
@@ -9,6 +9,10 @@ import dayjs from 'dayjs';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { useNavigate } from "react-router-dom";
+import { Close } from "@mui/icons-material";
+import axios from "axios";
+import crypto from 'crypto-js';
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: 'black',
@@ -46,13 +50,19 @@ const columns = [
   { id: 'productName', label: 'Tên sản phẩm', minWidth: 100, align: 'left' },
   { id: 'categoryName', label: 'Loại', align: 'center' },
   { id: 'supplierName', label: 'Nhà cung cấp', align: 'center' },
-  { id: 'inventory_quantity', label: 'Số lượng', align: 'center', format: (value) => value.toLocaleString('en-US'), },
+  { id: 'inventory_quantity', label: 'Số lượng', align: 'center'},
+  { id: 'unit', label: 'Đơn vị', align: 'center'},
   { id: 'price', label: 'Giá', minWidth: 100, align: 'center', format: (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value) },
   { id: 'production_date', label: 'Ngày sản xuất', minWidth: 100, align: 'center', format: (value) => Intl.DateTimeFormat('vi-VN').format(new Date(value)) },
   { id: 'expiration_date', label: 'Ngày hết hạn', minWidth: 100, align: 'center', format: (value) => value ? Intl.DateTimeFormat('vi-VN').format(new Date(value)) : '' },
   { id: 'productStatus', label: 'Trạng thái', align: 'center' },
   { id: 'action', label: '', align: 'center' },
 ];
+
+const productStatus = [
+    "IN_STOCK",
+    "OUT_STOCK"
+]
 
 // function createData(productName, categoryId, supplierId, inventory_quantity, price, production_date, expiration_date) {
 //   return {productName, categoryId, supplierId, inventory_quantity, price, production_date, expiration_date};
@@ -91,6 +101,7 @@ const Product = () => {
     const [openEdit, setOpenEdit] = React.useState(false);
     const [rows, setRows] = React.useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
+    const nav = useNavigate();
 
     useEffect(() => {
       fetchRows();
@@ -110,16 +121,19 @@ const Product = () => {
     }
 
     const handleChangeProductionDate = (value) => {
-        refInput.current['production_date'] = value.$y + "-" + (value.$M + 1) + "-" + value.$D;
+        refInput.current['production_date'] = `${value.$y}-${(value.$M + 1).toString().padStart(2, '0')}-${value.$D.toString().padStart(2, '0')}`;
         console.log(refInput);
     }
 
     const handleChangeExpirationDate = (value) => {
-        refInput.current['expiration_date'] = value.$y + "-" + (value.$M + 1) + "-" + value.$D;
+        refInput.current['expiration_date'] = `${value.$y}-${(value.$M + 1).toString().padStart(2, '0')}-${value.$D.toString().padStart(2, '0')}`;
         console.log(refInput);
     }
 
     const handleAddProduct = async () => {
+        uploadImage();
+        console.log(imageUrls);
+        refInput.current['image'] = imageUrls;
         const respond = await ApiService.addProduct(refInput.current);
         if (respond.status === 201) setOpen(false);
         console.log(respond);
@@ -143,6 +157,10 @@ const Product = () => {
         setListSupplier(await ApiService.getAllSupplier());
     };
 
+    const handleClickRow = (row) => {
+        nav('/app/product/detail/' + row.id);
+    }
+
     const handleFilterChange = (e) => {
         setFilter(e.target.value);
     };
@@ -151,6 +169,7 @@ const Product = () => {
         setOpen(true);
         setListCategory(await ApiService.getAllCategorys());
         setListSupplier(await ApiService.getAllSupplier());
+        setImages();
     }
     const handleClose = () => setOpen(false);
 
@@ -186,6 +205,67 @@ const Product = () => {
         console.error("Lỗi khi tải thông tin các Product", error.message);
       }
     };
+
+    //image upload
+    const [images, setImages] = useState();
+    const [imageUrls, setImageUrls] = useState();
+    const [previewUrl, setPreviewUrl] = useState(null);
+
+    useEffect(() => {
+        console.log('Updated images:', images);
+      }, [images]);
+
+    const handleImageChange = (e) => {
+        setImages(e.target.files[0]);
+        setPreviewUrl(URL.createObjectURL(e.target.files[0]));
+    };
+
+    const uploadImage = async () => {
+        if (!images) {
+            alert('Vui lòng chọn một hình ảnh trước!');
+            return;
+        }
+        
+        const publicId = `${refInput.current['productName']}-${refInput.current['supplierId']}`;
+        const timestamp = Math.round(new Date().getTime() / 1000);
+        const signature = crypto.SHA1(`public_id=${publicId}&timestamp=${timestamp}Mn2a9bePfKtrHY9Z3q0T_48-YuM`).toString();
+
+        try {
+            await axios.post(
+                'https://api.cloudinary.com/v1_1/dsygvdfd2/image/destroy',
+                {
+                    public_id: publicId,
+                    signature: signature,
+                    api_key: '291288338413912',
+                    api_secret: 'Mn2a9bePfKtrHY9Z3q0T_48-YuM',
+                    timestamp: timestamp
+                }
+            );
+    
+            console.log(`Đã xóa ảnh cũ với public_id: ${publicId}`);
+        } catch (error) {
+            console.warn('Không tìm thấy ảnh cũ hoặc lỗi khi xóa:', error.response?.data || error.message);
+        }
+    
+        const formData = new FormData();
+        formData.append('file', images);
+        formData.append('upload_preset', 'phatwarehouse');
+        formData.append('public_id', publicId);
+    
+        try {
+            const response = await axios.post(
+                'https://api.cloudinary.com/v1_1/dsygvdfd2/image/upload',
+                formData
+            );
+            const uploadedUrl = response.data.secure_url;
+    
+            setImageUrls(uploadedUrl);
+            console.log('Uploaded Image URL:', uploadedUrl);
+        } catch (error) {
+            console.error('Lỗi khi tải hình ảnh:', error);
+        }
+    };
+    
 
     return(
         <Container maxWidth="xl" className="Product" sx={{ width: "100%", height: "auto", display: "flex", flexDirection: "column"}}>
@@ -255,7 +335,7 @@ const Product = () => {
                         </Stack>
                     </Stack>
                 </Stack>
-                <MyTable tableColumns={columns} tableRows={rows} handleDeleteButton={handleDeleteButton} handleEditButton={handleEditButton} />
+                <MyTable tableColumns={columns} tableRows={rows} handleDeleteButton={handleDeleteButton} handleEditButton={handleEditButton} handleClickRow={handleClickRow}/>
             </Stack>
             <Modal
                 aria-labelledby="transition-modal-title"
@@ -332,7 +412,37 @@ const Product = () => {
                                     />
                                 </LocalizationProvider>
                                 <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} multiline="true" name="description" label="Mô tả sản phẩm" variant="outlined" />
-                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} name="image" label="Hình ảnh" variant="outlined" />
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    style={{margin: '1%', width: "100%"}}
+                                />
+                                
+                                {images !== undefined && (
+                                    <Box
+                                        sx={{
+                                            position: 'relative',
+                                            width: 120,
+                                            height: 100,
+                                            borderRadius: 1,
+                                            overflow: 'hidden',
+                                            boxShadow: 1,
+                                        }}
+                                    >
+                                        <img
+                                            src={previewUrl}
+                                            alt="preview"
+                                            style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover',
+                                                borderRadius: '4px',
+                                            }}
+                                        />
+                                    </Box>
+                                )}
+
                             </Stack>
                             <Button 
                                 className="btn-setting"
@@ -424,7 +534,24 @@ const Product = () => {
                                     />
                                 </LocalizationProvider>
                                 <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} defaultValue={selectedRow?.description || ''} multiline="true" name="description" label="Mô tả sản phẩm" variant="outlined" />
-                                <TextField sx={{margin:"1%", width:"100%"}} onChange={handleChange} name="image" label="Hình ảnh" variant="outlined" />
+                                <FormControl sx={{margin:"1%", width:"48%" }}>
+                                    <InputLabel id="demo-simple-select-helper-label">Trạng thái</InputLabel>
+                                    <Select
+                                        labelId="demo-simple-select-helper-label"
+                                        id="demo-simple-select-helper"
+                                        name="productStatus"
+                                        defaultValue={selectedRow?.productStatus ?? ''}
+                                        label="Trạng thái"
+                                        onChange={handleChange}
+                                    >
+                                        {productStatus.map((status, index) => {
+                                            return (
+                                                <MenuItem key={index} value={status}>{status}</MenuItem>
+                                            );
+                                        })}
+                                    </Select>
+                                </FormControl>
+                                <TextField sx={{margin:"1%", width:"48%"}} onChange={handleChange} name="image" label="Hình ảnh" variant="outlined" />
                             </Stack>
                             <Button 
                                 className="btn-setting"

@@ -62,15 +62,15 @@ export default function MyTable(props) {
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => {
                 return (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
+                  <TableRow hover role="checkbox" tabIndex={-1} key={index}>
+                    {columns.map((column, columnIndex) => {
                       let value = row[column.id];
                       if (column.id === 'stt') {
                         value = page * rowsPerPage + index + 1; // Calculate row number
                       };
                       if (column.id === 'action')
                         return (
-                          <TableCell>
+                          <TableCell key={{index}+"-"+{columnIndex}}>
                             <IconButton
                               color="default"
                               onClick={() => {
@@ -86,7 +86,7 @@ export default function MyTable(props) {
                           </TableCell>
                       );
                       return (
-                        <TableCell className='table-body-cell' key={column.id} align={column.align} type={column.type}>
+                        <TableCell className='table-body-cell' key={column.id} align={column.align} type={column.type} onClick={() => {props.handleClickRow(row) ?? ''}}>
                           {column.render
                             ? column.render(value)
                             : column.format

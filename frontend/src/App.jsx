@@ -15,6 +15,7 @@ import ImportShipment from "./Pages/ImportShipment/ImportShipment.jsx";
 import Supplier from "./Pages/Supplier/Supplier.jsx";
 import Order from "./Pages/Order/Order.jsx";
 import ExportShipment from "./Pages/ExportShipment/ExportShipment.jsx";
+import ProductDetail from "./Pages/Product/SubPages/ProductDetail.jsx";
 
 const App = () =>{
   return(
@@ -31,6 +32,7 @@ const App = () =>{
             <Route path='inventory' element={<Inventory/>}/>
             <Route path='category' element={<Category/>}/>
             <Route path='product' element={<Product/>}/>
+            <Route path="product/detail/:productId" element={<ProductDetail/>} />
             <Route path='employee' element={<Employee/>}/>
             <Route path='shelf' element={<Shelf/>}/>
             <Route path='importshipment' element={<ImportShipment/>}/>
