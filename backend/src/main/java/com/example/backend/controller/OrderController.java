@@ -46,7 +46,7 @@ public class OrderController {
     }
 
     @PutMapping("/updateOrder/{id}")
-    public ResponseEntity<ApiOrderRespone> updateOrder(@RequestHeader("Authorization") String jwt, @PathVariable String id, OrderItemRequest order) throws Exception{
+    public ResponseEntity<ApiOrderRespone> updateOrder(@RequestHeader("Authorization") String jwt, @PathVariable String id, @RequestBody OrderItemRequest order) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         ApiOrderRespone apiOrderRespone = new ApiOrderRespone();
         Order order1 = orderService.updateOrder(order, id);

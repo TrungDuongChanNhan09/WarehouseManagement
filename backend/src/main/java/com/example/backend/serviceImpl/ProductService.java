@@ -73,7 +73,7 @@ public class ProductService implements com.example.backend.service.ProductServic
             existingProduct.setUnit(product.getUnit());
             existingProduct.setSupplierId(product.getSupplierId());
             existingProduct.setPrice(product.getPrice());
-            return this.productRepository.save(product);
+            return this.productRepository.save(existingProduct);
         }
     }
 

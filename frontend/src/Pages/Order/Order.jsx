@@ -191,6 +191,7 @@ const OrderPage = () => {
         searchQuery={searchQuery}
         statusFilter={statusFilter}
         handleOpenUpdateModal={handleOpenUpdateModal}
+        fetchOrders={fetchOrders}
       />
 
       <OrderModal

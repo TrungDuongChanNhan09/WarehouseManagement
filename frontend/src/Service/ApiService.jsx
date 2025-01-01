@@ -216,6 +216,17 @@ export default class ApiService {
             throw error;
         }
     }
+    static async getProductByName(name) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getByName/${name}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
     static async getShelfByProductName(name) {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/shelf/allShelfCode/${name}`, {

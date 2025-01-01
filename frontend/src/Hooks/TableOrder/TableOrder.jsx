@@ -15,18 +15,24 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  TablePagination, // Import TablePagination
 } from '@mui/material';
 import { ExpandMore, ExpandLess, Edit, Delete } from '@mui/icons-material';
 import ApiService from "../../Service/ApiService.jsx";
 import OrderUpdateModal from '../ModalUpdateOrder/ModalUpdateOrder.jsx';
 
-const OrderTable = ({ orders, searchQuery, statusFilter }) => {
+const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [orderItems, setOrderItems] = useState({});
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  // Pagination state
+  const [page, setPage] = useState(0); // Current page
+  const [rowsPerPage, setRowsPerPage] = useState(5); // Number of rows per page
+
   // Expand/Collapse Row
   const handleExpandRow = async (orderId, orderItemCodes) => {
     setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
@@ -94,6 +100,20 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
       (statusFilter ? order.state === statusFilter : true)
   );
 
+  // Handle page change
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Handle rows per page change
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to first page when changing rows per page
+  };
+
+  // Slice the filtered orders to show only the current page
+  const paginatedOrders = filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
   return (
     <>
       <TableContainer>
@@ -110,7 +130,7 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredOrders.map((order) => (
+            {paginatedOrders.map((order) => (
               <React.Fragment key={order.id}>
                 <TableRow hover>
                   <TableCell>
@@ -122,7 +142,7 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
                   <TableCell>{order.address}</TableCell>
                   <TableCell>{order.date}</TableCell>
                   <TableCell>{order.value} VND</TableCell>
-                  <TableCell>{order.state}</TableCell> 
+                  <TableCell>{order.state}</TableCell>
                   <TableCell>
                     <IconButton onClick={() => handleEdit(order.id)}>
                       <Edit />
@@ -169,11 +189,23 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
         </Table>
       </TableContainer>
 
+      {/* Pagination */}
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={filteredOrders.length} // Total number of orders
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+
       {/* Update Modal */}
       <OrderUpdateModal 
         openModal={openUpdateModal}
         handleCloseModal={handleCloseUpdateModal}
-        selectedOrder={selectedOrder} // Pass the selected order details to the modal
+        selectedOrder={selectedOrder}
+        fetchOrders ={ fetchOrders}
       />
 
       {/* Confirm Delete Dialog */}

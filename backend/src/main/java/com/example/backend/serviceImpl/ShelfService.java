@@ -139,11 +139,13 @@ public class ShelfService implements com.example.backend.service.ShelfService{
     @Override
     public List<String> getShelfContainProduct(String productName) {
         Product product = productRepository.findByproductName(productName);
+        System.out.println(product.getId());
         List<Shelf> shelves = shelfRepository.findByproductId(product.getId());
         List<String> shelfCode = new ArrayList<>();
         for(Shelf shelf : shelves){
             shelfCode.add(shelf.getShelfCode());
         }
+        System.out.println(shelfCode);
         return shelfCode;
     }
 

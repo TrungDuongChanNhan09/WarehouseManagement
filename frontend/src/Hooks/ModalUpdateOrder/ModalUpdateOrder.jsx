@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import ApiService from "../../Service/ApiService";
 
-const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
+const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrders }) => {
   const [orderDetails, setOrderDetails] = useState({
     orderCode: "",
     orderPrice: 0,
@@ -33,7 +33,6 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
   const [products, setProducts] = useState([]);
   const [shelves, setShelves] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-
   useEffect(() => {
     const fetchOrderData = async () => {
       // Kiểm tra nếu chưa chọn đơn hàng
@@ -43,97 +42,65 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
       }
   
       try {
-        // Log order ID đang xử lý
         console.log("1. Fetching data for order ID:", selectedOrder.id);
         setOrderDetails(selectedOrder);
   
-        // Log thông tin orderItem_code đang được sử dụng
         console.log("2. Fetching order items for orderItemCode:", selectedOrder.orderItem_code);
   
         // Lấy danh sách các order items
-        const fetchedOrderItems = await ApiService.getOrderItemByCode(selectedOrder.orderItem_code);
-        console.log("3. Fetched Order Items:", fetchedOrderItems);
-  
-        // Kiểm tra nếu dữ liệu trả về là một mảng
-        if (Array.isArray(fetchedOrderItems)) {
-          console.log("4. Order Items is an array. Processing each item...");
-  
-          const productDetails = []; // Mảng để lưu thông tin chi tiết sản phẩm
-  
-          // Duyệt qua từng item trong order và lấy thông tin sản phẩm
-          for (const item of fetchedOrderItems) {
-            try {
-              // Log thông tin sản phẩm theo product_id
-              console.log(`5. Fetching product for item with product_id: ${item.product_id}`);
-              const fetchedProduct = await ApiService.getProductById(item.product_id);
-              console.log(`6. Fetched Product for item ${item.orderItemCode}:`, fetchedProduct);
-  
-              // Lấy thông tin kệ cho sản phẩm này
-              console.log(`7. Fetching shelf data for Order Item Code: ${item.orderItemCode}, Product Name: ${item.productName}`);
-              const shelvesResponse = await ApiService.getShelfByProductName(fetchedProduct.productName);
-              console.log(`8. Fetched Shelves for Product ${item.productName}:`, shelvesResponse);
-  
-              // Kiểm tra nếu có kệ và lấy mã kệ
-              const shelfCodes = shelvesResponse ? shelvesResponse.map(shelf => shelf.code) : [];
-              console.log(`9. Shelf Codes for Product ${item.productName}:`, shelfCodes);
-  
-              // Thêm chi tiết vào danh sách productDetails
-              productDetails.push({
-                ...item,
-                productName: item.productName,
-                productPrice: item.price,
-                orderItemCode: item.orderItemCode,  // Đảm bảo orderItemCode có trong dữ liệu
-                shelfCode: shelfCodes,  // Lưu kệ vào
-              });
-            } catch (error) {
-              console.error(`10. Error fetching product or shelf data for Order Item Code: ${item.orderItemCode}`, error);
-            }
-          }
-  
-          // Log danh sách các item sau khi đã lấy đủ thông tin
-          console.log("11. Order Items with Product and Shelf Details:", productDetails);
-          setOrderItems(productDetails); // Cập nhật state với danh sách item đã xử lý
-        } else if (fetchedOrderItems && typeof fetchedOrderItems === 'object') {
-          // Nếu là đối tượng, vẫn gọi API để lấy sản phẩm và kệ
-          console.log("12. Fetched Order Item is a single object. Processing single item...");
-  
+        const orderItemCodes = selectedOrder.orderItem_code; 
+        const productDetails = [];
+        for (const orderItemCode of orderItemCodes) {
           try {
-            console.log("13. Fetching product for single item with product_id:", fetchedOrderItems.product_id);
-            const fetchedProduct = await ApiService.getProductById(fetchedOrderItems.product_id);
-            console.log("14. Fetched Product for single item:", fetchedProduct);
-  
-            console.log(`15. Fetching shelf data for Order Item Code: ${fetchedOrderItems.orderItemCode}, Product Name: ${fetchedOrderItems.productName}`);
-            const shelvesResponse = await ApiService.getShelfByProductName(fetchedProduct.productName);
-            console.log(`16. Fetched Shelves for Product ${fetchedOrderItems.productName}:`, shelvesResponse);
-  
-            const shelfCodes = shelvesResponse ? shelvesResponse.map(shelf => shelf.code) : [];
-            console.log(`17. Shelf Codes for Product ${fetchedOrderItems.productName}:`, shelfCodes);
-  
-            const productDetails = [
-              {
-                ...fetchedOrderItems, 
-                productName: fetchedProduct.productName, 
-                productPrice: fetchedProduct.price,     
-                orderItemCode: fetchedOrderItems.orderItemCode,
-              },
-            ];
+            console.log(`3. Fetching details for order item code: ${orderItemCode}`);
             
+            const fetchedOrderItems = await ApiService.getOrderItemByCode(orderItemCode);
+            console.log(`4. Fetched details for order item ${orderItemCode}:`, fetchedOrderItems);
   
-            console.log("18. Order Item (single) with Product and Shelf Details:", productDetails);
-            setOrderItems(productDetails); // Cập nhật state với thông tin sản phẩm duy nhất
+            // Lấy thông tin sản phẩm cho từng item
+            const fetchedProduct = await ApiService.getProductById(fetchedOrderItems.product_id);
+            console.log(`5. Fetched Product for item ${orderItemCode}:`, fetchedProduct);
+  
+            // Lấy thông tin kệ cho sản phẩm này
+            const shelvesResponse = await ApiService.getShelfByProductName(fetchedProduct.productName);
+            console.log(`6. Fetched Shelves for Product ${fetchedProduct.productName}:`, shelvesResponse);
+  
+            // Kiểm tra nếu có kệ và lấy mã kệ
+            if (Array.isArray(shelvesResponse) && shelvesResponse.length > 0) {
+              const shelfCodes = shelvesResponse.map(shelf => shelf || "Unknown Shelf");
+              console.log(`7. Shelf Codes for Product ${fetchedProduct.productName}:`, shelfCodes);
+  
+              productDetails.push({
+                ...fetchedOrderItems,
+                productName: fetchedProduct.productName,
+                productPrice: fetchedProduct.price,
+                shelfCode: shelfCodes, 
+              });
+            } else {
+              console.log(`8. No shelves found for Product ${fetchedProduct.productName}`);
+              productDetails.push({
+                ...fetchedOrderItems,
+                productName: fetchedProduct.productName,
+                productPrice: fetchedProduct.price,
+                shelfCode: [],
+              });
+            }
           } catch (error) {
-            console.error(`19. Error fetching product or shelf data for Order Item Code: ${fetchedOrderItems.orderItemCode}`, error);
+            console.error(`9. Error fetching product or shelf data for Order Item Code: ${orderItemCode}`, error);
           }
-        } else {
-          console.error("20. Fetched Order Items is not in expected format", fetchedOrderItems);
         }
+        console.log("10. Order Items with Product and Shelf Details:", productDetails);
+        setOrderItems(productDetails); 
+  
       } catch (error) {
-        // Log lỗi nếu có vấn đề trong quá trình fetching dữ liệu
-        console.error("21. Error fetching order data", error.response?.data || error.message);
+        console.error("11. Error fetching order data", error.response?.data || error.message);
       }
     };
+  
     fetchOrderData();
   }, [selectedOrder]);
+  
+  
   
   useEffect(() => {
     const fetchProducts = async () => {
@@ -148,6 +115,15 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
   
     fetchProducts();
   }, []);
+  const handleInputChange = (orderItemCode, field, value) => {
+    setOrderItems((prevOrderItems) =>
+      prevOrderItems.map((item) =>
+        item.orderItemCode === orderItemCode
+          ? { ...item, [field]: value } // Cập nhật trường tương ứng
+          : item
+      )
+    );
+  };
   
   const handleOrderItemChange = (itemCode, field, value) => {
     const updatedItems = orderItems.map((item) =>
@@ -161,79 +137,109 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
     setOrderItems(orderItems.filter((item) => item.orderItemCode !== itemCode));
   };
 
-  const handleAddOrderItem = (productCode) => {
-    console.log("Adding product:", productCode); // Debug: Log the productCode being added
-  
-    // Find the product details by productCode
-    const product = products.find((product) => product.productCode === productCode);
-  
+  const handleAddOrderItem = async (productId) => {
+    const product = products.find((product) => product.id === productId);
     if (product) {
-      console.log("Product found:", product); 
-    
-      setOrderItems([
-        ...orderItems,
-        {
-          ...product,
-          quantity: 1,
-          orderItemCode: `orderItem-${Date.now()}`
-        },
-      ]);
+      try {
+        // Lấy kệ cho sản phẩm
+        const shelvesResponse = await ApiService.getShelfByProductName(product.productName);
+        console.log("shelvesResponse:", shelvesResponse);
+  
+        if (Array.isArray(shelvesResponse)) {
+          const shelfCodes = shelvesResponse.map(shelf => shelf.shelfCode || shelf);
+  
+          setOrderItems((prevOrderItems) => [
+            ...prevOrderItems,
+            {
+              ...product,
+              quantity: 1, 
+              orderItemCode: `orderItem-${Date.now()}`, 
+              shelfCode: shelfCodes,
+              productPrice: product.price, 
+              productId: product.id,  // Đảm bảo gán productId
+            },
+          ]);
+        }
+      } catch (error) {
+        console.error("Error fetching shelf code:", error.message);
+      }
     } else {
-      console.error("Product not found for productCode:", productCode);
+      console.error("Product not found for productId:", productId);
     }
   };
   
-
+  
   const handleSubmitOrder = async () => {
     try {
-      // Kiểm tra nếu không có order items, thông báo lỗi
+      // Kiểm tra xem có order item nào không
       if (!orderItems || orderItems.length === 0) {
         console.error("No items in the order. Please add items before submitting.");
         return;
       }
   
-      // Khởi tạo mảng để chứa các promises tạo mới item
-      const createItemPromises = [];
-  
-      // Duyệt qua các item trong orderItems, tạo mới nếu cần
+      // Duyệt qua các order item và kiểm tra từng item
       for (const item of orderItems) {
-        if (!item.orderItemCode) {
-          // Nếu không có orderItemCode, nghĩa là đây là item mới, cần tạo
-          const createItem = ApiService.addOrderItem({
-            productId: item.productId, // Bạn có thể thay đổi tùy thuộc vào cấu trúc dữ liệu
-            quantity: item.quantity,
-            shelfCode: item.shelfCode,
-          });
+        // Kiểm tra xem orderItem có chứa productId không
+        if (!item.productId) {
+          console.error(`Order item with code ${item.orderItemCode} does not have a product ID.`);
+          continue; // Bỏ qua item này nếu không có productId
+        }
   
-          createItemPromises.push(createItem); // Thêm promise tạo item mới vào mảng
+        try {
+          // Lấy productId từ orderItem đã có
+          const productId = item.productId;
+          console.log(`Product ID for order item ${item.orderItemCode}: ${productId}`);
+  
+          // Kiểm tra xem order item đã có hay chưa bằng orderItemCode
+          const existingItem = await ApiService.getOrderItemByCode(item.orderItemCode);
+          console.log(`Checking existing item for order item code: ${item.orderItemCode}`, existingItem);
+  
+          if (!existingItem) {
+            // Nếu item chưa có, tạo mới
+            const orderItemData = {
+              orderItem_id: item.id || "N/A", // Nếu không có id, sử dụng "N/A"
+              product_id: productId, // Gửi productId từ orderItem
+              quantity: item.quantity || 0, // Sử dụng quantity của item
+              totalPrice: item.productPrice * item.quantity, // Tính tổng giá
+              orderItemCode: item.orderItemCode, // Mã order item
+              orderItemState: "IN_ORDER", // Trạng thái mặc định
+              shelfCode: item.shelfCode || [], // Mảng shelfCode
+            };
+  
+            console.log("Creating new order item with data:", JSON.stringify(orderItemData, null, 2));
+            await ApiService.addOrderItem(orderItemData);
+            console.log(`Order item ${item.orderItemCode} created successfully.`);
+          } else {
+            // Nếu item đã có, cập nhật
+            const updatedItemData = {
+              ...item,
+              product_id: productId, // Đảm bảo luôn cập nhật product_id
+              totalPrice: item.productPrice * item.quantity, // Tính lại tổng giá
+            };
+            console.log("Updating existing order item with data:", JSON.stringify(updatedItemData, null, 2));
+            await ApiService.updateOrderItem(existingItem.id, updatedItemData);
+            console.log(`Order item ${item.orderItemCode} updated successfully.`);
+          }
+        } catch (error) {
+          // Nếu có lỗi trong việc tạo hoặc cập nhật item, bỏ qua lỗi và tiếp tục
+          console.error(`Error processing order item ${item.orderItemCode}:`, error.message);
         }
       }
   
-      // Đợi tất cả các item mới được tạo
-      const createdItems = await Promise.all(createItemPromises);
-      console.log("All new order items have been created successfully.");
-  
-      // Cập nhật orderItemCode cho các item đã được tạo mới
-      createdItems.forEach((newItem, index) => {
-        if (!orderItems[index].orderItemCode) {
-          orderItems[index].orderItemCode = newItem.orderItemCode;
-        }
-      });
-  
-      // Cập nhật thời gian update_at
+      // Chuẩn bị dữ liệu order để gửi
       const currentTime = new Date().toISOString();
-  
-      // Tiến hành chuẩn bị dữ liệu để gửi đi
       const orderData = {
-        ...orderDetails, // Thông tin chi tiết đơn hàng
-        orderItem_code: orderItems.map((item) => item.orderItemCode).filter(Boolean),
-        update_at: currentTime, // Thêm thời gian cập nhật
+        orderItem_code: orderItems.map((item) => item.orderItemCode).filter(Boolean), // Chỉ bao gồm orderItemCode
+        delivery_Address: orderDetails.delivery_Address || "N/A", // Default "N/A" nếu không có
+        created_at: orderDetails.created_at || currentTime, // Dùng thời gian hiện tại nếu không có thời gian tạo
+        update_at: currentTime, // Thời gian cập nhật
+        orderCode: orderDetails.orderCode || "N/A", // Default "N/A" nếu không có
       };
   
-      // Log toàn bộ thông tin dữ liệu sẽ được gửi
-      console.log("Order data prepared for submission:", JSON.stringify(orderData, null, 2));
+      // Log dữ liệu gửi lên
+      console.log("Data to be sent for order update:", JSON.stringify(orderData, null, 2));
   
-      // Kiểm tra nếu `selectedOrder.id` có tồn tại
+      // Cập nhật đơn hàng
       if (selectedOrder.id) {
         console.log("Submitting order update for order ID:", selectedOrder.id);
         await ApiService.updateOrder(selectedOrder.id, orderData);
@@ -242,15 +248,15 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
         console.error("No selected order to update.");
       }
   
-      handleCloseModal(); // Đóng modal sau khi gửi thành công
+      console.log("Thành công");
+      // Đóng modal sau khi hoàn tất
+      handleCloseModal(); // Giả sử handleCloseModal là hàm đóng modal
+      fetchOrders();
     } catch (error) {
-      console.error("Error submitting order:", error.response?.data || error.message);
+      console.error("Error preparing order data:", error.message);
     }
   };
   
-  
-  
-
   // Calculate total order price based on item quantities and prices
   const totalAmount = orderItems.reduce((total, item) => {
     return total + item.productPrice * item.quantity;
@@ -319,70 +325,67 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
                 ))}
               </TextField>
               {orderItems.length > 0 && (
-                <Box sx={{ maxHeight: 400, overflowY: "auto" }}>
-                  <TableContainer>
-                    <Table size="small">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Mã Gói Hàng</TableCell>
-                          <TableCell>Tên sản phẩm</TableCell>
-                          <TableCell>Kệ</TableCell>
-                          <TableCell>Số lượng</TableCell>
-                          <TableCell>Tổng giá</TableCell>
-                          <TableCell>Hành động</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {orderItems.map((item, index) => (
-                          <TableRow key={index}>
-                           <TableCell>
-                          <TextField
-                            value={item.orderItemCode || "N/A"}
-                            onChange={(e) => handleInputChange(item.id, e.target.value)} // Add handler for updates
-                            variant="outlined"
-                            fullWidth
-                          />
-                        </TableCell>
-                            <TableCell>{item.productName}</TableCell>
-                            <TableCell>
-                              <TextField
-                                select
-                                value={item.shelfCode && item.shelfCode.length > 0 ? item.shelfCode[0] : ""}
-                                onChange={(e) =>
-                                  handleOrderItemChange(item.orderItemCode, "shelfCode", e.target.value || null)
-                                }
-                              >
-                                <MenuItem value="">
-                                  <em>Chọn kệ</em>
-                                </MenuItem>
-                                {item.shelfCode && item.shelfCode.map((shelfCode, index) => (
-                                  <MenuItem key={index} value={shelfCode}>
-                                    {shelfCode}
-                                  </MenuItem>
-                                ))}
-                              </TextField>
-                            </TableCell>
-                            <TableCell>
-                              <TextField
-                                type="number"
-                                value={item.quantity}
-                                onChange={(e) =>
-                                  handleOrderItemChange(item.orderItemCode, "quantity", parseInt(e.target.value, 10))
-                                }
-                              />
-                            </TableCell>
-                            <TableCell>{item.productPrice * item.quantity} VND</TableCell>
-                            <TableCell>
-                              <Button color="error" onClick={() => handleRemoveOrderItem(item.orderItemCode)}>
-                                Xóa
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Box>
+               <Box sx={{ maxHeight: 400, overflowY: "auto" }}>
+               <TableContainer>
+                 <Table size="small">
+                   <TableHead>
+                     <TableRow>
+                       <TableCell>Mã Gói Hàng</TableCell>
+                       <TableCell>Tên sản phẩm</TableCell>
+                       <TableCell>Kệ</TableCell>
+                       <TableCell>Số lượng</TableCell>
+                       <TableCell>Tổng giá</TableCell>
+                       <TableCell>Hành động</TableCell>
+                     </TableRow>
+                   </TableHead>
+                   <TableBody>
+                     {orderItems.map((item, index) => (
+                       <TableRow key={index}>
+                         <TableCell>
+                           <TextField
+                             value={item.orderItemCode || ""}
+                             onChange={(e) => handleInputChange(item.orderItemCode, "orderItemCode", e.target.value)}
+                             variant="outlined"
+                             fullWidth
+                           />
+                         </TableCell>
+                         <TableCell>{item.productName}</TableCell>
+                         <TableCell>
+                           <TextField
+                             select
+                             value={item.shelfCode && item.shelfCode.length > 0 ? item.shelfCode[0] : ""}
+                             onChange={(e) => handleOrderItemChange(item.orderItemCode, "shelfCode", e.target.value || null)}
+                           >
+                             <MenuItem value="">
+                               <em>Chọn kệ</em>
+                             </MenuItem>
+                             {item.shelfCode && item.shelfCode.map((shelfCode, index) => (
+                               <MenuItem key={index} value={shelfCode}>
+                                 {shelfCode}
+                               </MenuItem>
+                             ))}
+                           </TextField>
+                         </TableCell>
+                         <TableCell>
+                           <TextField
+                             type="number"
+                             value={item.quantity}
+                             onChange={(e) => handleOrderItemChange(item.orderItemCode, "quantity", parseInt(e.target.value, 10))}
+                           />
+                         </TableCell>
+                         <TableCell>{item.productPrice * item.quantity} VND</TableCell>
+                         <TableCell>
+                           <Button color="error" onClick={() => handleRemoveOrderItem(item.orderItemCode)}>
+                             Xóa
+                           </Button>
+                         </TableCell>
+                       </TableRow>
+                     ))}
+                   </TableBody>
+                 </Table>
+               </TableContainer>
+             </Box>
+             
               )}
             </Box>
 
@@ -409,14 +412,14 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
                       {products
                         .filter((product) => product.productName.toLowerCase().includes(searchQuery.toLowerCase()))
                         .map((product) => (
-                          <TableRow key={product.productCode}>
+                          <TableRow key={product.id}>
                             <TableCell>{product.productName}</TableCell>
                             <TableCell>{product.inventory_quantity}</TableCell>
                             <TableCell>{product.price}</TableCell>
                             <TableCell>
                             <Button
                               variant="contained"
-                              onClick={() => handleAddOrderItem(product.productCode)}
+                              onClick={() => handleAddOrderItem(product.id)}
                               sx={{
                                 backgroundColor: "#243642",
                                 '&:hover': {
@@ -435,41 +438,39 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder }) => {
               </Box>
             </Box>
           </Stack>
-
-  <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
-    <Typography variant="h6">Tổng tiền: {totalAmount} VND</Typography>
-    <Box sx={{ display: 'flex', gap: 2 }}>
-    <Button
-        variant="contained"
-        color="secondary"
-        onClick={handleCloseModal}  // Gọi hàm đóng modal
-        sx={{
-          backgroundColor: "#f44336",  // Màu đỏ cho nút đóng
-          '&:hover': {
-            backgroundColor: "#d32f2f",  // Màu khi hover
-          },
-        }}
-      >
-        Đóng
-      </Button>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSubmitOrder}
-        sx={{
-          backgroundColor: "#243642", 
-          '&:hover': {
-            backgroundColor: "#1c2b35",
-          },
-        }}
-      >
-        Cập nhật đơn hàng
-      </Button>
-     
-    </Box>
-  </Box>
-</Box>
-
+          <Box sx={{ marginTop: 2, display: 'flex', justifyContent: 'space-between', gap: 2 }}>
+            <Typography variant="h6">Tổng tiền: {totalAmount} VND</Typography>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+                variant="contained"
+                color="secondary"
+                onClick={handleCloseModal}
+                sx={{
+                  backgroundColor: "#f44336", 
+                  '&:hover': {
+                    backgroundColor: "#d32f2f",
+                  },
+                }}
+              >
+                Đóng
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSubmitOrder}
+                sx={{
+                  backgroundColor: "#243642", 
+                  '&:hover': {
+                    backgroundColor: "#1c2b35",
+                  },
+                }}
+              >
+                Cập nhật đơn hàng
+              </Button>
+            
+            </Box>
+          </Box>
+        </Box>
       </Fade>
     </Modal>
   );

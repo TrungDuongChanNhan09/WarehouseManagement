@@ -212,7 +212,7 @@ const Employee = () => {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Thêm Tài Khoản Nhân Viên Mới</DialogTitle>
         <DialogContent>
-          {errorMessage && <Alert severity="error">{errorMessage}</Alert>} {/* Display error message */}
+          {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
           <TextField
             label="Tên Nhân Viên"
             fullWidth
