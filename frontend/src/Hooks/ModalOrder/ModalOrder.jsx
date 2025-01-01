@@ -118,11 +118,14 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
             quantity: item.quantity,
             totalPrice: item.totalPrice,
             orderItemState: item.orderItemState,
-            shelfCode: item.shelf ? [item.shelf] : [],
+            shelfCode: item.shelf ? [item.shelf] : [], // Ensure shelfCode is set correctly
           };
-
+  
+          // Log the order item data before submitting
+          console.log("Submitting order item:", orderItemData);
+  
           const response = await ApiService.addOrderItem(orderItemData);
-
+  
           setNewOrder({
             ...newOrder,
             orderItems: newOrder.orderItems.map((orderItem) =>
@@ -131,11 +134,11 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
                 : orderItem
             ),
           });
-
+  
           return response.orderItemCode;
         })
       );
-
+  
       const orderData = {
         orderItem_code: orderItemResponses,
         delivery_Address: newOrder.address,
@@ -143,16 +146,20 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
         created_at: new Date().toISOString(),
         update_at: new Date().toISOString(),
       };
-
+  
+      // Log the complete order data before submitting
+      console.log("Submitting order data:", orderData);
+  
       const response = await ApiService.addOrder(orderData);
       setOrders((prevOrders) => [...prevOrders, response]);
-
+  
       handleCloseModal();
       fetchOrders();
     } catch (error) {
       console.error("Error submitting order", error);
     }
   };
+  
 
   const totalAmount = newOrder.orderItems.reduce(
     (total, item) => total + item.totalPrice,
@@ -184,9 +191,9 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
             <Box sx={{ width: "100%", md: "50%", marginBottom: 2 }}>
               <TextField
                 fullWidth
-                label="OrderID"
-                value={newOrder.customer}
-                onChange={(e) => setNewOrder({ ...newOrder, customer: e.target.value })}
+                label="Order Code" // Changed label to "Order Code"
+                value={newOrder.orderCode}
+                onChange={(e) => setNewOrder({ ...newOrder, orderCode: e.target.value })} // Corrected to update `orderCode`
                 sx={{ marginBottom: 2 }}
               />
               <TextField

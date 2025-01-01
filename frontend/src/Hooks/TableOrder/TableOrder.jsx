@@ -74,6 +74,7 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
       // Fetch the full order details
       const order = await ApiService.getOrderById(orderId);
       setSelectedOrder(order); // Store the selected order in state
+      console.log(order);
       setOpenUpdateModal(true); // Open the update modal
     } catch (error) {
       console.error("Error fetching order details:", error);
@@ -89,8 +90,8 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
   const filteredOrders = orders.filter(
     (order) =>
       (order.orderCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.status?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (statusFilter ? order.status === statusFilter : true)
+        order.state?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (statusFilter ? order.state === statusFilter : true)
   );
 
   return (
@@ -119,17 +120,9 @@ const OrderTable = ({ orders, searchQuery, statusFilter }) => {
                   </TableCell>
                   <TableCell>{order.orderCode}</TableCell>
                   <TableCell>{order.address}</TableCell>
-                  <TableCell>
-                    {order.created_at
-                      ? new Date(order.created_at).toLocaleDateString("vi-VN", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        })
-                      : "Không xác định"}
-                  </TableCell>
+                  <TableCell>{order.date}</TableCell>
                   <TableCell>{order.value} VND</TableCell>
-                  <TableCell>{order.status}</TableCell>
+                  <TableCell>{order.state}</TableCell> 
                   <TableCell>
                     <IconButton onClick={() => handleEdit(order.id)}>
                       <Edit />

@@ -61,20 +61,36 @@ const OrderPage = () => {
   const fetchOrders = async () => {
     try {
       const orderData = await ApiService.getAllOrders();
-      const formattedOrders = orderData.map((order) => ({
-        id: order.id,
-        orderCode: order.orderCode,
-        address: order.delivery_Address,
-        orderItemCodes: order.orderItem_code || [],  // Chứa các mã gói hàng
-        status: order.orderStatus,
-        date: new Date(order.created_at).toLocaleDateString(),
-        value: order.orderPrice,
-      }));
+      
+      const formattedOrders = orderData.map((order) => {
+        // Log giá trị created_at và orderState để kiểm tra
+        console.log("created_at:", order.created_at);
+        console.log("orderState:", order.orderState);
+  
+        // Chuyển đổi định dạng ngày từ ISO string sang định dạng ngày giờ chuẩn của người dùng
+        const formattedDate = new Date(order.created_at).toLocaleString("vi-VN", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric"
+        });
+  
+        return {
+          id: order.id,
+          orderCode: order.orderCode,
+          address: order.delivery_Address,
+          orderItemCodes: order.orderItem_code || [], 
+          state: order.orderState,
+          date: formattedDate,  // Lưu lại ngày giờ đã định dạng
+          value: order.orderPrice,
+        };
+      });
+  
       setOrders(formattedOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
   };
+  
   
 
   const handleOpenModal = () => {
@@ -145,8 +161,8 @@ const OrderPage = () => {
                 onChange={handleChangeStatusFilter}
               >
                 <MenuItem value="">Tất cả</MenuItem>
-                <MenuItem value="Pending">Chờ xử lý</MenuItem>
-                <MenuItem value="Confirmed">Đã xác nhận</MenuItem>
+                <MenuItem value="PENDING">Chờ xử lý</MenuItem>
+                <MenuItem value="DELIVERED">Đã giao</MenuItem>
               </Select>
             </FormControl>
 
@@ -177,22 +193,20 @@ const OrderPage = () => {
         handleOpenUpdateModal={handleOpenUpdateModal}
       />
 
-<OrderModal 
-  openModal={openModal} 
-  handleCloseModal={handleCloseModal} 
-  newOrder={newOrder} 
-  setNewOrder={setNewOrder} 
-  setOrders={setOrders} 
-  fetchOrders={fetchOrders}
-/>
-
+      <OrderModal
+        openModal={openModal}
+        handleCloseModal={handleCloseModal}
+        newOrder={newOrder}
+        setOrders={setOrders}
+        setNewOrder={setNewOrder}
+        fetchOrders={fetchOrders}
+      />
 
       <OrderUpdateModal
         openUpdateModal={openUpdateModal}
         handleCloseUpdateModal={handleCloseUpdateModal}
         selectedOrder={selectedOrder}
         setOrders={setOrders}
-        fetchOrders={fetchOrders}
       />
     </Container>
   );
