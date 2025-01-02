@@ -36,8 +36,8 @@ public class ImportShipmentItemController {
     @GetMapping("/{id}")
     public ResponseEntity<ImportShipmentItem> getImportShipmentItem(@PathVariable String id, @RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserByJwtToken(jwt);
-        service.getImportShipmentItemById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        ImportShipmentItem item = service.getImportShipmentItemById(id);
+        return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
     @GetMapping("/search")

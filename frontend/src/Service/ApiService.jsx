@@ -85,8 +85,6 @@ export default class ApiService {
         }
     }
 
-
-
     static async addInventory(formData) {
         try {
             const response = await axios.post(`${this.BASE_URL}/api/admin/inventory`, formData, {
@@ -256,8 +254,231 @@ export default class ApiService {
     
 
     // Phát
+    
+    //Product
+    static async getAllProduct() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 
+    static async addProduct(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/product`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
 
+    static async updateProduct(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/product/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async deleteProduct(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/product/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    
+    static async getProductBySupplierName(supplierName) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getBySupplier/${supplierName}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    static async getProductById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getById/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getAllCategorys() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/category`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async getCategoryById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/category/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            throw error;
+        }
+    }
+    
+    //Supplier
+    static async getAllSupplier() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/supplier`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addSupplier(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/supplier`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async updateSupplier(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/supplier/updateSupplier/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async getSupplierById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/supplier/getById/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async deleteSupplier(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/supplier/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response; 
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    //ImportShipments
+    static async getAllImportShipments() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/importshipments`, {
+                headers: this.getHeader()
+            });
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addImportShipment(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/importshipments`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json'
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async updateImportShipment(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/importshipments/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async deleteImportShipment(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/importshipments/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response; 
+        } catch (error) {
+            console.error("Lỗi khi xóa:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    //ImportShipmentItems
+
+    static async getImportShipmentItemsById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/importShipmentItems/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response; 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async addImportShipmentItems(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/importShipmentItems`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json'
+            });
+            return response;
+        } catch (error) {
+            throw error;
+        }
+    }
+    
     // Tân
     //order
     static async getAllOrders() {

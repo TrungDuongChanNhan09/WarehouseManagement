@@ -17,6 +17,7 @@ import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined
 import CorporateFareOutlinedIcon from '@mui/icons-material/CorporateFareOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
+import BusinessIcon from '@mui/icons-material/Business';
 import SearchAppBar from "../AppBar/AppBar.jsx";
 
 
@@ -285,11 +286,34 @@ const Navbar = () => {
                                     },
                                 }}
                             />
-                                )}
-
+                            )}
+                            <BottomNavigationAction
+                                showLabel={true}
+                                label="Supplier"
+                                value="supplier"
+                                icon={<BusinessIcon />}
+                                onClick={() => navigate("/app/supplier")} 
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    flexGrow: 1,
+                                    justifyContent: "flex-start",
+                                    marginTop: "1rem",
+                                    padding: "0.5rem",
+                                    fontSize: "24px",
+                                    textAlign: "left",
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px",
+                                        marginRight: "10px",
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px", 
+                                    },
+                                }}
+                            />
                         </BottomNavigation>
                     </Stack>
-                
+          
                     <Button className="btn-setting" sx={{color: "#387478", background: "none", margin:"1rem"}} variant="contained">
                         <HelpOutlineIcon sx={{color: "#387478", marginRight:"10px"}}/>
                         Trợ giúp

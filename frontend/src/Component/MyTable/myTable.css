@@ -2,13 +2,16 @@
     margin-top: 10px;
     .table{
         .table-head{
-            background-color: #297342;
+            background-color: #E2F1E7;
             .table-head-cell{
                 font-size: medium;
                 font-weight: bold;
-                color: #ffffff;
+                color: #000000;
                 padding: 15px;
             }
+        }
+        .table-head .MuiTableCell-root {
+            border-bottom: none !important;
         }
         .table-body{
             .table-body-cell{

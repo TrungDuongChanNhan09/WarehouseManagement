@@ -21,11 +21,13 @@
     "@mui/x-charts": "^7.23.2",
     "@mui/x-date-pickers": "^7.23.3",
     "axios": "^1.7.9",
+    "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "frontend": "file:",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.0.2",
+    "react-signify": "^1.5.4",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
