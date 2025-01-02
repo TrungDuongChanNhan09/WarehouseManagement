@@ -131,16 +131,16 @@ const Product = () => {
     }
 
     const handleAddProduct = async () => {
-        uploadImage();
-        console.log(imageUrls);
-        refInput.current['image'] = imageUrls;
+        await uploadImage();
         const respond = await ApiService.addProduct(refInput.current);
         if (respond.status === 201) setOpen(false);
-        console.log(respond);
     }
 
     const handleUpdateProduct = async () => {
+        await uploadImage();
+        console.log(refInput.current);
         const respond = await ApiService.updateProduct(selectedRow.id, refInput.current);
+        console.log(respond.data);
         if (respond.status === 200) setOpenEdit(false);
     }
 
@@ -151,10 +151,24 @@ const Product = () => {
 
     const handleEditButton = async (row) => {
         setSelectedRow(row);
-        setOpenEdit(true);
         refInput.current = row;
-        setListCategory(await ApiService.getAllCategorys());
-        setListSupplier(await ApiService.getAllSupplier());
+        setImages(null);
+
+        const updateStates = async () => {
+            if (row.image !== null) {
+                await setImageUrls(row.image);
+                await setPreviewUrl(row.image);
+            } else {
+                await setImageUrls(null);
+                await setPreviewUrl(null);
+            }
+    
+            setListCategory(await ApiService.getAllCategorys());
+            setListSupplier(await ApiService.getAllSupplier());
+            setOpenEdit(true);
+        };
+    
+        updateStates();
     };
 
     const handleClickRow = (row) => {
@@ -170,6 +184,7 @@ const Product = () => {
         setListCategory(await ApiService.getAllCategorys());
         setListSupplier(await ApiService.getAllSupplier());
         setImages();
+        refInput.current = {};
     }
     const handleClose = () => setOpen(false);
 
@@ -207,8 +222,8 @@ const Product = () => {
     };
 
     //image upload
-    const [images, setImages] = useState();
-    const [imageUrls, setImageUrls] = useState();
+    const [images, setImages] = useState(null);
+    const [imageUrls, setImageUrls] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
 
     useEffect(() => {
@@ -222,7 +237,7 @@ const Product = () => {
 
     const uploadImage = async () => {
         if (!images) {
-            alert('Vui lòng chọn một hình ảnh trước!');
+            setImageUrls(null);
             return;
         }
         
@@ -260,6 +275,7 @@ const Product = () => {
             const uploadedUrl = response.data.secure_url;
     
             setImageUrls(uploadedUrl);
+            refInput.current['image'] = uploadedUrl;
             console.log('Uploaded Image URL:', uploadedUrl);
         } catch (error) {
             console.error('Lỗi khi tải hình ảnh:', error);
@@ -551,7 +567,36 @@ const Product = () => {
                                         })}
                                     </Select>
                                 </FormControl>
-                                <TextField sx={{margin:"1%", width:"48%"}} onChange={handleChange} name="image" label="Hình ảnh" variant="outlined" />
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    style={{margin: '1%', width: "48%"}}
+                                />
+                                
+                                {(imageUrls !== null || images !== null) && (
+                                    <Box
+                                        sx={{
+                                            position: 'relative',
+                                            width: 120,
+                                            height: 100,
+                                            borderRadius: 1,
+                                            overflow: 'hidden',
+                                            boxShadow: 1,
+                                        }}
+                                    >
+                                        <img
+                                            src={previewUrl}
+                                            alt="preview"
+                                            style={{
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover',
+                                                borderRadius: '4px',
+                                            }}
+                                        />
+                                    </Box>
+                                )}
                             </Stack>
                             <Button 
                                 className="btn-setting"

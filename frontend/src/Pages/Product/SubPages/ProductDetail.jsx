@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Typography, Button, Select, MenuItem, Grid2, CardMedia, Stack } from '@mui/material';
 import ApiService from '../../../Service/ApiService';
 
@@ -7,11 +7,33 @@ export default function ProductDetail() {
   const { productId } = useParams();
   const [mainImage, setMainImage] = useState('');
   const [productInfo,setProductInfo] = useState([]);
+  const nav = useNavigate();
 
   useEffect(() => {
     const fetchProductInfo = async () => {
       try {
-        setProductInfo(await ApiService.getProductById(productId));
+        const response = await ApiService.getProductById(productId);
+
+        const updatedRows = async () => {
+          try {
+              const supplier = await ApiService.getSupplierById(response.supplierId);
+              const category = await ApiService.getCategoryById(response.categoryId);
+              setProductInfo({ 
+                ...response,
+                supplierName: supplier?.nameSupplier || '',
+                categoryName: category?.categoryName || '',
+              });
+          } catch (error) {
+              console.error('Lỗi khi lấy dữ liệu:', error);
+              setProductInfo({ 
+                ...response,
+                supplierName: '',
+                categoryName: '',
+              });
+          }
+        };
+
+        setProductInfo(updatedRows);
       } catch (error) {
         console.error('Failed to fetch product info:', error);
       }
@@ -26,7 +48,15 @@ export default function ProductDetail() {
 
   return (
     <Box sx={{ maxWidth: 1200, margin: 'auto', p: 3 }}>
-      <Grid2 container spacing={4} >
+      <Button 
+        variant="outlined" 
+        color="#E2F1E7" 
+        onClick={() => nav('/app/product/')}
+        sx={{ mb: 3, fontWeight: 'bold', fontSize: '15px' }}
+      >
+        ← Quay lại
+      </Button>
+      <Grid2 container spacing={4}>
         {/* Image Section */}
         <Grid2 size={6}>
           <Box sx={{ position: 'relative', borderRadius: 2, overflow: 'hidden', mb: 2 }}>
@@ -41,11 +71,11 @@ export default function ProductDetail() {
 
         {/* Info Section */}
         <Grid2 size={6}>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h3" gutterBottom>
             {productInfo.productName}
           </Typography>
-          <Typography variant="h5" color="error" gutterBottom>
-            {productInfo.price}
+          <Typography variant="h4" color="error" gutterBottom>
+            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(productInfo.price)}
           </Typography>
             <Box 
             sx={{
@@ -55,26 +85,38 @@ export default function ProductDetail() {
                 padding: '5px',
                 marginBottom: '20px'
             }}>
-                <Typography variant="body1">
-                    Từ thương hiệu loại nước ngọt giải khát được nhiều người yêu thích với hương vị thơm ngon, sảng khoái. 
-                    6 lon nước ngọt Coca Cola lon 235ml chính hãng nước ngọt Coca Cola với lượng gas lớn sẽ giúp bạn xua tan 
-                    mọi cảm giác mệt mỏi, căng thẳng, đem lại cảm giác thoải mái sau khi hoạt động ngoài trời.
-                </Typography>
-                <Typography variant="body1">
-                    Đôi nét về thương hiệu Coca Cola:
-                </Typography>
-                <Typography variant="body1">
-                    Coca Cola là thương hiệu nước ngọt nổi tiếng thế giới, được ra đời tại Mỹ năm 1886 và nhanh chóng phát 
-                    triển thành tập đoàn đa quốc gia hùng mạnh trên thị trường nước ngọt thế giới. Hiện nay Coca Cola đã 
-                    có mặt và được yêu thích tại hơn 200 quốc gia trên thế giới với hương vị nước cola chua chua ngọt ngọt 
-                    hài hòa, vị ga sảng khoái cùng hương thơm dễ chịu.
-                </Typography>
-                <Typography variant="body1">
-                    Ngoài dòng Coca Original, thương hiệu này còn phát triển nhiều dòng sản phẩm mới phù hợp với nhu cầu và 
-                    mối quan tâm về sức khỏe, cân nặng của người dùng bằng các sản phẩm ít đường ít calo hơn như Coca Zero, 
-                    Coca Light, Coca Plus,...
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+                    {productInfo.description}
                 </Typography>
             </Box>
+          <Grid2 container spacing={0} sx={{marginBottom: '20px'}}>
+            <Grid2 size={6}>
+              <Typography variant="h6" gutterBottom sx={{fontSize: '18px'}}>
+                Loại: {productInfo.categoryName}
+              </Typography>
+              <Typography variant="h6" gutterBottom sx={{fontSize: '18px'}}>
+                Nhà cung cấp: {productInfo.supplierName}
+              </Typography>
+              <Typography variant="h6" gutterBottom sx={{fontSize: '18px'}}>
+                Số lượng: {productInfo.inventory_quantity} {productInfo.unit}
+              </Typography>
+            </Grid2>
+            <Grid2 size={6}>
+              <Typography variant="h6" gutterBottom sx={{fontSize: '18px'}}>
+                Ngày sản xuất: {productInfo.production_date
+                  ? new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric',}).format(new Date(productInfo.production_date))
+                  : ''}
+              </Typography>
+              <Typography variant="h6" gutterBottom sx={{fontSize: '18px'}}>
+                Ngày hết hạn: {productInfo.expiration_date
+                  ? new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric',}).format(new Date(productInfo.expiration_date))
+                  : ''}
+              </Typography>
+              <Typography variant="h6" gutterBottom sx={{fontSize: '18px'}}>
+                Trạng thái: {productInfo.productStatus}
+              </Typography>
+            </Grid2>
+          </Grid2>
           <Stack direction="row" spacing={2}>
             <Button variant="contained" color="success" sx={{ width: 150 }}>
               Chỉnh Sửa
