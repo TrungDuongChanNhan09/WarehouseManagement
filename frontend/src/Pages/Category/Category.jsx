@@ -19,10 +19,9 @@ import {
   DialogActions,
   IconButton,
 } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import AppBarMenu from "../../Component/AppBar/AppBar";
 import ApiService from "../../Service/ApiService.jsx";
-
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
@@ -30,11 +29,9 @@ const Category = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openDialog, setOpenDialog] = useState(false);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
   const [newCategory, setNewCategory] = useState({ categoryName: "", description: "" });
-  const [editCategory, setEditCategory] = useState({ categoryName: "", description: "" });
-  const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // New state for confirmation dialog
-  const [categoryToDelete, setCategoryToDelete] = useState(null); // Store the category to delete
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // Confirmation dialog state
+  const [categoryToDelete, setCategoryToDelete] = useState(null); // To store category ID to delete
 
   // Fetch categories from API
   const fetchCategories = async () => {
@@ -66,31 +63,19 @@ const Category = () => {
     }
   };
 
-  // Edit an existing category
-  const handleEditCategory = async () => {
-    if (!editCategory.categoryName || !editCategory.description) {
-      alert("Vui lòng nhập đầy đủ thông tin!");
+  // Delete a category
+  const handleDeleteCategory = async () => {
+    if (!categoryToDelete) {
+      console.log("No category selected for deletion:", categoryToDelete);
       return;
     }
     try {
-      await ApiService.updateCategory(editCategory);
-      fetchCategories(); // Refresh list
-      setOpenEditDialog(false);
-    } catch (error) {
-      console.error("Lỗi khi chỉnh sửa danh mục:", error);
-    }
-  };
-
-  // Delete a category
-  const handleDeleteCategory = async () => {
-    if (!categoryToDelete) return;
-
-    try {
       await ApiService.deleteCategory(categoryToDelete);
-      fetchCategories(); // Refresh list
-      setOpenConfirmDialog(false); // Close confirm dialog after delete
+      fetchCategories();
+      setOpenConfirmDialog(false); 
     } catch (error) {
       console.error("Lỗi khi xóa danh mục:", error);
+      alert("Xóa danh mục không thành công, vui lòng thử lại!");
     }
   };
 
@@ -100,7 +85,7 @@ const Category = () => {
 
   return (
     <Container maxWidth="xl" className="category-page">
-      {/* Chỉ sử dụng AppBarMenu như yêu cầu */}
+      {/* AppBarMenu */}
       <AppBarMenu />
 
       {/* Search and Add Button */}
@@ -144,24 +129,16 @@ const Category = () => {
             {filteredCategories
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((category) => (
-                <TableRow key={category.categoryId}>
+                <TableRow key={category.id}>
                   <TableCell>{category.categoryName}</TableCell>
                   <TableCell>{category.description}</TableCell>
                   <TableCell>
                     <IconButton
                       color="default"
                       onClick={() => {
-                        setEditCategory(category);
-                        setOpenEditDialog(true);
-                      }}
-                    >
-                      <Edit />
-                    </IconButton>
-                    <IconButton
-                      color="default"
-                      onClick={() => {
-                        setCategoryToDelete(category.categoryId); // Store category ID to delete
-                        setOpenConfirmDialog(true); // Open confirmation dialog
+                        console.log("Selected category for deletion:", category);
+                        setCategoryToDelete(category.id);
+                        setOpenConfirmDialog(true);
                       }}
                     >
                       <Delete />
@@ -211,35 +188,6 @@ const Category = () => {
           </Button>
           <Button onClick={handleAddCategory} color="primary">
             Thêm Danh Mục
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Edit Category Dialog */}
-      <Dialog open={openEditDialog} onClose={() => setOpenEditDialog(false)}>
-        <DialogTitle>Chỉnh Sửa Danh Mục</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Tên Danh Mục"
-            fullWidth
-            margin="normal"
-            value={editCategory.categoryName}
-            onChange={(e) => setEditCategory({ ...editCategory, categoryName: e.target.value })}
-          />
-          <TextField
-            label="Mô Tả"
-            fullWidth
-            margin="normal"
-            value={editCategory.description}
-            onChange={(e) => setEditCategory({ ...editCategory, description: e.target.value })}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenEditDialog(false)} color="default">
-            Hủy
-          </Button>
-          <Button onClick={handleEditCategory} color="primary">
-            Lưu Thay Đổi
           </Button>
         </DialogActions>
       </Dialog>

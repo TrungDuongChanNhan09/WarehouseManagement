@@ -1,160 +1,196 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Stack,
   Button,
   Typography,
-  InputBase,
-  Modal,
-  Fade,
+  IconButton,
   Box,
-  TextField,
-  Paper,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
-  IconButton,
-  Collapse,
+  Paper,
+  TableContainer,
+  TextField,
 } from "@mui/material";
-import { ExpandMore, ExpandLess, Add, Edit, Delete } from "@mui/icons-material";
-import { styled, alpha } from "@mui/material/styles";
-import PrimarySearchAppBar from "../../Component/AppBar/AppBar";
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "black",
-  width: "100%",
-  backgroundColor: "white",
-  borderRadius: theme.shape.borderRadius,
-  padding: theme.spacing(1, 1, 1, 0),
-  paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-  transition: theme.transitions.create("width"),
-  [theme.breakpoints.up("sm")]: {
-    width: "12ch",
-    "&:focus": {
-      width: "20ch",
-    },
-  },
-}));
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  display: "flex",
-  alignItems: "center",
-  width: "100%",
-}));
+import { Add, Edit, Delete, ExpandMore, ExpandLess } from "@mui/icons-material";
+import ModalExport from "../../Hooks/ModalExport/ModalExport.jsx";
+import ApiService from "../../Service/ApiService";
+import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
 
 const ExportShipment = () => {
-  const [expandedShipmentId, setExpandedShipmentId] = useState(null);
   const [openModal, setOpenModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [newExport, setNewExport] = useState({
-    export_address: "",
-    export_state: "",
-    order_ids: [],
-    order_quantity: 0,
-  });
+  const [exportShipments, setExportShipments] = useState([]);
+  const [filteredExportShipments, setFilteredExportShipments] = useState([]);
+  const [expandedShipmentId, setExpandedShipmentId] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(""); // Selected date for filtering
+  const [expandedShipmentOrders, setExpandedShipmentOrders] = useState({}); // Store order details for each shipment
+  const [editingShipment, setEditingShipment] = useState(null); // Store the shipment being edited
+  const [editingOrders, setEditingOrders] = useState([]); // Store orders related to the shipment
+  const fetchExportShipments = async () => {
+    try {
+      const exportResponse = await ApiService.getAllExport();
+      console.log("Response data from API:", exportResponse);
+      if (Array.isArray(exportResponse)) {
+        setExportShipments(exportResponse);
+        setFilteredExportShipments(exportResponse); // Set initial filtered data
+      } else {
+        console.error("Data is not an array");
+        setExportShipments([]);
+        setFilteredExportShipments([]);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setExportShipments([]);
+      setFilteredExportShipments([]);
+    }
+  };
+  useEffect(() => {
+  
 
-  const [exportShipments, setExportShipments] = useState([
-    {
-      export_id: "EXP001",
-      export_address: "123 Main St",
-      export_state: "Pending",
-      created_At: "01/11/2024",
-      updated_At: "01/11/2024",
-      order_ids: ["O001", "O002"],
-      order_quantity: 3,
-    },
-    {
-      export_id: "EXP002",
-      export_address: "456 Oak Ave",
-      export_state: "Shipped",
-      created_At: "02/11/2024",
-      updated_At: "02/11/2024",
-      order_ids: ["O003"],
-      order_quantity: 1,
-    },
-  ]);
+    fetchExportShipments();
+  }, []);
 
-  const handleExpandRow = (shipmentId) => {
-    setExpandedShipmentId((prev) => (prev === shipmentId ? null : shipmentId));
+  // Filter shipments by creation date
+  const handleFilter = () => {
+    if (!selectedDate) {
+      // If no date selected, show all
+      setFilteredExportShipments(exportShipments);
+      return;
+    }
+
+    const filtered = exportShipments.filter((shipment) => {
+      const shipmentDate = new Date(shipment.createdAt).toLocaleDateString();
+      const selectedDateFormatted = new Date(selectedDate).toLocaleDateString();
+      return shipmentDate === selectedDateFormatted;
+    });
+
+    setFilteredExportShipments(filtered);
   };
 
   const handleOpenModal = (shipment = null) => {
     if (shipment) {
-      // Edit mode
-      setNewExport({
-        ...shipment,
-      });
+      setEditingShipment({ ...shipment });
+      // Fetch orders associated with the shipment when editing
+      setEditingOrders(shipment.orders || []); // Set orders related to this shipment
     } else {
-      // Add new export shipment
-      setNewExport({
-        export_address: "",
-        export_state: "",
-        order_ids: [],
-        order_quantity: 0,
-      });
+      setEditingShipment(null); // Reset editing shipment for new export
+      setEditingOrders([]); // Reset orders for new export
     }
     setOpenModal(true);
   };
 
-  const handleCloseModal = () => setOpenModal(false);
-
-  const handleSubmitExport = () => {
-    const newExportId = `EXP${exportShipments.length + 1}`;
-    setExportShipments([
-      ...exportShipments,
-      {
-        ...newExport,
-        export_id: newExportId,
-        created_At: new Date().toLocaleDateString(),
-        updated_At: new Date().toLocaleDateString(),
-      },
-    ]);
-    setNewExport({
-      export_address: "",
-      export_state: "",
-      order_ids: [],
-      order_quantity: 0,
-    });
-    handleCloseModal();
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setEditingShipment(null); // Reset editing shipment when closing the modal
+    setEditingOrders([]); // Reset orders when closing the modal
   };
 
-  const filteredShipments = exportShipments.filter(
-    (shipment) =>
-      shipment.export_address.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      shipment.export_state.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleModalSubmit = () => {
+    if (editingShipment) {
+      console.log("Updating shipment:", editingShipment);
+      ApiService.updateExport(editingShipment.id, editingShipment)
+        .then(() => {
+          console.log("Shipment updated successfully.");
+          setOpenModal(false); // Close modal after update
+          setEditingShipment(null); // Reset editing shipment
+          fetchExportShipments(); // Reload shipment list
+        })
+        .catch((error) => console.error("Error updating shipment:", error));
+    } else {
+      console.log("New shipment created successfully");
+      setOpenModal(false);
+    }
+  };
+
+  // Function to fetch order details by order code
+  const fetchOrderDetails = async (orderCode) => {
+    try {
+      const orderDetails = await ApiService.getOrderByOrderCode(orderCode);
+      // Store the fetched order details in the expandedShipmentOrders state
+      setExpandedShipmentOrders((prev) => ({
+        ...prev,
+        [orderCode]: orderDetails.data,
+      }));
+    } catch (error) {
+      console.error("Error fetching order details:", error);
+    }
+  };
+
+  // Handle deleting shipment and updating orders to OUT_EXPORT with confirmation
+  const handleDeleteShipment = async (shipmentId) => {
+    const confirmation = window.confirm("Bạn chắc chắn muốn xóa xuất hàng này?");
+    if (!confirmation) return; // If user cancels the deletion, return early.
+
+    try {
+
+      await ApiService.deleteExport(shipmentId);
+      setExportShipments((prev) => prev.filter((shipment) => shipment.id !== shipmentId)); // Update shipment list
+      console.log("Export shipment deleted.");
+    } catch (error) {
+      console.error("Error deleting shipment:", error);
+    }
+  };
 
   return (
-    <Container maxWidth="xl" sx={{ paddingTop: 2 }}>
+    <Container maxWidth="lg">
       <PrimarySearchAppBar />
-
-      <Stack sx={{ backgroundColor: "#E2F1E7", padding: "1rem", borderRadius: "0.5rem", marginTop: 0 }}>
+      <Stack
+        className="order-bar"
+        sx={{
+          backgroundColor: "#E2F1E7",
+          padding: "1rem",
+          borderRadius: "0.5rem",
+          marginTop: 0,
+        }}
+      >
         <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
-          <Typography sx={{ fontWeight: "bold", fontSize: "20px", paddingLeft: "20px", width: "200px" }} variant="p">
+          <Typography sx={{ fontWeight: "bold", fontSize: "20px", paddingLeft: "20px", flex: "1" }} variant="p">
             Quản lý Xuất Hàng
           </Typography>
 
-          <Stack direction={"row"} alignItems={"center"}>
-            <Search>
-              <StyledInputBase
-                sx={{ padding: "0.5rem" }}
-                placeholder="Tìm kiếm"
-                inputProps={{ "aria-label": "search" }}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </Search>
+          <Stack direction={"row"} alignItems={"center"} spacing={2} sx={{ flex: "2", justifyContent: "flex-end" }}>
+            {/* Date filter */}
+            <TextField
+              label="Chọn ngày"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="outlined"
+              size="small"
+            />
 
-            <Button onClick={() => handleOpenModal()} sx={{ color: "white", height: "50px", backgroundColor: "#243642" }} variant="contained">
+            <Button
+              onClick={handleFilter}
+              sx={{
+                backgroundColor: "#243642",
+                color: "white",
+                textTransform: "none",
+              }}
+              variant="contained"
+            >
+              Lọc
+            </Button>
+
+            {/* Button to add new export shipment */}
+            <Button
+              onClick={() => handleOpenModal()}
+              sx={{
+                color: "white",
+                height: "50px",
+                backgroundColor: "#243642",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+                flexShrink: 0,
+              }}
+              variant="contained"
+            >
               <Add sx={{ color: "white" }} />
               Thêm Xuất Hàng
             </Button>
@@ -162,118 +198,112 @@ const ExportShipment = () => {
         </Stack>
       </Stack>
 
-      <Box sx={{ marginTop: 0 }}>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell></TableCell>
-                <TableCell>ID</TableCell>
-                <TableCell>Địa chỉ xuất hàng</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell>Ngày tạo</TableCell>
-                <TableCell>Ngày cập nhật</TableCell>
-                <TableCell>Hành động</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredShipments.map((shipment) => (
-                <React.Fragment key={shipment.export_id}>
-                  <TableRow hover>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Địa chỉ xuất hàng</TableCell>
+              <TableCell>Trạng thái</TableCell>
+              <TableCell>Ngày tạo</TableCell>
+              <TableCell>Ngày cập nhật</TableCell>
+              <TableCell>Hành động</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredExportShipments.length > 0 ? (
+              filteredExportShipments.map((shipment) => (
+                <React.Fragment key={shipment.id}>
+                  <TableRow>
                     <TableCell>
-                      <IconButton onClick={() => handleExpandRow(shipment.export_id)}>
-                        {expandedShipmentId === shipment.export_id ? <ExpandLess /> : <ExpandMore />}
+                      <IconButton onClick={() => setExpandedShipmentId(expandedShipmentId === shipment.id ? null : shipment.id)}>
+                        {expandedShipmentId === shipment.id ? <ExpandLess /> : <ExpandMore />}
                       </IconButton>
                     </TableCell>
-                    <TableCell>{shipment.export_id}</TableCell>
-                    <TableCell>{shipment.export_address}</TableCell>
-                    <TableCell>{shipment.export_state}</TableCell>
-                    <TableCell>{shipment.created_At}</TableCell>
-                    <TableCell>{shipment.updated_At}</TableCell>
+                    <TableCell>{shipment.id}</TableCell>
+                    <TableCell>{shipment.export_address || "Chưa có địa chỉ"}</TableCell>
+                    <TableCell>{shipment.exportState || "Chưa có trạng thái"}</TableCell>
+                    <TableCell>{new Date(shipment.createdAt).toLocaleDateString("en-GB") || "Chưa có ngày tạo"}</TableCell>
+                    <TableCell>{shipment.updatedAt || "Chưa có ngày cập nhật"}</TableCell>
                     <TableCell>
                       <IconButton onClick={() => handleOpenModal(shipment)}>
                         <Edit />
                       </IconButton>
-                      <IconButton sx={{ ml: 1 }}>
+                      <IconButton onClick={() => handleDeleteShipment(shipment.id)}>
                         <Delete />
                       </IconButton>
                     </TableCell>
                   </TableRow>
-                  <TableRow>
-                    <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
-                      <Collapse in={expandedShipmentId === shipment.export_id} timeout="auto" unmountOnExit>
-                        <Box margin={1}>
-                          <Typography variant="h6" gutterBottom>
-                            Các Đơn Hàng trong Xuất Hàng
-                          </Typography>
-                          <Table size="small">
-                            <TableHead>
-                              <TableRow>
-                                <TableCell>Order ID</TableCell>
-                                <TableCell>Số lượng</TableCell>
-                              </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {shipment.order_ids.map((orderId, index) => (
-                                <TableRow key={orderId}>
-                                  <TableCell>{orderId}</TableCell>
-                                  <TableCell>{shipment.order_quantity}</TableCell>
+
+                  {/* Expandable Row for Orders */}
+                  {expandedShipmentId === shipment.id && (
+                    <TableRow key={`details-${shipment.id}`}>
+                      <TableCell colSpan={7}>
+                        <Box sx={{ padding: "1rem" }}>
+                          <Typography sx={{ fontWeight: "bold", marginBottom: "1rem" }}>Đơn hàng liên quan:</Typography>
+
+                          {/* Orders Table */}
+                          <TableContainer component={Paper} sx={{ marginBottom: "1rem" }}>
+                            <Table>
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell>Order Code</TableCell>
+                                  <TableCell>Địa chỉ</TableCell>
+                                  <TableCell>Trạng thái</TableCell>
+                                  <TableCell>Ngày tạo</TableCell>
                                 </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
+                              </TableHead>
+                              <TableBody>
+                                {shipment.orderCode?.length > 0 ? (
+                                  shipment.orderCode.map((orderCode, index) => {
+                                    fetchOrderDetails(orderCode);
+                                    return (
+                                      <TableRow key={index}>
+                                        <TableCell>{orderCode}</TableCell>
+                                        {expandedShipmentOrders[orderCode] ? (
+                                          <>
+                                            <TableCell>{expandedShipmentOrders[orderCode].delivery_Address}</TableCell>
+                                            <TableCell>{expandedShipmentOrders[orderCode].orderStatus}</TableCell>
+                                            <TableCell>{new Date(expandedShipmentOrders[orderCode].created_at).toLocaleDateString()}</TableCell>
+                                          </>
+                                        ) : (
+                                          <TableCell colSpan={3}>Đang tải thông tin đơn hàng...</TableCell>
+                                        )}
+                                      </TableRow>
+                                    );
+                                  })
+                                ) : (
+                                  <TableRow>
+                                    <TableCell colSpan={4} align="center">Không có đơn hàng liên quan</TableCell>
+                                  </TableRow>
+                                )}
+                              </TableBody>
+                            </Table>
+                          </TableContainer>
                         </Box>
-                      </Collapse>
-                    </TableCell>
-                  </TableRow>
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </React.Fragment>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} align="center">Không có dữ liệu</TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      {/* Modal for Adding/Editing Export Shipment */}
-      <Modal open={openModal} onClose={handleCloseModal} closeAfterTransition>
-        <Fade in={openModal}>
-          <Box sx={{ position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)", width: 1000, bgcolor: "background.paper", boxShadow: 24, p: 4 }}>
-            <Typography sx={{ fontWeight: "bold", mb: 2 }}>Thêm hoặc Chỉnh sửa Xuất Hàng</Typography>
-            <Stack direction="row" spacing={4}>
-              {/* Left side: Export Info */}
-              <Box sx={{ width: "45%" }}>
-                <TextField
-                  fullWidth
-                  label="Địa chỉ xuất hàng"
-                  value={newExport.export_address}
-                  onChange={(e) => setNewExport({ ...newExport, export_address: e.target.value })}
-                  sx={{ marginBottom: "1rem" }}
-                />
-                <TextField
-                  fullWidth
-                  label="Trạng thái xuất hàng"
-                  value={newExport.export_state}
-                  onChange={(e) => setNewExport({ ...newExport, export_state: e.target.value })}
-                  sx={{ marginBottom: "1rem" }}
-                />
-              </Box>
-
-              {/* Right side: Order IDs */}
-              <Box sx={{ width: "50%" }}>
-                <Typography variant="h6" gutterBottom>
-                  Danh sách Đơn Hàng
-                </Typography>
-                {/* Here, you can display order ids or provide a selection mechanism */}
-              </Box>
-            </Stack>
-
-            <Box sx={{ marginTop: "2rem", textAlign: "right" }}>
-              <Button variant="contained" sx={{ backgroundColor: "#243642", color: "white" }} onClick={handleSubmitExport}>
-                Lưu Xuất Hàng
-              </Button>
-            </Box>
-          </Box>
-        </Fade>
-      </Modal>
+      {/* Modal for adding or editing export shipment */}
+      <ModalExport
+        open={openModal}
+        onClose={handleCloseModal}
+        onSubmit={handleModalSubmit}
+        shipment={editingShipment} // Pass the shipment with orders to the modal
+        orders={editingOrders} // Pass the orders to the modal
+      />
     </Container>
   );
 };

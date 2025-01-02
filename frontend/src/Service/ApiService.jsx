@@ -40,7 +40,7 @@ export default class ApiService {
     }
     static async getAllInventory() {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/inventory`, {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/inventory`, {
                 headers: this.getHeader()  
             });
             return response.data;
@@ -49,34 +49,9 @@ export default class ApiService {
         }
     }
 
-    static async getSingleInventory(id) {
+    static async getAllShelf() {
         try {
-            const response = await axios.get(`${this.BASE_URL}/api/inventory/${id}`, {
-                headers: this.getHeader()  
-            });
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-
-    static async getSingleProduct(id) {
-        try {
-            const response = await axios.get(`${this.BASE_URL}/api/product/getById/${id}`, {
-                headers: this.getHeader()  
-            });
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    
-
-    static async getAllQuantityProduct(){
-        try {
-            const response = await axios.get(`${this.BASE_URL}/api/admin/order/getOrderQuantity`, {
+            const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
                 headers: this.getHeader()  
             });
             return response.data;
@@ -96,10 +71,6 @@ export default class ApiService {
             throw error;  
         }
     }
-
-
-    
-    
 
     static async deleteInventory(id) {
         try {
@@ -124,133 +95,6 @@ export default class ApiService {
             throw error;  
         }
     }
-
-    static async getAllShelf() {
-        try {
-            const response = await axios.get(`${this.BASE_URL}/api/shelf/all`, {
-                headers: this.getHeader()  
-            });
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-
-    static async getInforUser(){
-        try {
-            const response = await axios.get(`${this.BASE_URL}/api/getInformation`, {
-                headers: this.getHeader()  
-            });
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    }
-
-    static async addShelf(formData) {
-        try {
-            const response = await axios.post(`${this.BASE_URL}/api/shelf`, formData, {
-                headers: this.getHeader(),
-                'Content-Type': 'application/json' 
-            });
-            return response.data;
-        } catch (error) {
-            throw error;  
-        }
-    }
-    static async deleteShelf(id) {
-        try {
-            const response = await axios.delete(`${this.BASE_URL}/api/shelf/${id}`, {
-                headers: this.getHeader(),
-            });
-            return response.data; 
-        } catch (error) {
-            console.error("Lỗi khi xóa:", error.response?.data || error.message);
-            throw error;
-        }
-    }
-
-    static async updateShelf(id, formData) {
-        try {
-            const response = await axios.put(`${this.BASE_URL}/api/shelf/${id}`, formData, {
-                headers: this.getHeader(),
-                'Content-Type': 'application/json' 
-            });
-            return response.data;
-        } catch (error) {
-            throw error;  
-        }
-    }
-
-    static async searchShelf(keyword) {
-        try {
-          const response = await axios.get(`${this.BASE_URL}/api/shelf/searchByName/${keyword}`, {
-            headers: this.getHeader(),
-                'Content-Type': 'application/json' 
-          });
-          return response.data;  
-        } catch (error) {
-            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
-            throw error;
-        }
-    }
-
-    static async searchInventory(keyword) {
-        try {
-          const response = await axios.get(`${this.BASE_URL}/api/inventory/searchByName/${keyword}`, {
-            headers: this.getHeader(),
-                'Content-Type': 'application/json' 
-          });
-          return response.data;  
-        } catch (error) {
-            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
-            throw error;
-        }
-    }
-
-    static async updateInforUser(formData) {
-        try {
-            const response = await axios.put(`${this.BASE_URL}/api/updateInfor`, formData, {
-                headers: this.getHeader(),
-                'Content-Type': 'application/json' 
-            });
-            return response.data;
-        } catch (error) {
-            throw error;  
-        }
-    }
-    // static async uploadImage(formData) {
-    //     try {
-    //         const response = await axios.post(`${this.BASE_URL}/upload/image`, formData, {
-    //             headers: this.getHeader(),
-    //             'Content-Type': 'multipart/form-data' 
-    //         });
-    //         return response.data;
-    //     } catch (error) {
-    //         throw error;  
-    //     }
-    // }
-
-    static async uploadImage(formData) {
-        try {
-            const response = await axios.post(`${this.BASE_URL}/upload/image`, formData, {
-                // headers: this.getHeader(),
-            });
-            return response.data;
-        } catch (error) {
-            throw error;  
-        }
-    }
-
-
-
-
-
-
-
-
-
     
 
     // Phát
@@ -492,6 +336,130 @@ export default class ApiService {
             throw error;
         }
     }
+    static async addOrder(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/order`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi thêm gói hàng:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async updateOrder(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/order/updateOrder/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    static async updateOrderStatus(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/order/updateOrderStatus/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    static async getProduct() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách sản phẩm:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async deleteOrder(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/order/deleteOrder/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi xóa đơn:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getOrderById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/order/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getOrderByOrderCode(code) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/order/getOrderByOrderCode/${code}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin bằng code:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
+    static async searchShelf(keyword) {
+        try {
+          const response = await axios.get(`${this.BASE_URL}/api/shelf/searchByName/${keyword}`, {
+            headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+          });
+          return response.data;  
+        } catch (error) {
+            console.error("Lỗi khi tìm kiếm:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getProductById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getById/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getProductByName(name) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/getByName/${name}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getShelfByProductName(name) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/shelf/allShelfCode/${name}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi lấy thông tin kệ:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    
     //order items
     
     static async getOrderItemById(id) {
@@ -502,6 +470,51 @@ export default class ApiService {
             return response.data; 
         } catch (error) {
             console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getOrderItemByCode(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/orderItem/getOrderItemByOrderCode/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async addOrderItem(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/orderItem`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi thêm gói hàng:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async updateOrderItem(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/orderItem/updateOrderItem/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    
+    static async deleteOrderItem(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/orderItem/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi xóa orderitem:", error.response?.data || error.message);
             throw error;
         }
     }
@@ -528,17 +541,7 @@ export default class ApiService {
             throw error;
         }
     }
-    // static async updateEmployee(id, formData) {
-    //     try {
-    //         const response = await axios.put(`${this.BASE_URL}/api/admin/user/${id}`, formData, {
-    //             headers: this.getHeader(),
-    //         });
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error("Lỗi khi cập nhật thông tin nhân viên:", error.response?.data || error.message);
-    //         throw error;
-    //     }
-    // }
+    
 
     static async deleteEmployee(id) {
         try {
@@ -573,18 +576,7 @@ export default class ApiService {
             console.error("Lỗi khi thêm danh mục:", error.response?.data || error.message);
             throw error;
         }
-    }
-    static async updateCategory(id, formData) {
-        try {
-            const response = await axios.put(`${this.BASE_URL}/api/admin/category/${id}`, formData, {
-                headers: this.getHeader(),
-            });
-            return response.data;
-        } catch (error) {
-            console.error("Lỗi khi cập nhật thông tin nhân viên:", error.response?.data || error.message);
-            throw error;
-        }
-    }
+    }   
     static async deleteCategory(id) {
         try {
             const response = await axios.delete(`${this.BASE_URL}/api/admin/category/${id}`, {
@@ -592,9 +584,53 @@ export default class ApiService {
             });
             return response.data;
         } catch (error) {
-            console.error("Lỗi khi xóa nhân viên:", error.response?.data || error.message);
+            console.error("Lỗi khi xóa danh mục:", error.response?.data || error.message);
             throw error;
         }
     }
-    //Order
+    //Export
+    static async getAllExport() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/export`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sách xuất:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async addExport(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/admin/export`, formData, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi thêm danh mục:", error.response?.data || error.message);
+            throw error;
+        }
+    }   
+    static async deleteExport(id) {
+        try {
+            const response = await axios.delete(`${this.BASE_URL}/api/admin/export/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi xóa danh mục:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async updateExport(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/export/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
 }

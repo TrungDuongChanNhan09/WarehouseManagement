@@ -21,7 +21,7 @@ import {
   DialogTitle,
   Alert,
 } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { Delete } from "@mui/icons-material";
 import AppBarMenu from "../../Component/AppBar/AppBar";
 import ApiService from "../../Service/ApiService.jsx";
 
@@ -37,7 +37,6 @@ const Employee = () => {
     userName: "",
     fullName: "",
     password: "",
-    role: "",
   });
   const [errorMessage, setErrorMessage] = useState(""); // State to hold error messages
 
@@ -73,12 +72,7 @@ const Employee = () => {
   // Add a new employee
   const handleAddEmployee = async () => {
     // Kiểm tra nếu có trường thông tin nào trống
-    if (
-      !newEmployee.userName ||
-      !newEmployee.fullName ||
-      !newEmployee.password ||
-      !newEmployee.role
-    ) {
+    if (!newEmployee.userName || !newEmployee.fullName || !newEmployee.password) {
       setErrorMessage("Vui lòng nhập đầy đủ thông tin!");
       return; // Dừng nếu có trường bị trống
     }
@@ -88,7 +82,6 @@ const Employee = () => {
       username: newEmployee.userName, // Đặt tên theo đúng kiểu dữ liệu yêu cầu
       fullName: newEmployee.fullName,
       password: newEmployee.password,
-      role: newEmployee.role,
     };
 
     try {
@@ -114,11 +107,6 @@ const Employee = () => {
         setOpenConfirmDialog(false);
       }
     }
-  };
-
-  // Handle edit action
-  const handleEdit = (id) => {
-    console.log("Edit employee with ID:", id);
   };
 
   // Handle delete action
@@ -182,7 +170,7 @@ const Employee = () => {
               <TableCell>Giới Tính</TableCell>
               <TableCell>Ngày Sinh</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Vai Trò</TableCell>          
+              <TableCell>Vai Trò</TableCell>
               <TableCell>Hành Động</TableCell>
             </TableRow>
           </TableHead>
@@ -193,13 +181,12 @@ const Employee = () => {
                 <TableRow key={employee.id}>
                   <TableCell>{employee.fullName}</TableCell>
                   <TableCell>{employee.gender}</TableCell>
-                  <TableCell>{new Date(employee.dateOfBirth).toLocaleDateString()}</TableCell>
-                  <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.role}</TableCell>             
                   <TableCell>
-                    <IconButton onClick={() => handleEdit(employee.id)}>
-                      <Edit />
-                    </IconButton>
+                    {new Date(employee.dateOfBirth).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>{employee.email}</TableCell>
+                  <TableCell>{employee.role}</TableCell>
+                  <TableCell>
                     <IconButton onClick={() => handleDelete(employee.id)}>
                       <Delete />
                     </IconButton>
@@ -225,7 +212,7 @@ const Employee = () => {
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
         <DialogTitle>Thêm Tài Khoản Nhân Viên Mới</DialogTitle>
         <DialogContent>
-          {errorMessage && <Alert severity="error">{errorMessage}</Alert>} {/* Display error message */}
+          {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
           <TextField
             label="Tên Nhân Viên"
             fullWidth
@@ -252,15 +239,6 @@ const Employee = () => {
             value={newEmployee.password}
             onChange={(e) => {
               setNewEmployee({ ...newEmployee, password: e.target.value });
-            }}
-          />
-          <TextField
-            label="Vai Trò"
-            fullWidth
-            margin="normal"
-            value={newEmployee.role}
-            onChange={(e) => {
-              setNewEmployee({ ...newEmployee, role: e.target.value });
             }}
           />
         </DialogContent>
