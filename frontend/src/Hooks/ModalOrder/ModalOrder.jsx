@@ -118,7 +118,7 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
             quantity: item.quantity,
             totalPrice: item.totalPrice,
             orderItemState: item.orderItemState,
-            shelfCode: item.shelf ? [item.shelf] : [], // Ensure shelfCode is set correctly
+            shelfCode: item.shelf ? [item.shelf] : [],
           };
   
           // Log the order item data before submitting

@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import ApiService from "../../Service/ApiService";
 
-const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrders }) => {
+const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrders,  reloadOrderItems }) => {
   const [orderDetails, setOrderDetails] = useState({
     orderCode: "",
     orderPrice: 0,
@@ -226,6 +226,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
   
       // Close the modal and reload the orders
       handleCloseModal();
+      reloadOrderItems(updatedOrder.id, updatedOrder.orderItemCodes);
       fetchOrders();
     } catch (error) {
       console.error("Error preparing order data:", error.message);

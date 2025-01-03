@@ -1,1 +1,10 @@
-/*# sourceMappingURL=DashBoard.css.map */
+.DashBoard .stack-component {
+  flex-direction: row;
+  align-items: center;
+  background-color: white;
+  height: 80px;
+  width: 250px;
+  margin: 0.5rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}/*# sourceMappingURL=DashBoard.css.map */

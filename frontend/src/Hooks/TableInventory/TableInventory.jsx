@@ -17,7 +17,10 @@ import {
   TableRow,
   Menu,
   MenuItem,
-  IconButton, Select
+  IconButton, 
+  Select,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ApiService from "../../Service/ApiService";
@@ -54,6 +57,9 @@ const TableInventory = ({ searchInventory }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({});
   const [role, setRole] = useState(localStorage.getItem('role') || '');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const fetchInventorys = async () => {
     try {
@@ -88,15 +94,18 @@ const TableInventory = ({ searchInventory }) => {
 
   const handleSaveUpdate = async () => {
     try {
-      console.log(editData);
       await ApiService.updateInventory(editData.id, editData);
-      alert("Cập nhật thành công!");
+      setSnackbarMessage("Cập nhật kho hàng thành công!");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
       setInventorys((prev) =>
         prev.map((item) => (item.id === editData.id ? editData : item))
       );
       setIsEditModalOpen(false);
     } catch (error) {
-      alert("Lỗi khi cập nhật kho hàng!");
+      setSnackbarMessage("Lỗi khi cập nhật kho hàng!");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
 
@@ -106,10 +115,14 @@ const TableInventory = ({ searchInventory }) => {
       if (confirmDelete) {
         try {
           await ApiService.deleteInventory(selectedRow.id);
-          alert("Kho hàng đã được xóa thành công!");
+          setSnackbarMessage("Kho hàng đã được xóa thành công!");
+          setSnackbarSeverity("success");
+          setOpenSnackbar(true);
           setInventorys((prev) => prev.filter((item) => item.id !== selectedRow.id));
         } catch (error) {
-          alert("Lỗi khi xóa kho hàng. Vui lòng thử lại.");
+          setSnackbarMessage("Lỗi khi xóa kho hàng. Vui lòng thử lại.");
+          setSnackbarSeverity("error");
+          setOpenSnackbar(true);
         } finally {
           handleCloseMenu();
         }
@@ -234,10 +247,18 @@ const TableInventory = ({ searchInventory }) => {
           </Box>
         </Fade>
       </Modal>
+      <Snackbar 
+        open={openSnackbar} 
+        autoHideDuration={6000} 
+        onClose={() => setOpenSnackbar(false)} 
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
+      >
+        <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 };
 
 export default TableInventory;
-
-

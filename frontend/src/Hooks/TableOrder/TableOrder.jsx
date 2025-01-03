@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TablePagination, // Import TablePagination
+  TablePagination,
 } from '@mui/material';
 import { ExpandMore, ExpandLess, Edit, Delete } from '@mui/icons-material';
 import ApiService from "../../Service/ApiService.jsx";
@@ -34,7 +34,13 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
 
   // Expand/Collapse Row
   const handleExpandRow = async (orderId, orderItemCodes) => {
-    setExpandedOrderId((prev) => (prev === orderId ? null : orderId));
+    if (expandedOrderId === orderId) {
+      setExpandedOrderId(null); // Collapse if already expanded
+      return;
+    }
+  
+    setExpandedOrderId(orderId); // Expand new row
+  
     if (orderItemCodes && orderItemCodes.length > 0) {
       try {
         const fetchedItems = [];
@@ -203,6 +209,7 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
         handleCloseModal={handleCloseUpdateModal}
         selectedOrder={selectedOrder}
         fetchOrders ={ fetchOrders}
+        reloadOrderItems={(orderId, orderItemCodes) => handleExpandRow(orderId, orderItemCodes)}
       />
 
       {/* Confirm Delete Dialog */}

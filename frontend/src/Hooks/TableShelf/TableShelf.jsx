@@ -24,7 +24,7 @@
 
 // const columns = [
 //   { id: "stt", label: "STT", minWidth: 30 },
-//   { id: "customId", label: "ID", maxWidth: 100 },  // Cột ID tùy chỉnh
+//   { id: "customId", label: "ID", maxWidth: 100 },
 //   { id: "shelfCode", label: "Tên kệ hàng", maxWidth: 140 },
 //   { id: "inventoryid", label: "Kho hàng", maxWidth: 140 },
 //   { id: "productId", label: "Loại sản phẩm", maxWidth: 140 },
@@ -55,7 +55,6 @@
 //   const [inventoryNames, setInventoryNames] = useState({}); 
 //   const [productNames, setProductNames] = useState({}); 
 
-//   // Fetch all shelves
 //   const fetchShelfs = async () => {
 //     try {
 //       const response = await ApiService.getAllShelf();
@@ -70,7 +69,7 @@
 //         productNameMap[shelf.productId] = productData.productName;
 //       }
 //       setInventoryNames(inventoryNameMap);  
-//       setProductNames(productNameMap)
+//       setProductNames(productNameMap);
 //     } catch (error) {
 //       console.error("Lỗi khi tải thông tin các Shelf", error.message);
 //     }
@@ -160,15 +159,15 @@
 //               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 //               .map((row, index) => (
 //                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
-//                   <TableCell>{index + 1}</TableCell> {/* STT column */}
-//                   <TableCell>{`SH${(index + 1).toString().padStart(2, "0")}`}</TableCell> {/* ID column */}
+//                   <TableCell>{index + 1}</TableCell> 
+//                   <TableCell>{`SH${(index + 1).toString().padStart(2, "0")}`}</TableCell> 
 //                   {columns.slice(2).map((column) => {
 //                     let value = row[column.id];
 //                     if (column.id === "inventoryid" && inventoryNames[value]) {
-//                       value = inventoryNames[value];  // Replace inventory id with name
+//                       value = inventoryNames[value];  
 //                     }
 //                     if (column.id === "productId" && productNames[value]) {
-//                       value = productNames[value];  // Replace inventory id with name
+//                       value = productNames[value];  
 //                     }
 //                     return <TableCell key={column.id}>{value}</TableCell>;
 //                   })}
@@ -215,17 +214,19 @@
 //               />
 //               <TextField
 //                 label="Kho hàng"
-//                 value={editData.inventoryid || ""}
+//                 value={inventoryNames[editData.inventoryid] || ""}
 //                 onChange={(e) =>
 //                   setEditData({ ...editData, inventoryid: e.target.value })
 //                 }
+//                 disabled
 //               />
 //               <TextField
 //                 label="Loại sản phẩm"
-//                 value={editData.productId || ""}
+//                 value={productNames[editData.productId] || ""}
 //                 onChange={(e) =>
 //                   setEditData({ ...editData, productId: e.target.value })
 //                 }
+//                 disabled
 //               />
 //               <TextField
 //                 label="Tổng sản phẩm"
@@ -233,6 +234,7 @@
 //                 onChange={(e) =>
 //                   setEditData({ ...editData, quantity: e.target.value })
 //                 }
+//                 disabled
 //               />
 //               <TextField
 //                 label="Sức chứa (sản phẩm)"
@@ -240,6 +242,7 @@
 //                 onChange={(e) =>
 //                   setEditData({ ...editData, capacity: e.target.value })
 //                 }
+//                 disabled
 //               />
 //               <Button
 //                 sx={{ backgroundColor: "#243642" }}
@@ -257,6 +260,7 @@
 // };
 
 // export default TableShelf;
+
 
 
 import React, { useState, useEffect } from "react";
@@ -279,6 +283,8 @@ import {
   Menu,
   MenuItem,
   IconButton,
+  Snackbar,  // Add Snackbar for notifications
+  Alert,  // Add Alert for Snackbar content
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ApiService from "../../Service/ApiService";
@@ -315,6 +321,8 @@ const TableShelf = ({ searchShelfs }) => {
   const [role, setRole] = useState(localStorage.getItem("role") || "");
   const [inventoryNames, setInventoryNames] = useState({}); 
   const [productNames, setProductNames] = useState({}); 
+  const [snackBarOpen, setSnackBarOpen] = useState(false);
+  const [snackBarMessage, setSnackBarMessage] = useState('');
 
   const fetchShelfs = async () => {
     try {
@@ -333,6 +341,8 @@ const TableShelf = ({ searchShelfs }) => {
       setProductNames(productNameMap);
     } catch (error) {
       console.error("Lỗi khi tải thông tin các Shelf", error.message);
+      setSnackBarMessage('Lỗi khi tải dữ liệu kệ hàng.');
+      setSnackBarOpen(true);
     }
   };
 
@@ -361,13 +371,15 @@ const TableShelf = ({ searchShelfs }) => {
   const handleSaveUpdate = async () => {
     try {
       await ApiService.updateShelf(editData.id, editData);
-      alert("Cập nhật thành công!");
+      setSnackBarMessage('Cập nhật thành công!');
+      setSnackBarOpen(true);
       setShelfs((prev) =>
         prev.map((item) => (item.id === editData.id ? editData : item))
       );
       setIsEditModalOpen(false);
     } catch (error) {
-      alert("Lỗi khi cập nhật kệ hàng!");
+      setSnackBarMessage('Lỗi khi cập nhật kệ hàng.');
+      setSnackBarOpen(true);
     }
   };
 
@@ -379,10 +391,12 @@ const TableShelf = ({ searchShelfs }) => {
       if (confirmDelete) {
         try {
           await ApiService.deleteShelf(selectedRow.id);
-          alert("Kệ hàng đã được xóa thành công!");
+          setSnackBarMessage('Kệ hàng đã được xóa thành công!');
+          setSnackBarOpen(true);
           setShelfs((prev) => prev.filter((item) => item.id !== selectedRow.id));
         } catch (error) {
-          alert("Lỗi khi xóa kệ hàng. Vui lòng thử lại.");
+          setSnackBarMessage('Lỗi khi xóa kệ hàng. Vui lòng thử lại.');
+          setSnackBarOpen(true);
         } finally {
           handleCloseMenu();
         }
@@ -397,6 +411,10 @@ const TableShelf = ({ searchShelfs }) => {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
+  };
+
+  const handleCloseSnackBar = () => {
+    setSnackBarOpen(false);
   };
 
   return (
@@ -495,7 +513,6 @@ const TableShelf = ({ searchShelfs }) => {
                 onChange={(e) =>
                   setEditData({ ...editData, quantity: e.target.value })
                 }
-                disabled
               />
               <TextField
                 label="Sức chứa (sản phẩm)"
@@ -503,22 +520,32 @@ const TableShelf = ({ searchShelfs }) => {
                 onChange={(e) =>
                   setEditData({ ...editData, capacity: e.target.value })
                 }
-                disabled
               />
-              <Button
-                sx={{ backgroundColor: "#243642" }}
-                variant="contained"
-                onClick={handleSaveUpdate}
-              >
-                Lưu
-              </Button>
+              <Stack direction="row" spacing={2} justifyContent="flex-end">
+                <Button onClick={() => setIsEditModalOpen(false)}>Hủy</Button>
+                <Button
+                  variant="contained"
+                  onClick={handleSaveUpdate}
+                >
+                  Lưu
+                </Button>
+              </Stack>
             </Stack>
           </Box>
         </Fade>
       </Modal>
+      <Snackbar
+        open={snackBarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackBar}
+      >
+        <Alert onClose={handleCloseSnackBar} severity="success" sx={{ width: "100%" }}>
+          {snackBarMessage}
+        </Alert>
+      </Snackbar>
     </Paper>
   );
 };
 
 export default TableShelf;
-
+  
