@@ -145,7 +145,11 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
                   <TableCell>{order.address}</TableCell>
                   <TableCell>{order.date}</TableCell>
                   <TableCell>{order.value} VND</TableCell>
-                  <TableCell>{order.state}</TableCell>
+                  <TableCell>
+                    {order.state === "PENDING" ? "Đang chờ" : 
+                    order.state === "DELIVERED" ? "Đã giao" : 
+                    order.state || "Chưa có trạng thái"}
+                  </TableCell>
                   <TableCell>
                     <IconButton onClick={() => handleEdit(order.id)}>
                       <Edit />
