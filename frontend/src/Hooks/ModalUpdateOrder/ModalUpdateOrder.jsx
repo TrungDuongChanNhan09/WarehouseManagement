@@ -75,6 +75,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
                 productName: fetchedProduct.productName,
                 productPrice: fetchedProduct.price,
                 shelfCode: shelfCodes, 
+                product_id: fetchedOrderItems.product_id,
               });
             } else {
               console.log(`8. No shelves found for Product ${fetchedProduct.productName}`);
@@ -156,7 +157,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
               orderItemCode: `orderItem-${Date.now()}`, 
               shelfCode: shelfCodes,
               productPrice: product.price, 
-              productId: product.id,  // Đảm bảo gán productId
+              productId: product.id, 
             },
           ]);
         }
@@ -167,95 +168,70 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
       console.error("Product not found for productId:", productId);
     }
   };
-  
-  
+
+
   const handleSubmitOrder = async () => {
     try {
-      // Kiểm tra xem có order item nào không
+      // Check if there are any order items
       if (!orderItems || orderItems.length === 0) {
         console.error("No items in the order. Please add items before submitting.");
         return;
       }
   
-      // Duyệt qua các order item và kiểm tra từng item
+      // Iterate over the order items and check each item
       for (const item of orderItems) {
-        // Kiểm tra xem orderItem có chứa productId không
-        if (!item.productId) {
-          console.error(`Order item with code ${item.orderItemCode} does not have a product ID.`);
-          continue; // Bỏ qua item này nếu không có productId
-        }
-  
         try {
-          // Lấy productId từ orderItem đã có
-          const productId = item.productId;
-          console.log(`Product ID for order item ${item.orderItemCode}: ${productId}`);
-  
-          // Kiểm tra xem order item đã có hay chưa bằng orderItemCode
+          // Check if the order item already exists by orderItemCode
           const existingItem = await ApiService.getOrderItemByCode(item.orderItemCode);
-          console.log(`Checking existing item for order item code: ${item.orderItemCode}`, existingItem);
-  
-          if (!existingItem) {
-            // Nếu item chưa có, tạo mới
-            const orderItemData = {
-              orderItem_id: item.id || "N/A", // Nếu không có id, sử dụng "N/A"
-              product_id: productId, // Gửi productId từ orderItem
-              quantity: item.quantity || 0, // Sử dụng quantity của item
-              totalPrice: item.productPrice * item.quantity, // Tính tổng giá
-              orderItemCode: item.orderItemCode, // Mã order item
-              orderItemState: "IN_ORDER", // Trạng thái mặc định
-              shelfCode: item.shelfCode || [], // Mảng shelfCode
-            };
-  
-            console.log("Creating new order item with data:", JSON.stringify(orderItemData, null, 2));
-            await ApiService.addOrderItem(orderItemData);
-            console.log(`Order item ${item.orderItemCode} created successfully.`);
-          } else {
-            // Nếu item đã có, cập nhật
-            const updatedItemData = {
-              ...item,
-              product_id: productId, // Đảm bảo luôn cập nhật product_id
-              totalPrice: item.productPrice * item.quantity, // Tính lại tổng giá
-            };
-            console.log("Updating existing order item with data:", JSON.stringify(updatedItemData, null, 2));
-            await ApiService.updateOrderItem(existingItem.id, updatedItemData);
-            console.log(`Order item ${item.orderItemCode} updated successfully.`);
+          
+          if (!existingItem || !existingItem.orderItem_id) {
+            console.error(`No existing order item found with code: ${item.orderItemCode}. Cannot update.`);
+            return; // Return if the item is not found
           }
+  
+          // Prepare the order item data
+          const orderItemData = {
+            orderItem_id: existingItem.orderItem_id,
+            product_id: item.product_id,
+            quantity: item.quantity || 0,
+            totalPrice: item.productPrice * item.quantity,
+            orderItemCode: item.orderItemCode,
+            orderItemState: "IN_ORDER",
+            shelfCode: item.shelfCode || [],
+          };
+  
+          // Update the order item using the existing item ID
+          await ApiService.updateOrderItem(existingItem.orderItem_id, orderItemData);
         } catch (error) {
-          // Nếu có lỗi trong việc tạo hoặc cập nhật item, bỏ qua lỗi và tiếp tục
           console.error(`Error processing order item ${item.orderItemCode}:`, error.message);
         }
       }
   
-      // Chuẩn bị dữ liệu order để gửi
+      // Prepare the order data to be sent
       const currentTime = new Date().toISOString();
       const orderData = {
-        orderItem_code: orderItems.map((item) => item.orderItemCode).filter(Boolean), // Chỉ bao gồm orderItemCode
-        delivery_Address: orderDetails.delivery_Address || "N/A", // Default "N/A" nếu không có
-        created_at: orderDetails.created_at || currentTime, // Dùng thời gian hiện tại nếu không có thời gian tạo
-        update_at: currentTime, // Thời gian cập nhật
-        orderCode: orderDetails.orderCode || "N/A", // Default "N/A" nếu không có
+        orderItem_code: orderItems.map((item) => item.orderItemCode).filter(Boolean),
+        delivery_Address: orderDetails.delivery_Address || "N/A",
+        created_at: orderDetails.created_at || currentTime,
+        update_at: currentTime,
+        orderCode: orderDetails.orderCode || "N/A",
       };
   
-      // Log dữ liệu gửi lên
-      console.log("Data to be sent for order update:", JSON.stringify(orderData, null, 2));
-  
-      // Cập nhật đơn hàng
+      // Submit the order update
       if (selectedOrder.id) {
-        console.log("Submitting order update for order ID:", selectedOrder.id);
         await ApiService.updateOrder(selectedOrder.id, orderData);
-        console.log("Order updated successfully.");
       } else {
         console.error("No selected order to update.");
       }
   
-      console.log("Thành công");
-      // Đóng modal sau khi hoàn tất
-      handleCloseModal(); // Giả sử handleCloseModal là hàm đóng modal
+      // Close the modal and reload the orders
+      handleCloseModal();
       fetchOrders();
     } catch (error) {
       console.error("Error preparing order data:", error.message);
     }
   };
+  
   
   // Calculate total order price based on item quantities and prices
   const totalAmount = orderItems.reduce((total, item) => {
@@ -336,6 +312,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
                        <TableCell>Số lượng</TableCell>
                        <TableCell>Tổng giá</TableCell>
                        <TableCell>Hành động</TableCell>
+                       <TableCell sx={{ display: "none" }}>ID Sản Phẩm</TableCell>
                      </TableRow>
                    </TableHead>
                    <TableBody>
@@ -379,6 +356,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
                              Xóa
                            </Button>
                          </TableCell>
+                         <TableCell sx={{ display: "none" }}>{item.productId}</TableCell>
                        </TableRow>
                      ))}
                    </TableBody>

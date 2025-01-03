@@ -29,9 +29,8 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  // Pagination state
-  const [page, setPage] = useState(0); // Current page
-  const [rowsPerPage, setRowsPerPage] = useState(5); // Number of rows per page
+  const [page, setPage] = useState(0); 
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   // Expand/Collapse Row
   const handleExpandRow = async (orderId, orderItemCodes) => {
@@ -89,7 +88,7 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
 
   const handleCloseUpdateModal = () => {
     setOpenUpdateModal(false);
-    setSelectedOrder(null); // Reset the selected order when closing the modal
+    setSelectedOrder(null); 
   };
 
   // Filter orders
@@ -100,12 +99,10 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
       (statusFilter ? order.state === statusFilter : true)
   );
 
-  // Handle page change
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  // Handle rows per page change
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0); // Reset to first page when changing rows per page
@@ -193,7 +190,7 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={filteredOrders.length} // Total number of orders
+        count={filteredOrders.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

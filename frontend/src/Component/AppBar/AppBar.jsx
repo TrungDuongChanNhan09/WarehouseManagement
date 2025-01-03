@@ -465,8 +465,8 @@ const PrimarySearchAppBar = () => {
                       Bật xác thực hai yếu tố (2FA):
                       <Switch defaultChecked />
                     </Typography>
-                    <TextField label="Mật khẩu mới" type="password" fullWidth variant="outlined" />
-                    <TextField label="Nhập lại mật khẩu mới" type="password" fullWidth variant="outlined" />
+                    <TextField label="Mật khẩu hiện tại" type="password" fullWidth variant="outlined" />
+                    <TextField label="Nhập mật khẩu mới" type="password" fullWidth variant="outlined" />
                     <Button
                       className="btn-setting"
                       sx={{ color: "white", height: "50px", backgroundColor: "#243642" }}
