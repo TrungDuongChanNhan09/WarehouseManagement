@@ -510,7 +510,7 @@ export default class ApiService {
     }
     static async updateOrderStatus(id, formData) {
         try {
-            const response = await axios.put(`${this.BASE_URL}/api/admin/order/updateOrderStatus/${id}`, formData, {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/order/updateOrderState/${id}`, formData, {
                 headers: this.getHeader(),
                 'Content-Type': 'application/json' 
             });

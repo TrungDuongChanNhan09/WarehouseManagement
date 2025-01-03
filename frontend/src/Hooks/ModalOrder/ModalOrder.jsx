@@ -118,7 +118,7 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
             quantity: item.quantity,
             totalPrice: item.totalPrice,
             orderItemState: item.orderItemState,
-            shelfCode: item.shelf ? [item.shelf] : [], // Ensure shelfCode is set correctly
+            shelfCode: item.shelf ? [item.shelf] : [],
           };
   
           // Log the order item data before submitting
@@ -185,7 +185,7 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
           }}
         >
           <Typography variant="h6" sx={{ marginBottom: 2 }}>
-            Thêm hoặc Chỉnh sửa Đơn Hàng
+            Thêm Đơn Hàng
           </Typography>
           <Stack direction="row" spacing={4} sx={{ flexWrap: "wrap" }}>
             <Box sx={{ width: "100%", md: "50%", marginBottom: 2 }}>
@@ -301,9 +301,18 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
                             <TableCell>{product.price} VND</TableCell>
                             <TableCell>{product.inventory_quantity}</TableCell>
                             <TableCell>
-                              <Button variant="contained" color="primary" onClick={() => handleAddOrderItem(product)}>
-                                Thêm
-                              </Button>
+                            <Button
+                              variant="contained"
+                              onClick={() => handleAddOrderItem(product)}
+                              sx={{
+                                backgroundColor: "#243642",
+                                "&:hover": {
+                                  backgroundColor: "#1c2b35",
+                                },
+                              }}
+                            >
+                              Thêm
+                            </Button>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -316,8 +325,29 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
 
           <Stack direction="row" spacing={2} sx={{ justifyContent: "flex-end", mt: 3 }}>
             <Typography variant="h6">Tổng cộng: {totalAmount} VND</Typography>
-            <Button variant="contained" color="primary" onClick={handleSubmitOrder}>
-              Xác nhận
+            <Button
+              variant="contained"
+              onClick={handleCloseModal}
+              sx={{
+                backgroundColor: "#c62828", 
+                '&:hover': {
+                  backgroundColor: "#b71c1c", 
+                },
+              }}
+            >
+              Đóng
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSubmitOrder}
+              sx={{
+                backgroundColor: "#243642", 
+                '&:hover': {
+                  backgroundColor: "#1c2b35", 
+                },
+              }}
+            >
+              Thêm
             </Button>
           </Stack>
         </Box>

@@ -89,21 +89,10 @@ const ExportShipment = () => {
   };
 
   const handleModalSubmit = () => {
-    if (editingShipment) {
-      console.log("Updating shipment:", editingShipment);
-      ApiService.updateExport(editingShipment.id, editingShipment)
-        .then(() => {
-          console.log("Shipment updated successfully.");
-          setOpenModal(false); // Close modal after update
-          setEditingShipment(null); // Reset editing shipment
-          fetchExportShipments(); // Reload shipment list
-        })
-        .catch((error) => console.error("Error updating shipment:", error));
-    } else {
-      console.log("New shipment created successfully");
-      setOpenModal(false);
-    }
+    setOpenModal(false);
+    fetchExportShipments();
   };
+  
 
   // Function to fetch order details by order code
   const fetchOrderDetails = async (orderCode) => {
@@ -203,7 +192,8 @@ const ExportShipment = () => {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
-              <TableCell>ID</TableCell>
+              <TableCell>STT</TableCell>
+              <TableCell sx={{ display: "none" }}>ID</TableCell>
               <TableCell>Địa chỉ xuất hàng</TableCell>
               <TableCell>Trạng thái</TableCell>
               <TableCell>Ngày tạo</TableCell>
@@ -213,7 +203,7 @@ const ExportShipment = () => {
           </TableHead>
           <TableBody>
             {filteredExportShipments.length > 0 ? (
-              filteredExportShipments.map((shipment) => (
+             filteredExportShipments.map((shipment, index) => (
                 <React.Fragment key={shipment.id}>
                   <TableRow>
                     <TableCell>
@@ -221,11 +211,16 @@ const ExportShipment = () => {
                         {expandedShipmentId === shipment.id ? <ExpandLess /> : <ExpandMore />}
                       </IconButton>
                     </TableCell>
-                    <TableCell>{shipment.id}</TableCell>
+                    <TableCell>{index + 1}</TableCell> 
+                    <TableCell sx={{ display: "none" }}>{shipment.id}</TableCell>
                     <TableCell>{shipment.export_address || "Chưa có địa chỉ"}</TableCell>
                     <TableCell>{shipment.exportState || "Chưa có trạng thái"}</TableCell>
                     <TableCell>{new Date(shipment.createdAt).toLocaleDateString("en-GB") || "Chưa có ngày tạo"}</TableCell>
-                    <TableCell>{shipment.updatedAt || "Chưa có ngày cập nhật"}</TableCell>
+                    <TableCell>
+                      {shipment.updatedAt ? 
+                        new Date(shipment.updatedAt).toLocaleDateString('en-GB') : 
+                        "Chưa có ngày cập nhật"}
+                    </TableCell>
                     <TableCell>
                       <IconButton onClick={() => handleOpenModal(shipment)}>
                         <Edit />
