@@ -519,6 +519,17 @@ export default class ApiService {
             throw error;  
         }
     }
+    static async updateOrderState(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/order/updateOrderStatus/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
     static async getProduct() {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/product`, {
