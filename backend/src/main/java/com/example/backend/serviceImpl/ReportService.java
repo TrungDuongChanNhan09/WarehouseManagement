@@ -3,6 +3,7 @@ package com.example.backend.serviceImpl;
 import com.example.backend.model.Report;
 import com.example.backend.repository.ReportRepository;
 import com.example.backend.request.ReportRequest;
+import com.example.backend.request.ReportStatusRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,5 +70,15 @@ public class ReportService implements com.example.backend.service.ReportService 
     @Override
     public List<Report> getReportByUsername(String username) {
         return reportRepository.findByuserName(username);
+    }
+
+    @Override
+    public Report updateReportStatus(String reportId, ReportStatusRequest request) throws Exception {
+        Report report = reportRepository.findById(reportId).orElse(null);
+        if(report == null){
+            throw new Exception("Report is not found");
+        }
+        report.setReportStatus(request.getReportStatus());
+        return reportRepository.save(report);
     }
 }

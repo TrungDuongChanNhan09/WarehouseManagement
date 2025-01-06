@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.model.Report;
 import com.example.backend.request.ReportRequest;
+import com.example.backend.request.ReportStatusRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,4 +14,5 @@ public interface ReportService {
     List<Report> getAllReport();
     void deleteReport(String reportId);
     List<Report> getReportByUsername(String username);
+    Report updateReportStatus(String reportId, ReportStatusRequest request) throws Exception;
 }

@@ -3,6 +3,7 @@ package com.example.backend.serviceImpl;
 import com.example.backend.config.JwtProvider;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.request.ChangePasswordRequest;
 import com.example.backend.request.LoginRequest;
 import com.example.backend.request.UserAccountRequest;
 import com.example.backend.request.UserInforRequest;
@@ -15,6 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+
 @Service
 public class UserService implements com.example.backend.service.UserService {
     @Autowired
@@ -84,6 +87,19 @@ public class UserService implements com.example.backend.service.UserService {
         authRespone.setRole(savedUser.getRole());
         authRespone.setMessage("Create Success");
         return authRespone;
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest changePasswordRequest, User user) throws Exception {
+        if(passwordEncoder.matches(changePasswordRequest.getOldPass(), user.getPassword())){
+            if(changePasswordRequest.getNewPass().equals(changePasswordRequest.getOldPass())){
+                throw new Exception("Old pass and new pass must different");
+            }
+            user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPass()));
+            userRepository.save(user);
+        } else {
+            throw new Exception("Password is incorrect....");
+        }
     }
 
 
