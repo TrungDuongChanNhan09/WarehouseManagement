@@ -19,6 +19,7 @@ import AssignmentTurnedInOutlined from "@mui/icons-material/AssignmentTurnedInOu
 import { BarChart } from '@mui/x-charts/BarChart';
 
 import ApiService from "../../Service/ApiService.jsx";
+import { roRO } from "@mui/x-date-pickers/locales";
 
 const chartSetting = {
     xAxis: [
@@ -149,14 +150,14 @@ const DashBoard = () => {
                 
                 >
                 <Typography 
-                    sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"200px"}} 
+                    sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"300px"}} 
                     variant="p">
                         Tổng quan
                     </Typography>
 
                 <Stack  sx={{backgroundColor: "#E2F1E7",padding:"1rem", borderRadius:"0.5rem"}} className="overview" direction="row" spacing={2}>
                     <LocalizationProvider dateAdapter={AdapterDayjs} >
-                        <DateCalendar sx={{backgroundColor: "white", borderRadius:"0.5rem"}} />
+                        <DateCalendar sx={{backgroundColor: "white", borderRadius:"0.5rem", height:"300px"}} />
                     </LocalizationProvider>
                     <Stack 
                         flexWrap="wrap" 
@@ -215,6 +216,32 @@ const DashBoard = () => {
                         </Stack>
                     </Stack>
                 </Stack>
+                <Stack justifyContent={"space-between"} sx={{backgroundColor: "#E2F1E7",borderRadius:"0.5rem", padding:"1rem"}} direction={"row"}>
+                      <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
+                        <WorkHistoryOutlined sx={{fontSize:"30px"}}/>
+                        <Typography 
+                        sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
+                        variant="p">
+                            Tổng doanh thu: 0
+                        </Typography>
+                    </Stack>
+                      <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px",margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
+                        <WorkHistoryOutlined sx={{fontSize:"30px"}}/>
+                        <Typography 
+                        sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
+                        variant="p">
+                            Tổng lô hàng xuất: 0
+                        </Typography>
+                    </Stack>
+                      <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px",margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
+                        <WorkHistoryOutlined sx={{fontSize:"30px"}}/>
+                        <Typography 
+                        sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
+                        variant="p">
+                            Tổng lô hàng nhập: 0
+                        </Typography>
+                    </Stack>
+                </Stack>
                 <Typography 
                     sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"200px"}} 
                     variant="p" 
@@ -234,3 +261,4 @@ const DashBoard = () => {
     )
 }
 export default DashBoard
+

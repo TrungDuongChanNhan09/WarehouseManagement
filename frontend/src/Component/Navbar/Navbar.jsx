@@ -15,6 +15,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import SpaceDashboardOutlinedIcon from '@mui/icons-material/SpaceDashboardOutlined';
 import AssignmentIndOutlinedIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CorporateFareOutlinedIcon from '@mui/icons-material/CorporateFareOutlined';
+import MarkChatUnreadOutlinedIcon from '@mui/icons-material/MarkChatUnreadOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import InputRoundedIcon from '@mui/icons-material/InputRounded';
 import BusinessIcon from '@mui/icons-material/Business';
@@ -53,7 +54,6 @@ const Navbar = () => {
 
                 <Stack sx={{width: "100%",padding: "0.7rem"}}>
                     <Stack>
-                    
                         <BottomNavigation
                             value={value}
                             onChange={handleChange}
@@ -79,7 +79,7 @@ const Navbar = () => {
                                     display: "flex",
                                     flexDirection: "row",
                                     justifyContent: "flex-start", 
-                                    marginTop: "3.5rem",
+                                    marginTop: "10rem",
                                     padding: "0.5rem",
                                     fontSize: "24px",
                                     flexGrow: 1,
@@ -239,7 +239,7 @@ const Navbar = () => {
                              {(role === "ROLE_ADMIN") && (
                             <BottomNavigationAction
                                 showLabel={true}
-                                label="Import Shipment"
+                                label="ImportShipment"
                                 value="importshipment"
                                 icon={<InputRoundedIcon />}
                                 onClick={() => navigate("/app/importshipment")}
@@ -293,6 +293,30 @@ const Navbar = () => {
                                 value="supplier"
                                 icon={<BusinessIcon />}
                                 onClick={() => navigate("/app/supplier")} 
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    flexGrow: 1,
+                                    justifyContent: "flex-start",
+                                    marginTop: "1rem",
+                                    padding: "0.5rem",
+                                    fontSize: "24px",
+                                    textAlign: "left",
+                                    "& .MuiSvgIcon-root": {
+                                        fontSize: "24px",
+                                        marginRight: "10px",
+                                    },
+                                    "& .MuiBottomNavigationAction-label": {
+                                        fontSize: "16px", 
+                                    },
+                                }}
+                            />
+                            <BottomNavigationAction
+                                showLabel={true}
+                                label="Report"
+                                value="report"
+                                icon={<MarkChatUnreadOutlinedIcon />}
+                                onClick={() => navigate("/app/report")} 
                                 sx={{
                                     display: "flex",
                                     flexDirection: "row",
