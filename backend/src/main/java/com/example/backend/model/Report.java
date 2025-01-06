@@ -15,4 +15,5 @@ public class Report {
     private LocalDate createdAt;
     private LocalDate updatedAt;
     private REPORT_PRIORITY reportPriority;
+    private REPORT_STATUS reportStatus = REPORT_STATUS.PENDING;
 }
