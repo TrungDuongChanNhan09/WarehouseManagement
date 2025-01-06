@@ -125,6 +125,7 @@ function valueFormatter(value) {
 const DashBoard = () => {
     const [quantityProduct, setQuantityProduct] = useState([]);
     const [totalProduct, setTotalProduct] = useState(0);
+    const [orders, setOrders] = useState([])
     const fetchQuantityProduct = async () => {
       try {
         const response = await ApiService.getAllQuantityProduct();
@@ -135,8 +136,18 @@ const DashBoard = () => {
       }
     };
 
+    const fetchOrder = async() => {
+      try{
+        const response = await ApiService.getAllOrders();
+        setOrders(response);
+      }catch (error){
+        console.error("Lỗi khi tải thông tin các đơn hàng", error.message);
+      }
+    }
+
     useEffect(() => {
       fetchQuantityProduct();
+      fetchOrder();
     }, []);
     return(
         <Container maxWidth="xl" className="Dashboard" sx={{ width: "100%" , height: "100%", display: "flex", flexDirection: "column" }}>
@@ -216,7 +227,8 @@ const DashBoard = () => {
                         </Stack>
                     </Stack>
                 </Stack>
-                <Stack justifyContent={"space-between"} sx={{backgroundColor: "#E2F1E7",borderRadius:"0.5rem", padding:"1rem"}} direction={"row"}>
+
+                <Stack justifyContent={"center"} sx={{backgroundColor: "#E2F1E7",borderRadius:"0.5rem", padding:"1rem"}} direction={"row"}>
                       <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
                         <WorkHistoryOutlined sx={{fontSize:"30px"}}/>
                         <Typography 
@@ -242,6 +254,7 @@ const DashBoard = () => {
                         </Typography>
                     </Stack>
                 </Stack>
+
                 <Typography 
                     sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"200px"}} 
                     variant="p" 

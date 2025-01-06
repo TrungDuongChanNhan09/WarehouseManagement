@@ -10,6 +10,7 @@ import {
     Stack,
     Button,
     Table,
+    Select,
     TableBody,
     TableCell,
     TableContainer,
@@ -20,7 +21,7 @@ import {
     MenuItem,
     IconButton,
     Snackbar,  // Add Snackbar for notifications
-    Alert,  // Add Alert for Snackbar content
+    Alert,  // Add Alert for Snackbar content, 
   } from "@mui/material";
   import MoreVertIcon from "@mui/icons-material/MoreVert";
   import ApiService from "../../Service/ApiService";
@@ -31,7 +32,8 @@ const columns = [
     { id: "title", label: "Chủ đề", maxWidth: 100 },
     { id: "description", label: "Mô tả", maxWidth: 140 },
     { id: "userName", label: "Người tạo", maxWidth: 140 },
-    { id: "reportPriority", label: "Mức ưu tiên", minWidth: 140 },
+    { id: "reportStatus", label: "Trạng thái", maxWidth: 140 },
+    { id: "reportPriority", label: "Mức ưu tiên", minWidth: 120 },
     { id: "createdAt", label: "Ngày tạo", maxWidth: 100 },
 ];
   
@@ -202,6 +204,28 @@ const TableReport = ({valueReport}) =>{
                         }
                         // disabled
                     />
+
+                    {/* <TextField
+                        label="Trạng thái"
+                        value={editData.reportStatus || ""}
+                        onChange={(e) =>
+                        setEditData({ ...editData, reportStatus: e.target.value })
+                        }
+                        // disabled
+                    /> */}
+
+                <Select
+                    label="Trạng thái"
+                    value={editData.reportStatus}
+                    onChange={(e) =>
+                        setEditData({ ...editData, reportStatus: e.target.value })
+                    }
+                >
+                    <MenuItem value="PENDING">PENDING</MenuItem>
+                    <MenuItem value="IN_PROCESS">IN_PROCESS</MenuItem>
+                    <MenuItem value="PROCESSED">PROCESSED</MenuItem>
+                </Select>
+
                     <TextField
                         label="Mức ưu tiên"
                         value={editData.reportPriority || ""}
@@ -219,7 +243,7 @@ const TableReport = ({valueReport}) =>{
                         // disabled
                     />
 
-                {role === "ROLE_STAFF" && (
+                {/* {role === "ROLE_STAFF" && ( */}
 
                     <Stack direction="row" spacing={2} justifyContent="flex-end">
                         <Button onClick={() => setIsEditModalOpen(false)}>Hủy</Button>
@@ -230,7 +254,7 @@ const TableReport = ({valueReport}) =>{
                         Cập nhật
                         </Button>
                     </Stack>
-                )}
+                {/* )} */}
                     </Stack>
                 </Box>
                 </Fade>

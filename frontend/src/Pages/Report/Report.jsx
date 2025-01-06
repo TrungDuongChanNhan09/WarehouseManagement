@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import './Report.css'
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar";
 
-import { Container, Stack, Typography, TextField, Button, Modal, Fade, Box, Snackbar, Alert, Select, Menu, MenuItem} from "@mui/material";
+import { Container, FormControl, InputLabel,
+     Stack, Typography, TextField, Button, Modal, Fade, Box, Snackbar, Alert, Select, Menu, MenuItem} from "@mui/material";
 import TableReport from "../../Hooks/TableReport.jsx/TableReport";
 import { useScatterChartProps } from "@mui/x-charts/internals";
 import ApiService from "../../Service/ApiService.jsx";
@@ -30,7 +31,7 @@ const Report = () => {
     const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Severity type (success, error, etc.)
     const [newReportData, setNewReportData] = useState({
         title: "",
-        userName: "", 
+        // userName: "", 
         description: "",
         reportPriority: "",
         createdAt: "",
@@ -171,16 +172,16 @@ const Report = () => {
                         setNewReportData({ ...newReportData, reportPriority: e.target.value })
                     }
                 /> */}
-                <TextField
+                {/* <TextField
                     label="Người tạo"
                     value={newReportData.userName}
                     onChange={(e) =>
                         setNewReportData({ ...newReportData, userName: e.target.value })
                     }
-                />
+                /> */}
 
 
-                <Select
+                {/* <Select
                     label="Mức ưu tiên"
                     value={newReportData.reportPriority}
                     onChange={(e) =>
@@ -190,7 +191,24 @@ const Report = () => {
                     <MenuItem value="LOW">LOW</MenuItem>
                     <MenuItem value="MEDIUM">MEDIUM</MenuItem>
                     <MenuItem value="HIGH">HIGH</MenuItem>
-                </Select>
+                </Select> */}
+
+<FormControl fullWidth>
+    <InputLabel id="report-priority-label">Mức ưu tiên</InputLabel>
+    <Select
+        labelId="report-priority-label" // Liên kết với InputLabel
+        id="report-priority"           // ID cần có để liên kết
+        value={newReportData.reportPriority}
+        onChange={(e) =>
+            setNewReportData({ ...newReportData, reportPriority: e.target.value })
+        }
+    >
+        <MenuItem value="LOW">LOW</MenuItem>
+        <MenuItem value="MEDIUM">MEDIUM</MenuItem>
+        <MenuItem value="HIGH">HIGH</MenuItem>
+    </Select>
+</FormControl>
+
                 <TextField
                     label="Ngày tạo"
                     value={newReportData.createdAt}
