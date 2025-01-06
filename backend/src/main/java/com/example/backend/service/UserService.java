@@ -3,6 +3,7 @@ package com.example.backend.service;
 import java.util.List;
 
 import com.example.backend.model.User;
+import com.example.backend.request.ChangePasswordRequest;
 import com.example.backend.request.UserAccountRequest;
 import com.example.backend.request.UserInforRequest;
 import com.example.backend.respone.AuthRespone;
@@ -17,5 +18,7 @@ public interface UserService {
     public User updateUserInformation(UserInforRequest userInforRequest, User user);
 
     public AuthRespone createUserAccount(UserAccountRequest userAccountRequest) throws Exception;
+
+    public void changePassword(ChangePasswordRequest changePasswordRequest, User user) throws Exception;
 
 }

@@ -101,6 +101,15 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
     fetchOrderData();
   }, [selectedOrder]);
   
+  const updateOrderState = async (orderId, newState) => {
+    try {
+      // Gọi API để cập nhật trạng thái đơn hàng
+      const response = await ApiService.updateOrderState(orderId, { orderState: newState });
+      console.log("Order state updated successfully:", response);
+    } catch (error) {
+      console.error("Error updating order state:", error.message);
+    }
+  };
   
   
   useEffect(() => {
@@ -206,7 +215,10 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
           console.error(`Error processing order item ${item.orderItemCode}:`, error.message);
         }
       }
-  
+      const updatedOrder = {
+        ...orderDetails, 
+        orderState: orderDetails.orderState, 
+      };
       // Prepare the order data to be sent
       const currentTime = new Date().toISOString();
       const orderData = {
@@ -219,6 +231,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
   
       // Submit the order update
       if (selectedOrder.id) {
+        await updateOrderState(selectedOrder.id, orderDetails.orderState);
         await ApiService.updateOrder(selectedOrder.id, orderData);
       } else {
         console.error("No selected order to update.");
@@ -280,27 +293,27 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
                 }
                 sx={{ marginBottom: 2 }}
               />
-              <TextField
-                fullWidth
-                select
-                label="Trạng thái"
-                value={orderDetails.orderState}
-                onChange={(e) => {
-                  const selectedStatus = e.target.value;
-                  const mappedStatus = selectedStatus === "Đang chờ" ? "PENDING" : "DELIVERED";
-                  setOrderDetails({ ...orderDetails, orderState: mappedStatus });
-                }}
-                sx={{ marginBottom: 2 }}
-              >
-                {[
-                  { label: "Đang chờ", value: "PENDING" },
-                  { label: "Đã giao", value: "DELIVERED" }
-                ].map((status) => (
+             <TextField
+              fullWidth
+              select
+              label="Trạng thái"
+              value={orderDetails.orderState}
+              onChange={(e) => {
+                const selectedStatus = e.target.value;
+                setOrderDetails({
+                  ...orderDetails,
+                  orderState: selectedStatus,
+                });
+              }}
+            >
+              {[{ label: "Đang chờ", value: "PENDING" }, { label: "Đã giao", value: "DELIVERED" }].map(
+                (status) => (
                   <MenuItem key={status.value} value={status.value}>
                     {status.label}
                   </MenuItem>
-                ))}
-              </TextField>
+                )
+              )}
+            </TextField>
               {orderItems.length > 0 && (
                <Box sx={{ maxHeight: 400, overflowY: "auto" }}>
                <TableContainer>

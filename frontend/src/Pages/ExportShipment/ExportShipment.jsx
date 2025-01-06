@@ -214,7 +214,12 @@ const ExportShipment = () => {
                     <TableCell>{index + 1}</TableCell> 
                     <TableCell sx={{ display: "none" }}>{shipment.id}</TableCell>
                     <TableCell>{shipment.export_address || "Chưa có địa chỉ"}</TableCell>
-                    <TableCell>{shipment.exportState || "Chưa có trạng thái"}</TableCell>
+                    <TableCell>
+                      {shipment.exportState === "PENDING" ? "Đang chờ" : 
+                      shipment.exportState === "DELIVERED" ? "Đã giao" : 
+                      shipment.exportState || "Chưa có trạng thái"}
+                    </TableCell>
+
                     <TableCell>{new Date(shipment.createdAt).toLocaleDateString("en-GB") || "Chưa có ngày tạo"}</TableCell>
                     <TableCell>
                       {shipment.updatedAt ? 
@@ -245,8 +250,8 @@ const ExportShipment = () => {
                                 <TableRow>
                                   <TableCell>Order Code</TableCell>
                                   <TableCell>Địa chỉ</TableCell>
-                                  <TableCell>Trạng thái</TableCell>
                                   <TableCell>Ngày tạo</TableCell>
+                                  <TableCell>Tổng giá</TableCell>
                                 </TableRow>
                               </TableHead>
                               <TableBody>
@@ -259,8 +264,12 @@ const ExportShipment = () => {
                                         {expandedShipmentOrders[orderCode] ? (
                                           <>
                                             <TableCell>{expandedShipmentOrders[orderCode].delivery_Address}</TableCell>
-                                            <TableCell>{expandedShipmentOrders[orderCode].orderStatus}</TableCell>
                                             <TableCell>{new Date(expandedShipmentOrders[orderCode].created_at).toLocaleDateString()}</TableCell>
+                                            <TableCell>
+                                            {expandedShipmentOrders[orderCode].orderPrice ? 
+                                              expandedShipmentOrders[orderCode].orderPrice : 
+                                              "Chưa có giá đơn hàng"}
+                                          </TableCell>
                                           </>
                                         ) : (
                                           <TableCell colSpan={3}>Đang tải thông tin đơn hàng...</TableCell>

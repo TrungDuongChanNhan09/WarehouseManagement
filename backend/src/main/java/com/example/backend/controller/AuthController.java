@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.example.backend.model.Category;
+import com.example.backend.request.ChangePasswordRequest;
 import com.example.backend.serviceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -107,6 +108,13 @@ public class AuthController {
         user.setStatus("off");
         userRepository.save(user);
         return new ResponseEntity<>("Successfully logged out", HttpStatus.OK);
+    }
+
+    @PutMapping("/changePass")
+    public ResponseEntity<String> changePass(@RequestHeader("Authorization") String jwt, @RequestBody ChangePasswordRequest changePasswordRequest) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        userService.changePassword(changePasswordRequest, user);
+        return new ResponseEntity<>("Change password successfully", HttpStatus.OK);
     }
 
     private Authentication authenticate(String username, String password) {
