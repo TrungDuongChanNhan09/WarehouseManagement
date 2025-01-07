@@ -3,6 +3,7 @@ package com.example.backend.serviceImpl;
 import com.example.backend.model.Category;
 import com.example.backend.model.Product;
 import com.example.backend.model.Supplier;
+import com.example.backend.respone.ProductRespone;
 import com.example.backend.serviceImpl.ShelfService;
 
 import com.example.backend.repository.CategoryRepository;
@@ -30,8 +31,30 @@ public class ProductService implements com.example.backend.service.ProductServic
     @Autowired
     private SupplierRepository supplierRepository;
     @Override
-    public List<Product> getAllProduct() {
-        return productRepository.findAll();
+    public List<ProductRespone> getAllProduct() {
+        List<ProductRespone> productRespones = new ArrayList<>();
+        for(Product i : productRepository.findAll()){
+            ProductRespone productRespone = new ProductRespone();
+            Category category = categoryRepository.findById(i.getCategoryId()).orElse(null);
+            Supplier supplier = supplierRepository.findById(i.getSupplierId()).orElse(null);
+            productRespone.setProduction_date(i.getProduction_date());
+            productRespone.setProductName(i.getProductName());
+            productRespone.setDescription(i.getDescription());
+            productRespone.setImage(i.getImage());
+            productRespone.setUnit(i.getUnit());
+            productRespone.setPrice(i.getPrice());
+            productRespone.setInventory_quantity(i.getInventory_quantity());
+            productRespone.setExpiration_date(i.getExpiration_date());
+            productRespone.setCategoryId(i.getCategoryId());
+            productRespone.setSupplierId(i.getSupplierId());
+            productRespone.setStatus(i.getProductStatus());
+            productRespone.setProductId(i.getId());
+            productRespone.setSupplierName(supplier.getNameSupplier());
+            productRespone.setCategoryName(category.getCategoryName());
+            productRespones.add(productRespone);
+        }
+
+        return productRespones;
     }
 
     @Override
