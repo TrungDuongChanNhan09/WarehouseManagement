@@ -15,7 +15,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Snackbar, Alert
 } from "@mui/material";
 import ApiService from "../../Service/ApiService.jsx";
 
@@ -25,6 +26,10 @@ const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
   const [exportAddress, setExportAddress] = useState("");
   const [exportState, setExportState] = useState("PENDING");
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+
 
   useEffect(() => {
     // Fetch all orders for selection
@@ -143,40 +148,66 @@ const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
   const handleSubmit = async () => {
     if (selectedOrderIds.length === 0) {
       console.error("No orders selected, cannot submit export.");
-      return; // Prevent submission if no orders are selected
+      setSnackbarMessage("Vui lòng chọn ít nhất một đơn hàng.");
+      setSnackbarSeverity("warning");
+      setOpenSnackbar(true);
+      return;
     }
   
-    // Hàm để chỉ lấy ngày theo định dạng "YYYY-MM-DD"
-    const getDateOnly = (date) => date.toISOString().split('T')[0];
+    const getDateOnly = (date) => date.toISOString().split("T")[0];
   
-    // Prepare the new export data
     const newExport = {
-      orderCode: selectedOrderIds, // Đảm bảo orderCode là một mảng với đúng thứ tự
-      exportState: exportState, // Trạng thái xuất hàng
-      export_address: exportAddress, // Địa chỉ xuất hàng
-      created_at: shipment ? getDateOnly(new Date(shipment.createdAt)) : getDateOnly(new Date()), // Giữ nguyên created_at nếu có shipment, hoặc lấy ngày hiện tại
-      updated_at: getDateOnly(new Date()), // Cập nhật updated_at là thời gian hiện tại (ngày)
+      orderCode: selectedOrderIds,
+      exportState: exportState,
+      export_address: exportAddress,
+      created_at: shipment ? getDateOnly(new Date(shipment.createdAt)) : getDateOnly(new Date()),
+      updated_at: getDateOnly(new Date()),
     };
-  
-    // Log the export data before submitting
-    console.log("Export Data to be submitted:", newExport);
   
     try {
       let response;
       if (shipment) {
-        // Nếu có shipment (cập nhật), giữ nguyên created_at và chỉ cập nhật updated_at
         response = await ApiService.updateExport(shipment.id, newExport);
-        console.log("Update");
+        setSnackbarMessage("Cập nhật xuất hàng thành công!");
       } else {
-        // Nếu không có shipment (tạo mới), tạo mới với dữ liệu hiện tại
         response = await ApiService.addExport(newExport);
-        console.log("Add");
+        setSnackbarMessage("Tạo xuất hàng mới thành công!");
       }
-      console.log("Export Response:", response);
-      onSubmit(); 
-      onClose(); 
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+      onSubmit();
+      onClose();
     } catch (error) {
       console.error("Lỗi khi tạo hoặc cập nhật xuất hàng:", error);
+      setSnackbarMessage("Đã xảy ra lỗi khi tạo hoặc cập nhật xuất hàng.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+    }
+  };
+  
+  const handleUpdateExportState = async (newState) => {
+    if (!shipment || !shipment.id) {
+      console.error("Không thể cập nhật trạng thái: thiếu thông tin xuất hàng.");
+      setSnackbarMessage("Không thể cập nhật trạng thái: thiếu thông tin xuất hàng.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+      return;
+    }
+  
+    try {
+      const updatedExport = {
+        exportState: newState, 
+      };
+      await ApiService.updateExportState(shipment.id, updatedExport);
+      setExportState(newState); // Cập nhật trạng thái trong UI
+      setSnackbarMessage("Cập nhật trạng thái xuất hàng thành công!");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái xuất hàng:", error);
+      setSnackbarMessage("Đã xảy ra lỗi khi cập nhật trạng thái xuất hàng.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
     }
   };
   
@@ -238,11 +269,14 @@ const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
               <InputLabel>Trạng Thái Xuất Hàng</InputLabel>
               <Select
                 value={exportState}
-                onChange={(e) => setExportState(e.target.value)}
+                onChange={(e) => {
+                  const newState = e.target.value;
+                  handleUpdateExportState(newState); // Gọi API khi thay đổi trạng thái
+                }}
               >
                 <MenuItem value="PENDING">Chờ xử lý</MenuItem>
-                <MenuItem value="IN_PROGRESS">Đang xử lý</MenuItem>
-                <MenuItem value="COMPLETED">Hoàn thành</MenuItem>
+                <MenuItem value="ON_GOING">Đang giao</MenuItem>
+                <MenuItem value="CONFIRMED">Đã xác nhận</MenuItem>
               </Select>
             </FormControl>
           )}
@@ -283,6 +317,16 @@ const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
               </TableBody>
             </Table>
           </Paper>
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={4000}
+            onClose={() => setOpenSnackbar(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          >
+            <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: "100%" }}>
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
 
           {/* Submit Button */}
           <Box sx={{ marginTop: "2rem", textAlign: "right" }}>

@@ -18,6 +18,8 @@ import {
   DialogContent,
   DialogActions,
   IconButton,
+  Snackbar, 
+  Alert
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import AppBarMenu from "../../Component/AppBar/AppBar";
@@ -32,7 +34,15 @@ const Category = () => {
   const [newCategory, setNewCategory] = useState({ categoryName: "", description: "" });
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // Confirmation dialog state
   const [categoryToDelete, setCategoryToDelete] = useState(null); // To store category ID to delete
-
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success", 
+  });
+  
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };
   // Fetch categories from API
   const fetchCategories = async () => {
     try {
@@ -47,38 +57,37 @@ const Category = () => {
     fetchCategories();
   }, []);
 
-  // Add a new category
   const handleAddCategory = async () => {
     if (!newCategory.categoryName || !newCategory.description) {
-      alert("Vui lòng nhập đầy đủ thông tin!");
+      showSnackbar("Vui lòng nhập đầy đủ thông tin!", "error");
       return;
     }
     try {
       await ApiService.addCategory(newCategory);
       setNewCategory({ categoryName: "", description: "" });
-      fetchCategories(); // Refresh list
+      fetchCategories();
       setOpenDialog(false);
+      showSnackbar("Thêm danh mục thành công!", "success");
     } catch (error) {
       console.error("Lỗi khi thêm danh mục:", error);
+      showSnackbar("Lỗi khi thêm danh mục. Vui lòng thử lại.", "error");
     }
   };
-
-  // Delete a category
   const handleDeleteCategory = async () => {
     if (!categoryToDelete) {
-      console.log("No category selected for deletion:", categoryToDelete);
+      console.log("Không có danh mục được chọn để xóa.");
       return;
     }
     try {
       await ApiService.deleteCategory(categoryToDelete);
-      fetchCategories();
-      setOpenConfirmDialog(false); 
+      fetchCategories(); // Làm mới danh sách
+      setOpenConfirmDialog(false);
+      showSnackbar("Xóa danh mục thành công!", "success");
     } catch (error) {
       console.error("Lỗi khi xóa danh mục:", error);
-      alert("Xóa danh mục không thành công, vui lòng thử lại!");
+      showSnackbar("Xóa danh mục thất bại. Vui lòng thử lại.", "error");
     }
   };
-
   const filteredCategories = categories.filter((category) =>
     category.categoryName.toLowerCase().includes(search.toLowerCase())
   );
@@ -209,6 +218,22 @@ const Category = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+      open={snackbar.open}
+      autoHideDuration={3000}
+      onClose={() => setSnackbar({ ...snackbar, open: false })}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    >
+      <Alert
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        severity={snackbar.severity}
+        sx={{ width: "100%" }}
+      >
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
+
     </Container>
   );
 };

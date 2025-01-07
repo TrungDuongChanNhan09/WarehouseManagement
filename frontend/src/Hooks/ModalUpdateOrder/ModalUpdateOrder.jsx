@@ -14,6 +14,8 @@ import {
   TableHead,
   TableRow,
   MenuItem,
+  Snackbar, SnackbarContent,
+  Alert,
 } from "@mui/material";
 import ApiService from "../../Service/ApiService";
 
@@ -32,6 +34,9 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
   const [orderItems, setOrderItems] = useState([]);
   const [products, setProducts] = useState([]);
   const [shelves, setShelves] = useState([]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [searchQuery, setSearchQuery] = useState("");
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -63,12 +68,9 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
   
             // Lấy thông tin kệ cho sản phẩm này
             const shelvesResponse = await ApiService.getShelfByProductName(fetchedProduct.productName);
-            console.log(`6. Fetched Shelves for Product ${fetchedProduct.productName}:`, shelvesResponse);
-  
             // Kiểm tra nếu có kệ và lấy mã kệ
             if (Array.isArray(shelvesResponse) && shelvesResponse.length > 0) {
               const shelfCodes = shelvesResponse.map(shelf => shelf || "Unknown Shelf");
-              console.log(`7. Shelf Codes for Product ${fetchedProduct.productName}:`, shelfCodes);
   
               productDetails.push({
                 ...fetchedOrderItems,
@@ -78,7 +80,6 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
                 product_id: fetchedOrderItems.product_id,
               });
             } else {
-              console.log(`8. No shelves found for Product ${fetchedProduct.productName}`);
               productDetails.push({
                 ...fetchedOrderItems,
                 productName: fetchedProduct.productName,
@@ -101,22 +102,11 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
     fetchOrderData();
   }, [selectedOrder]);
   
-  const updateOrderState = async (orderId, newState) => {
-    try {
-      // Gọi API để cập nhật trạng thái đơn hàng
-      const response = await ApiService.updateOrderState(orderId, { orderState: newState });
-      console.log("Order state updated successfully:", response);
-    } catch (error) {
-      console.error("Error updating order state:", error.message);
-    }
-  };
-  
-  
+ 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const products = await ApiService.getProduct();
-        console.log("asf fetching products");
         setProducts(products);
       } catch (error) {
         console.error("Error fetching products", error);
@@ -125,11 +115,12 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
   
     fetchProducts();
   }, []);
+
   const handleInputChange = (orderItemCode, field, value) => {
     setOrderItems((prevOrderItems) =>
       prevOrderItems.map((item) =>
         item.orderItemCode === orderItemCode
-          ? { ...item, [field]: value } // Cập nhật trường tương ứng
+          ? { ...item, [field]: value }
           : item
       )
     );
@@ -166,7 +157,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
               orderItemCode: `orderItem-${Date.now()}`, 
               shelfCode: shelfCodes,
               productPrice: product.price, 
-              productId: product.id, 
+              product_id: product.id, 
             },
           ]);
         }
@@ -177,49 +168,60 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
       console.error("Product not found for productId:", productId);
     }
   };
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
-
-  const handleSubmitOrder = async () => {
+  async function handleSubmitOrder() {
     try {
-      // Check if there are any order items
       if (!orderItems || orderItems.length === 0) {
         console.error("No items in the order. Please add items before submitting.");
+        setSnackbarSeverity('error');
+        setSnackbarMessage("Đơn hàng không có sản phẩm. Vui lòng thêm sản phẩm trước khi cập nhật.");
+        setSnackbarOpen(true);
         return;
       }
   
-      // Iterate over the order items and check each item
       for (const item of orderItems) {
         try {
-          // Check if the order item already exists by orderItemCode
           const existingItem = await ApiService.getOrderItemByCode(item.orderItemCode);
-          
+  
           if (!existingItem || !existingItem.orderItem_id) {
-            console.error(`No existing order item found with code: ${item.orderItemCode}. Cannot update.`);
-            return; // Return if the item is not found
+            const newItemData = {
+              product_id: item.product_id,
+              quantity: item.quantity || 0,
+              totalPrice: item.productPrice * item.quantity,
+              orderItemCode: item.orderItemCode,
+              orderItemState: "IN_ORDER",
+              shelfCode: item.shelfCode || [],
+            };
+  
+            // Log thông tin item khi tạo mới
+            console.log("Sending new order item data:", newItemData);
+            await ApiService.addOrderItem(newItemData);
+            console.log(`Created new order item: ${item.orderItemCode}`);
+          } else {
+            const updatedItemData = {
+              orderItem_id: existingItem.orderItem_id,
+              product_id: item.product_id,
+              quantity: item.quantity || 0,
+              totalPrice: item.productPrice * item.quantity,
+              orderItemCode: item.orderItemCode,
+              orderItemState: "IN_ORDER",
+              shelfCode: item.shelfCode || [],
+            };
+  
+            // Log thông tin item khi cập nhật
+            console.log("Sending updated order item data:", updatedItemData);
+            await ApiService.updateOrderItem(existingItem.orderItem_id, updatedItemData);
+            console.log(`Updated order item: ${item.orderItemCode}`);
           }
-  
-          // Prepare the order item data
-          const orderItemData = {
-            orderItem_id: existingItem.orderItem_id,
-            product_id: item.product_id,
-            quantity: item.quantity || 0,
-            totalPrice: item.productPrice * item.quantity,
-            orderItemCode: item.orderItemCode,
-            orderItemState: "IN_ORDER",
-            shelfCode: item.shelfCode || [],
-          };
-  
-          // Update the order item using the existing item ID
-          await ApiService.updateOrderItem(existingItem.orderItem_id, orderItemData);
         } catch (error) {
           console.error(`Error processing order item ${item.orderItemCode}:`, error.message);
         }
       }
-      const updatedOrder = {
-        ...orderDetails, 
-        orderState: orderDetails.orderState, 
-      };
-      // Prepare the order data to be sent
+  
+      // Cập nhật thông tin đơn hàng
       const currentTime = new Date().toISOString();
       const orderData = {
         orderItem_code: orderItems.map((item) => item.orderItemCode).filter(Boolean),
@@ -229,22 +231,39 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
         orderCode: orderDetails.orderCode || "N/A",
       };
   
-      // Submit the order update
+      console.log("Sending order data:", orderData);
+  
       if (selectedOrder.id) {
-        await updateOrderState(selectedOrder.id, orderDetails.orderState);
         await ApiService.updateOrder(selectedOrder.id, orderData);
+        console.log("Order details updated successfully.");
       } else {
         console.error("No selected order to update.");
+        setSnackbarSeverity('error');
+        setSnackbarMessage("Không có đơn hàng được chọn để cập nhật.");
+        setSnackbarOpen(true);
+        return;
       }
   
-      // Close the modal and reload the orders
+      // Cập nhật trạng thái đơn hàng bằng API riêng
+      const orderStatePayload = { state: orderDetails.orderState };
+      console.log("Sending order state update:", orderStatePayload);
+      await ApiService.updateOrderState(selectedOrder.id, orderStatePayload);
+      console.log("Order state updated successfully.");
+  
+      setSnackbarSeverity('success');
+      setSnackbarMessage('Cập nhật đơn hàng thành công');
+      setSnackbarOpen(true);
+  
       handleCloseModal();
-      reloadOrderItems(updatedOrder.id, updatedOrder.orderItemCodes);
+      reloadOrderItems(selectedOrder.id, orderData.orderItem_code);
       fetchOrders();
     } catch (error) {
-      console.error("Error preparing order data:", error.message);
+      console.error("Error updating order:", error.message);
+      setSnackbarSeverity('error');
+      setSnackbarMessage(error.message || "Có lỗi xảy ra khi cập nhật.");
+      setSnackbarOpen(true);
     }
-  };
+  }
   
   
   // Calculate total order price based on item quantities and prices
@@ -294,26 +313,30 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
                 sx={{ marginBottom: 2 }}
               />
              <TextField
-              fullWidth
-              select
-              label="Trạng thái"
-              value={orderDetails.orderState}
-              onChange={(e) => {
-                const selectedStatus = e.target.value;
-                setOrderDetails({
-                  ...orderDetails,
-                  orderState: selectedStatus,
-                });
-              }}
-            >
-              {[{ label: "Đang chờ", value: "PENDING" }, { label: "Đã giao", value: "DELIVERED" }].map(
-                (status) => (
+                fullWidth
+                select
+                label="Trạng thái"
+                value={orderDetails.orderState}
+                onChange={(e) => {
+                  const selectedStatus = e.target.value;
+                  setOrderDetails({
+                    ...orderDetails,
+                    orderState: selectedStatus,
+                  });
+                }}
+              >
+                {[
+                  { label: "Đang chờ", value: "PENDING" },
+                  { label: "Đang xử lý", value: "ON_GOING" },
+                  { label: "Đã giao", value: "DELIVERED" },
+                  { label: "Đã xác nhận", value: "CONFIRMED" },
+                ].map((status) => (
                   <MenuItem key={status.value} value={status.value}>
                     {status.label}
                   </MenuItem>
-                )
-              )}
-            </TextField>
+                ))}
+              </TextField>
+
               {orderItems.length > 0 && (
                <Box sx={{ maxHeight: 400, overflowY: "auto" }}>
                <TableContainer>
@@ -459,7 +482,19 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
               >
                 Cập nhật đơn hàng
               </Button>
-            
+              <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+              >
+                <Alert
+                  onClose={handleSnackbarClose}
+                  severity={snackbarSeverity}
+                  sx={{ width: '100%' }}
+                >
+                  {snackbarMessage}
+                </Alert>
+              </Snackbar>
             </Box>
           </Box>
         </Box>
