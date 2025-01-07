@@ -21,5 +21,5 @@ public class ProductRespone{
     private int price;
     private String supplierName;
     private String categoryName;
-    private PRODUCT_STATUS status;
+    private PRODUCT_STATUS productStatus;
 }

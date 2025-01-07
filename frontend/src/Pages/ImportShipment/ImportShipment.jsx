@@ -10,6 +10,7 @@ import ApiService from "../../Service/ApiService";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: 'black',
@@ -88,12 +89,13 @@ const style = {
 };
 
 export default function ImportShipment() {
-    const [filter, setFilter] = useState();
+    const [filterDate, setFilterDate] = useState();
     const [search, setSearch] = useState('');
     const [rows, setRows] = React.useState([]);
     const [listSupplier, setListSupplier] = React.useState([]);
     const [listProduct, setListProduct] = React.useState([]);
     const [shipmentItemsFields, setShipmentItemFields] = useState([{ id: Date.now() }]);
+    const [removeFilterVisible, setRemoveFilterVisible] = useState(false);
     const refInput = useRef({});
     const shipmentItemsFieldRefs = useRef({});
 
@@ -102,8 +104,8 @@ export default function ImportShipment() {
     }, []);
 
     useEffect(() => {
-        console.log('change filter ' + filter);
-    },[filter]);
+        console.log(filterDate);
+    }, [filterDate]);
 
     const handleChangeSupplier = async ({target}) => {
         refInput.current[target.name] = target.value;
@@ -117,11 +119,8 @@ export default function ImportShipment() {
         console.log(refInput);
     }
 
-    const handleFilterChange = (e) => {
-        setFilter(e.target.value);
-    };
-
     const [openModalAdd, setOpenModalAdd] = useState(false);
+
     const handleOpenModalAdd = async () => {
         setOpenModalAdd(true);
         setListSupplier(await ApiService.getAllSupplier());
@@ -129,6 +128,7 @@ export default function ImportShipment() {
         shipmentItemsFieldRefs.current = {};
         setShipmentItemFields([{ id: Date.now() }]);
     };
+
     const handleCloseModalAdd = () => setOpenModalAdd(false);
 
     const updateProduct = async (supplierName) => {
@@ -242,9 +242,18 @@ export default function ImportShipment() {
       }
     };
 
-    const filteredRows = rows.filter(row => 
-        row.suppiler.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredRows = rows.filter(row => {
+        const createdAt = dayjs(row.createdAt);
+        const selectedDate = filterDate ? dayjs(filterDate) : null;
+
+        return (
+            row.suppiler.toLowerCase().includes(search.toLowerCase()) &&
+            (selectedDate ? 
+               ( createdAt.isAfter(selectedDate, 'day') || createdAt.isSame(selectedDate, 'day') ): true
+            ) &&
+            createdAt.isBefore(dayjs(), 'day') || createdAt.isSame(dayjs(), 'day')
+        );
+    });
 
     const [expandedShipmentId, setExpandedShipmentId] = useState(null);
 
@@ -299,7 +308,7 @@ export default function ImportShipment() {
                             Quản lý nhập hàng
                     </Typography>
                     <Stack direction={"row"} alignItems={"center"}>
-                        <Stack className="search-bar" direction={"row"} alignItems={"center"}>
+                        <Stack className="search-bar" direction={"row"} alignItems={"center"} sx={{marginRight: "0.5rem"}}>
                             <Search>
                                 <StyledInputBase sx={{padding:"0rem"}}
                                 placeholder="Tìm kiếm"
@@ -314,39 +323,40 @@ export default function ImportShipment() {
                             </Search>
                         </Stack>
 
-                        <Stack className="filter-bar" direction={"row"} alignItems={"center"}> 
-                            <FormControl sx={{width:"200px", marginLeft:"0.5rem", marginRight: "0.5rem"}}>
-                                <InputLabel sx={{
-                                    "&.Mui-focused": { 
-                                        color: "#297342" 
-                                    }}} 
-                                    id="demo-simple-select-label">
-                                        Lọc theo
-                                </InputLabel>
-                                <Select
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DesktopDatePicker 
+                                views={['year', 'month', 'day']} 
+                                sx={{width: "200px", marginRight: "0.5rem"}}
+                                value={filterDate}
+                                onChange={(v) => {
+                                    setFilterDate(v);
+                                    setRemoveFilterVisible(true);
+                                }}
+                                label="Lọc từ ngày" 
+                                format="DD/MM/YYYY"
+                            />
+                        </LocalizationProvider>
+
+                        {removeFilterVisible && (<Button 
+                                onClick={() => {
+                                    setFilterDate(null);
+                                    setRemoveFilterVisible(false);
+                                }} 
                                 sx={{
-                                        backgroundColor:"white", 
-                                        border:"none",
-                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: '#297342',
-                                        },
-                                    }}
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={filter}
-                                    label="Lọc theo"
-                                    onChange={handleFilterChange
-                                        
-                                    }
-                                >
-                                <MenuItem value="">
-                                    <em>Không chọn</em>
-                                </MenuItem>
-                                <MenuItem value={1}>Lớn đến nhỏ</MenuItem>
-                                <MenuItem value={2}>Nhỏ đến lớn</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Stack>
+                                    color: "white", 
+                                    height: "55px", 
+                                    backgroundColor: "#d32f2f", 
+                                    marginRight: "0.5rem",
+                                    padding: "10px",
+                                    borderRadius: "10px",
+                                    '&:hover': { backgroundColor: "#b71c1c" }
+                                }} 
+                                variant="contained"
+                            >
+                                Bỏ lọc
+                            </Button>
+                        )}
+                        
                         <Stack className="btn-add-inventory-bar" direction={"row"} alignItems={"center"}> 
                             <Button 
                                 onClick={handleOpenModalAdd} 

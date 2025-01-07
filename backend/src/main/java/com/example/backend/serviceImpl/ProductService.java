@@ -51,7 +51,7 @@ public class ProductService implements com.example.backend.service.ProductServic
             productRespone.setSupplierName(supplier.getNameSupplier());
             productRespone.setCategoryName(category.getCategoryName());
             productRespones.add(productRespone);
-            productRespone.setStatus(i.getProductStatus());
+            productRespone.setProductStatus(i.getProductStatus());
         }
 
         return productRespones;

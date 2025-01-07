@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import './Product.css'
-import { alpha, Box, Button, Container, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Stack, styled, TextField, Typography } from "@mui/material";
+import { Alert, alpha, Box, Button, Container, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Snackbar, Stack, styled, TextField, Typography } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import MyTable from "../../Component/MyTable";
@@ -106,6 +106,10 @@ const Product = () => {
     const [selectedRow, setSelectedRow] = useState(null);
     const nav = useNavigate();
 
+    const [openSnackbar, setOpenSnackbar] = useState(false);  // Control Snackbar visibility
+    const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message content
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Severity type (success, error, etc.)
+
     useEffect(() => {
         fetchRows();
     }, []);
@@ -148,9 +152,29 @@ const Product = () => {
     }
 
     const handleAddProduct = async () => {
-        await uploadImage();
-        const respond = await ApiService.addProduct(refInput.current);
-        if (respond.status === 201) setOpen(false);
+        if (refInput.current['productName'] !== undefined 
+            && refInput.current['categoryId'] !== undefined 
+            && refInput.current['supplierId'] !== undefined
+            && refInput.current['price'] !== undefined
+            && refInput.current['production_date'] !== undefined
+            && images !== null) {
+            await uploadImage();
+            const respond = await ApiService.addProduct(refInput.current);
+            if (respond.status === 201) {
+                setOpen(false);
+                setSnackbarMessage("Thêm đơn xuất hàng thành công!");
+                setSnackbarSeverity("success");
+                setOpenSnackbar(true);
+            } else {
+                setSnackbarMessage("Lỗi khi thêm đơn xuất hàng. Vui lòng thử lại.");
+                setSnackbarSeverity("error");
+                setOpenSnackbar(true);
+            }
+        } else {
+            setSnackbarMessage("Lỗi khi thêm đơn xuất hàng. Vui lòng thử lại.");
+            setSnackbarSeverity("error");
+            setOpenSnackbar(true);
+        }
     }
 
     const handleUpdateProduct = async () => {
@@ -158,7 +182,16 @@ const Product = () => {
         console.log(refInput.current);
         const respond = await ApiService.updateProduct(selectedRow.id, refInput.current);
         console.log(respond.data);
-        if (respond.status === 200) setOpenEdit(false);
+        if (respond.status === 200) {
+            setOpenEdit(false);
+            setSnackbarMessage("Cập nhật đơn xuất hàng thành công!");
+            setSnackbarSeverity("success");
+            setOpenSnackbar(true);
+        } else {
+            setSnackbarMessage("Lỗi khi cập nhật đơn xuất hàng. Vui lòng thử lại.");
+            setSnackbarSeverity("error");
+            setOpenSnackbar(true);
+        }
     }
 
     const handleDeleteButton = async (id) => {
@@ -233,7 +266,7 @@ const Product = () => {
         // );
 
         // setRows(updatedRows);
-
+        console.log(response);
         setRows(response);
       } catch (error) {
         console.error("Lỗi khi tải thông tin các Product", error.message);
@@ -666,7 +699,16 @@ const Product = () => {
                     </Box>
                 </Fade>
             </Modal>
-
+        <Snackbar
+            open={openSnackbar}
+            autoHideDuration={6000}
+            onClose={() => setOpenSnackbar(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+            <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity}>
+                {snackbarMessage}
+            </Alert>
+        </Snackbar>                        
         </Container>
     )
 }
