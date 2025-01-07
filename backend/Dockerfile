@@ -11,7 +11,7 @@ COPY pom.xml .
 RUN mvn dependency:go-offline
 
 # Sao chép mã nguồn vào thư mục /app/src trong container
-COPY src ./src
+COPY src ./backend/src
 
 # Chạy Maven để build ứng dụng
 RUN mvn clean package -DskipTests
