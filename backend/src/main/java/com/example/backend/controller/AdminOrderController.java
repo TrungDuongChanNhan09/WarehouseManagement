@@ -56,4 +56,11 @@ public class AdminOrderController {
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(orderService.updateOrderStatus(status, id), HttpStatus.OK);
     }
+
+    @GetMapping("/by-month")
+    public ResponseEntity<OrderQuantity> getOrderQuantityByMonth(@RequestHeader("Authorization") String jwt, @RequestParam("month") int month,
+                                                                 @RequestParam("year") int year) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(orderService.getOrderQuantityByMonth(month, year), HttpStatus.OK);
+    }
 }

@@ -15,4 +15,5 @@ public class ImportShipmentItem {
     private String productName;
     private int quantity;
     private BigDecimal totalPrice;
+
 }
