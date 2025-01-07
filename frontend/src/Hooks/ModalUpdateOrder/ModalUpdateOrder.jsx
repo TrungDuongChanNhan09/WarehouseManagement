@@ -217,7 +217,6 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
             console.log(`Updated order item: ${item.orderItemCode}`);
           }
         } catch (error) {
-          console.error(`Error processing order item ${item.orderItemCode}:`, error.message);
         }
       }
   
@@ -234,8 +233,22 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
       console.log("Sending order data:", orderData);
   
       if (selectedOrder.id) {
-        await ApiService.updateOrder(selectedOrder.id, orderData);
-        console.log("Order details updated successfully.");
+        if (orderDetails.orderState === "PENDING" || orderDetails.orderState === "CONFIRMED") {
+          // For "pending" and "confirmed", call both updateOrder and updateOrderState
+          await ApiService.updateOrder(selectedOrder.id, orderData);
+          console.log("Order details updated successfully.");
+          
+          const orderStatePayload = { state: orderDetails.orderState };
+          console.log("Sending order state update:", orderStatePayload);
+          await ApiService.updateOrderState(selectedOrder.id, orderStatePayload);
+          console.log("Order state updated successfully.");
+        } else if (orderDetails.orderState === "ON_GOING" || orderDetails.orderState === "DELIVERED") {
+          // For "on_going" and "delivered", only call updateOrderState
+          const orderStatePayload = { state: orderDetails.orderState };
+          console.log("Sending order state update:", orderStatePayload);
+          await ApiService.updateOrderState(selectedOrder.id, orderStatePayload);
+          console.log("Order state updated successfully.");
+        }
       } else {
         console.error("No selected order to update.");
         setSnackbarSeverity('error');
@@ -244,19 +257,17 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
         return;
       }
   
-      // Cập nhật trạng thái đơn hàng bằng API riêng
-      const orderStatePayload = { state: orderDetails.orderState };
-      console.log("Sending order state update:", orderStatePayload);
-      await ApiService.updateOrderState(selectedOrder.id, orderStatePayload);
-      console.log("Order state updated successfully.");
-  
+      // Show success message immediately after the update
       setSnackbarSeverity('success');
       setSnackbarMessage('Cập nhật đơn hàng thành công');
       setSnackbarOpen(true);
   
-      handleCloseModal();
+      // Reload data and update UI immediately
       reloadOrderItems(selectedOrder.id, orderData.orderItem_code);
       fetchOrders();
+      setTimeout(() => {
+        handleCloseModal();
+      }, 2000);
     } catch (error) {
       console.error("Error updating order:", error.message);
       setSnackbarSeverity('error');
@@ -265,7 +276,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
     }
   }
   
-  
+
   // Calculate total order price based on item quantities and prices
   const totalAmount = orderItems.reduce((total, item) => {
     return total + item.productPrice * item.quantity;
@@ -327,7 +338,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
               >
                 {[
                   { label: "Đang chờ", value: "PENDING" },
-                  { label: "Đang xử lý", value: "ON_GOING" },
+                  { label: "Đang giao", value: "ON_GOING" },
                   { label: "Đã giao", value: "DELIVERED" },
                   { label: "Đã xác nhận", value: "CONFIRMED" },
                 ].map((status) => (

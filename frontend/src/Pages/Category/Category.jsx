@@ -223,12 +223,12 @@ const Category = () => {
       open={snackbar.open}
       autoHideDuration={3000}
       onClose={() => setSnackbar({ ...snackbar, open: false })}
-      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      anchorOrigin={{ vertical: "left", horizontal: "bottom" }}
     >
       <Alert
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         severity={snackbar.severity}
-        sx={{ width: "100%" }}
+        sx={{ width: "auto" }}
       >
         {snackbar.message}
       </Alert>

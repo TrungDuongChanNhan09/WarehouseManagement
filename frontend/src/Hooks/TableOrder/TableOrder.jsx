@@ -16,6 +16,7 @@ import {
   DialogContent,
   DialogActions,
   TablePagination,
+  Snackbar, Alert
 } from '@mui/material';
 import { ExpandMore, ExpandLess, Edit, Delete } from '@mui/icons-material';
 import ApiService from "../../Service/ApiService.jsx";
@@ -31,6 +32,10 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
   const [productNames, setProductNames] = useState({});
   const [page, setPage] = useState(0); 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); 
+
 
   // Expand/Collapse Row
   const handleExpandRow = async (orderId, orderItemCodes) => {
@@ -88,15 +93,24 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
     if (orderToDelete) {
       try {
         await ApiService.deleteOrder(orderToDelete);
-        console.log(`Deleted order with ID: ${orderToDelete}`);
+        setSnackbarMessage('Xóa đơn hàng thành công!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+  
         setOrderToDelete(null);
         setOpenConfirmDialog(false);
+  
+        // Fetch lại danh sách đơn hàng
+        await fetchOrders();
       } catch (error) {
         console.error(`Error deleting order with ID ${orderToDelete}:`, error);
+        setSnackbarMessage('Có lỗi xảy ra khi xóa đơn hàng!');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
       }
     }
   };
-
+  
   const handleCancelDelete = () => {
     setOrderToDelete(null);
     setOpenConfirmDialog(false);
@@ -242,6 +256,20 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
         fetchOrders ={ fetchOrders}
         reloadOrderItems={(orderId, orderItemCodes) => handleExpandRow(orderId, orderItemCodes)}
       />
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        >
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
 
       {/* Confirm Delete Dialog */}
       <Dialog open={openConfirmDialog} onClose={handleCancelDelete}>

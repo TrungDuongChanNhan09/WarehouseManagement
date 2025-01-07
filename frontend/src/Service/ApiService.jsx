@@ -245,6 +245,57 @@ export default class ApiService {
     }
 
 
+
+
+    static async addReport(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/report`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async getAllReport() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/report`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async updateReport(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/report/updateReport/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async getAllReportOrStaff() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/report`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    
+
+
     
 
     // Phát

@@ -33,12 +33,15 @@ public class ExportService implements com.example.backend.service.ExportService 
         newExport.setOrderCode(export.getOrderCode());
         newExport.setOrderQuantity(export.getOrderCode().size());
         newExport.setExport_address(export.getExport_address());
-
+        int totalPrice = 0;
         for (String i : export.getOrderCode()){
             Order order = orderRepository.findByorderCode(i);
             order.setOrderStatus(ORDER_STATUS.IN_EXPORT);
+            totalPrice += order.getOrderPrice();
             orderRepository.save(order);
         }
+        newExport.setPrice(totalPrice);
+        newExport.setRevenue(totalPrice*0.1);
         return exportRepository.save(newExport);
     }
 
@@ -61,13 +64,16 @@ public class ExportService implements com.example.backend.service.ExportService 
         existingExport.setOrderCode(export.getOrderCode());
         existingExport.setOrderQuantity(export.getOrderCode().size());
         existingExport.setUpdatedAt(export.getUpdated_at());
+        int totalPrice = 0;
 
         for (String i : export.getOrderCode()){
             Order order = orderRepository.findByorderCode(i);
             order.setOrderStatus(ORDER_STATUS.IN_EXPORT);
+            totalPrice += order.getOrderPrice();
             orderRepository.save(order);
         }
-
+        existingExport.setPrice(totalPrice);
+        existingExport.setRevenue(totalPrice*0.1);
         return exportRepository.save(existingExport);
     }
 

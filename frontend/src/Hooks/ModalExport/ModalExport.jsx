@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import ApiService from "../../Service/ApiService.jsx";
 
-const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
+const ModalExport = ({ open, onClose, onSubmit, shipment,setNotification }) => {
   const [orders, setOrders] = useState([]); 
   const [selectedOrderIds, setSelectedOrderIds] = useState([]); 
   const [exportAddress, setExportAddress] = useState("");
@@ -28,7 +28,8 @@ const ModalExport = ({ open, onClose, onSubmit, shipment }) => {
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [loading, setLoading] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
 
   useEffect(() => {
@@ -121,19 +122,12 @@ const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const handleRemoveOrder = async (orderCode) => {
     try {
-      // Xóa đơn hàng khỏi `selectedOrders`
       const removedOrder = selectedOrders.find((order) => order.orderCode === orderCode);
       setSelectedOrders((prevSelected) => prevSelected.filter((order) => order.orderCode !== orderCode));
-  
-      // Thêm đơn hàng lại vào danh sách `orders`
       if (removedOrder) {
         setOrders((prevOrders) => [...prevOrders, removedOrder]);
       }
-  
-      // Xóa mã đơn hàng khỏi `selectedOrderIds`
       setSelectedOrderIds((prevSelected) => prevSelected.filter((code) => code !== orderCode));
-  
-      // Cập nhật trạng thái đơn hàng
       const response = await ApiService.getOrderByOrderCode(orderCode);
       const orderId = response.data.id;
       const formData = { orderStatus: "OUT_EXPORT" };
@@ -148,14 +142,19 @@ const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const handleSubmit = async () => {
     if (selectedOrderIds.length === 0) {
       console.error("No orders selected, cannot submit export.");
-      setSnackbarMessage("Vui lòng chọn ít nhất một đơn hàng.");
+      const notificationData = {
+        type: "warning",
+        message: "Vui lòng chọn ít nhất một đơn hàng.",
+      };
+      setNotification(notificationData);
+      setSnackbarMessage(notificationData.message);
       setSnackbarSeverity("warning");
-      setOpenSnackbar(true);
+      setOpenSnackbar(true); 
       return;
     }
-  
+
     const getDateOnly = (date) => date.toISOString().split("T")[0];
-  
+
     const newExport = {
       orderCode: selectedOrderIds,
       exportState: exportState,
@@ -163,33 +162,47 @@ const [snackbarSeverity, setSnackbarSeverity] = useState("success");
       created_at: shipment ? getDateOnly(new Date(shipment.createdAt)) : getDateOnly(new Date()),
       updated_at: getDateOnly(new Date()),
     };
-  
+
     try {
-      let response;
+      setLoading(true);
+
       if (shipment) {
-        response = await ApiService.updateExport(shipment.id, newExport);
-        setSnackbarMessage("Cập nhật xuất hàng thành công!");
+        if (exportState === "PENDING" || exportState === "CONFIRMED") {
+          console.log("Updating export with data:", newExport);
+          await ApiService.updateExport(shipment.id, newExport);
+          setSnackbarMessage("Cập nhật xuất hàng thành công!");
+          setSnackbarSeverity("success");
+          setOpenSnackbar(true);
+        } else if (exportState === "ON_GOING") {
+          await ApiService.updateExportState(shipment.id, { exportState });
+          setSnackbarMessage("Cập nhật trạng thái xuất hàng thành công!");
+          setSnackbarSeverity("success");
+          setOpenSnackbar(true); 
+        }
       } else {
-        response = await ApiService.addExport(newExport);
+        await ApiService.addExport(newExport);
         setSnackbarMessage("Tạo xuất hàng mới thành công!");
+        setSnackbarSeverity("success");
+        setOpenSnackbar(true); 
       }
-      setSnackbarSeverity("success");
-      setOpenSnackbar(true);
-      onSubmit();
-      onClose();
+
+      setTimeout(() => {
+        setLoading(false);
+        onSubmit();
+        onClose();
+      }, 1500);
     } catch (error) {
       console.error("Lỗi khi tạo hoặc cập nhật xuất hàng:", error);
-      setSnackbarMessage("Đã xảy ra lỗi khi tạo hoặc cập nhật xuất hàng.");
+      setSnackbarMessage("Có lỗi xảy ra khi cập nhật xuất hàng.");
       setSnackbarSeverity("error");
-      setOpenSnackbar(true);
+      setOpenSnackbar(true); 
     }
-  };
-  
+};
+
+
   const handleUpdateExportState = async (newState) => {
     if (!shipment || !shipment.id) {
       console.error("Không thể cập nhật trạng thái: thiếu thông tin xuất hàng.");
-      setSnackbarMessage("Không thể cập nhật trạng thái: thiếu thông tin xuất hàng.");
-      setSnackbarSeverity("error");
       setOpenSnackbar(true);
       return;
     }
@@ -200,13 +213,9 @@ const [snackbarSeverity, setSnackbarSeverity] = useState("success");
       };
       await ApiService.updateExportState(shipment.id, updatedExport);
       setExportState(newState); // Cập nhật trạng thái trong UI
-      setSnackbarMessage("Cập nhật trạng thái xuất hàng thành công!");
-      setSnackbarSeverity("success");
       setOpenSnackbar(true);
     } catch (error) {
       console.error("Lỗi khi cập nhật trạng thái xuất hàng:", error);
-      setSnackbarMessage("Đã xảy ra lỗi khi cập nhật trạng thái xuất hàng.");
-      setSnackbarSeverity("error");
       setOpenSnackbar(true);
     }
   };
@@ -270,8 +279,7 @@ const [snackbarSeverity, setSnackbarSeverity] = useState("success");
               <Select
                 value={exportState}
                 onChange={(e) => {
-                  const newState = e.target.value;
-                  handleUpdateExportState(newState); // Gọi API khi thay đổi trạng thái
+                  setExportState(e.target.value); // Cập nhật giá trị exportState
                 }}
               >
                 <MenuItem value="PENDING">Chờ xử lý</MenuItem>
@@ -319,14 +327,15 @@ const [snackbarSeverity, setSnackbarSeverity] = useState("success");
           </Paper>
           <Snackbar
             open={openSnackbar}
-            autoHideDuration={4000}
+            autoHideDuration={1500}
             onClose={() => setOpenSnackbar(false)}
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
           >
             <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity} sx={{ width: "100%" }}>
               {snackbarMessage}
             </Alert>
           </Snackbar>
+
 
           {/* Submit Button */}
           <Box sx={{ marginTop: "2rem", textAlign: "right" }}>

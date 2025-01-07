@@ -14,6 +14,7 @@ import {
   Paper,
   TableContainer,
   TextField,
+  Snackbar, Alert,Dialog, DialogActions, DialogContent, DialogTitle
 } from "@mui/material";
 import { Add, Edit, Delete, ExpandMore, ExpandLess } from "@mui/icons-material";
 import ModalExport from "../../Hooks/ModalExport/ModalExport.jsx";
@@ -29,6 +30,13 @@ const ExportShipment = () => {
   const [expandedShipmentOrders, setExpandedShipmentOrders] = useState({}); // Store order details for each shipment
   const [editingShipment, setEditingShipment] = useState(null); // Store the shipment being edited
   const [editingOrders, setEditingOrders] = useState([]); // Store orders related to the shipment
+  const [notification, setNotification] = useState(null);
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [shipmentToDelete, setShipmentToDelete] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+
+
   const fetchExportShipments = async () => {
     try {
       const exportResponse = await ApiService.getAllExport();
@@ -87,13 +95,27 @@ const ExportShipment = () => {
     setEditingShipment(null); // Reset editing shipment when closing the modal
     setEditingOrders([]); // Reset orders when closing the modal
   };
-
-  const handleModalSubmit = () => {
+  const handleModalSubmit = (isSuccess) => {
+    // Kiểm tra lại isSuccess để xác định là thành công hay thất bại
+    if (isSuccess) {
+      setNotification({
+        type: "success",
+        message: "Cập nhật thành công!"
+      });
+    } else {
+      setNotification({
+        type: "error",
+        message: "Cập nhật thất bại. Vui lòng thử lại."
+      });
+    }
+  
+    // Đóng modal và làm mới dữ liệu
     setOpenModal(false);
-    fetchExportShipments();
+    fetchExportShipments(); // Gọi lại API để lấy dữ liệu mới nhất
   };
   
-
+  
+  
   // Function to fetch order details by order code
   const fetchOrderDetails = async (orderCode) => {
     try {
@@ -108,20 +130,44 @@ const ExportShipment = () => {
     }
   };
 
-  // Handle deleting shipment and updating orders to OUT_EXPORT with confirmation
-  const handleDeleteShipment = async (shipmentId) => {
-    const confirmation = window.confirm("Bạn chắc chắn muốn xóa xuất hàng này?");
-    if (!confirmation) return; // If user cancels the deletion, return early.
-
+  const handleDeleteShipment = (shipmentId) => {
+    // Set shipmentIdToDelete cho đối tượng cần xóa
+    setShipmentToDelete(shipmentId);
+    setOpenDialog(true); // Mở dialog xác nhận xóa
+  };
+  
+  const handleConfirmDelete = async () => {
+    if (!shipmentToDelete) return;
+  
     try {
-
-      await ApiService.deleteExport(shipmentId);
-      setExportShipments((prev) => prev.filter((shipment) => shipment.id !== shipmentId)); // Update shipment list
-      console.log("Export shipment deleted.");
+      // Gọi API xóa xuất hàng
+      await ApiService.deleteExport(shipmentToDelete);
+      // Cập nhật lại danh sách xuất hàng
+      setExportShipments((prev) =>
+        prev.filter((shipment) => shipment.id !== shipmentToDelete)
+      );
+      // Hiển thị thông báo thành công
+      setNotification({
+        type: "success",
+        message: "Xuất hàng đã được xóa thành công!",
+      });
+      fetchExportShipments();
+      setOpenDialog(false); // Đóng Dialog sau khi xóa thành công
     } catch (error) {
       console.error("Error deleting shipment:", error);
+      // Hiển thị thông báo lỗi nếu có lỗi
+      setNotification({
+        type: "error",
+        message: "Xóa xuất hàng thất bại. Vui lòng thử lại.",
+      });
+      setOpenDialog(false); // Đóng Dialog trong trường hợp có lỗi
     }
   };
+  
+  const handleCancelDelete = () => {
+    setOpenDialog(false); // Đóng dialog khi người dùng hủy
+  };
+  
 
   return (
     <Container maxWidth="lg">
@@ -216,7 +262,8 @@ const ExportShipment = () => {
                     <TableCell>{shipment.export_address || "Chưa có địa chỉ"}</TableCell>
                     <TableCell>
                       {shipment.exportState === "PENDING" ? "Đang chờ" : 
-                      shipment.exportState === "DELIVERED" ? "Đã giao" : 
+                      shipment.exportState === "ON_GOING" ? "Đang giao" : 
+                      shipment.exportState === "CONFIRMED" ? "Đã xác nhận" : 
                       shipment.exportState || "Chưa có trạng thái"}
                     </TableCell>
 
@@ -300,11 +347,35 @@ const ExportShipment = () => {
         </Table>
       </TableContainer>
 
+       <Dialog
+        open={openDialog}
+        onClose={handleCancelDelete}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Bạn chắc chắn muốn xóa xuất hàng này?"}
+        </DialogTitle>
+        <DialogContent>
+          {/* Nội dung có thể thêm thông tin thêm nếu cần */}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete} color="primary">
+            Hủy
+          </Button>
+          <Button onClick={handleConfirmDelete} color="secondary" autoFocus>
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
       {/* Modal for adding or editing export shipment */}
       <ModalExport
         open={openModal}
         onClose={handleCloseModal}
         onSubmit={handleModalSubmit}
+        setNotification={setNotification}
         shipment={editingShipment} // Pass the shipment with orders to the modal
         orders={editingOrders} // Pass the orders to the modal
       />

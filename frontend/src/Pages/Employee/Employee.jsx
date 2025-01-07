@@ -194,7 +194,13 @@ const Employee = () => {
                     {new Date(employee.dateOfBirth).toLocaleDateString()}
                   </TableCell>
                   <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.role}</TableCell>
+                  <TableCell>
+                  {employee.role === 'ROLE_STAFF'
+                    ? 'Nhân viên'
+                    : employee.role === 'ROLE_ADMIN'
+                    ? 'Quản lý'
+                    : 'Vai trò không xác định'}
+                </TableCell>
                   <TableCell>
                     <IconButton onClick={() => handleDelete(employee.id)}>
                       <Delete />
@@ -286,7 +292,7 @@ const Employee = () => {
         open={snackbar.open}
         autoHideDuration={3000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
         <Alert
           onClose={() => setSnackbar({ ...snackbar, open: false })}

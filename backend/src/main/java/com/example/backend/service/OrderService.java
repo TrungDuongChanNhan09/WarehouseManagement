@@ -24,4 +24,5 @@ public interface OrderService {
     OrderQuantity getOrderQuantity();
     Order getOrderByOrderCode(String orderCode);
     Order updateOrderStatus(OrderStatusRequest status, String orderId) throws Exception;
+    OrderQuantity getOrderQuantityByMonth(int month, int year);
 }

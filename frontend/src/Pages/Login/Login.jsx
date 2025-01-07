@@ -61,11 +61,11 @@ const Login = () => {
 
                 <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" maxWidth="100%" justifyContent="center" alignItems="center" className="information-page">
                     <Stack className="title" alignItems={"center"}>
-                        <img src={Logo}/>
+                        <img src="https://res.cloudinary.com/dozs7ggs4/image/upload/v1734362317/WarehouseManagement-3_kibnmb.png"/>
                         <Typography 
                             className="title-login" 
                             variant="h4" 
-                            sx={{ color: "#F25D07" }} 
+                            sx={{ color: "#45474B" }} 
                             fontWeight={"bold"}>
                             Đăng nhập
                         </Typography>
@@ -94,7 +94,7 @@ const Login = () => {
                     />
 
                     <Stack alignSelf="flex-start" direction="row" alignItems={"space-between"}>
-                        <FormControlLabel control={<Checkbox style={{ color: "#F25D07" }} onChange={handleClickShowPassword} />} label="Hiện mật khẩu" />
+                        <FormControlLabel control={<Checkbox style={{ color: "#45474B" }} onChange={handleClickShowPassword} />} label="Hiện mật khẩu" />
                     </Stack>
 
                     <Button type="submit" variant="contained" className="button-login">

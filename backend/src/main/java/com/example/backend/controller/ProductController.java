@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.backend.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,9 @@ public class ProductController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @PostMapping("")
     public ResponseEntity<Product> createProduct(@RequestBody ProductRequest product, @RequestHeader("Authorization") String jwt) throws Exception{
@@ -81,5 +85,11 @@ public class ProductController {
     private ResponseEntity<List<Product>> getProductBySupplier(@PathVariable String supplierName, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.filterProductBySupplier(supplierName), HttpStatus.OK);
+    }
+
+    @GetMapping("/notification")
+    private ResponseEntity<List<String>> getNotification(@RequestHeader("Authorization") String jwt) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(notificationService.notifyProductExpiry(), HttpStatus.OK);
     }
 }
