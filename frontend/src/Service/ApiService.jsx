@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default class ApiService {
-    static BASE_URL = "http://localhost:6060";
+    static BASE_URL = "https://quanlykho-g8bg.onrender.com";
 
     // Từ
     static getHeader() {
