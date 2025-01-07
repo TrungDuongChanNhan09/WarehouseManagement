@@ -341,6 +341,7 @@ const OrderUpdateModal = ({ openModal, handleCloseModal, selectedOrder, fetchOrd
                   { label: "Đang giao", value: "ON_GOING" },
                   { label: "Đã giao", value: "DELIVERED" },
                   { label: "Đã xác nhận", value: "CONFIRMED" },
+                  { label: "Đã hủy", value: "CANCELLED" },
                 ].map((status) => (
                   <MenuItem key={status.value} value={status.value}>
                     {status.label}

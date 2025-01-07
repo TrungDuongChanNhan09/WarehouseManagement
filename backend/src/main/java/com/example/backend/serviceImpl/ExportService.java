@@ -129,7 +129,7 @@ public class ExportService implements com.example.backend.service.ExportService 
                 orderRepository.save(order);
             }
         }
-        return existingExport;
+        return exportRepository.save(existingExport);
     }
 
     @Override
