@@ -63,7 +63,7 @@ public class ExportService implements com.example.backend.service.ExportService 
         existingExport.setExport_address(export.getExport_address());
         existingExport.setOrderCode(export.getOrderCode());
         existingExport.setOrderQuantity(export.getOrderCode().size());
-        existingExport.setUpdatedAt(export.getUpdated_at());
+        existingExport.setUpdatedAt(currentDate);
         int totalPrice = 0;
 
         for (String i : export.getOrderCode()){
