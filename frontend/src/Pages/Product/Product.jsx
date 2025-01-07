@@ -107,9 +107,7 @@ const Product = () => {
     const nav = useNavigate();
 
     useEffect(() => {
-       fetchRows();
-    //   setListCategory(await ApiService.getAllCategorys());
-    //   setListSupplier(await ApiService.getAllSupplier());
+        fetchRows();
     }, []);
 
     // useEffect(() => {
@@ -120,11 +118,13 @@ const Product = () => {
     //     console.log('change sub filter ' + subfilter);
     // },[subfilter]);
 
-    const handleFilterChange = (e) => {
+    const handleFilterChange = async (e) => {
         const value = e.target.value;
         setFilter(value);
         setSubFilter("");
         setSubFilterVisible(value !== '');
+        setListCategory(await ApiService.getAllCategorys());
+        setListSupplier(await ApiService.getAllSupplier());
     }
 
     const handleSubFilterChange = ({target}) => {
@@ -172,6 +172,9 @@ const Product = () => {
         setImages(null);
         setImageUrls(null);
 
+        setListCategory(await ApiService.getAllCategorys());
+        setListSupplier(await ApiService.getAllSupplier());
+
         const updateStates = async () => {
             if (row.image !== null) {
                 await setImageUrls(row.image);
@@ -196,6 +199,8 @@ const Product = () => {
         setOpen(true);
         setImages();
         refInput.current = {};
+        setListCategory(await ApiService.getAllCategorys());
+        setListSupplier(await ApiService.getAllSupplier());
     }
     const handleClose = () => {
         setOpen(false);

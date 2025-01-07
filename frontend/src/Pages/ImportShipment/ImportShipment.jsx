@@ -89,6 +89,7 @@ const style = {
 
 export default function ImportShipment() {
     const [filter, setFilter] = useState();
+    const [search, setSearch] = useState('');
     const [rows, setRows] = React.useState([]);
     const [listSupplier, setListSupplier] = React.useState([]);
     const [listProduct, setListProduct] = React.useState([]);
@@ -241,6 +242,10 @@ export default function ImportShipment() {
       }
     };
 
+    const filteredRows = rows.filter(row => 
+        row.suppiler.toLowerCase().includes(search.toLowerCase())
+    );
+
     const [expandedShipmentId, setExpandedShipmentId] = useState(null);
 
     const handleExpandRow = (shipmentId) => {
@@ -303,6 +308,7 @@ export default function ImportShipment() {
                                     <SearchIcon />
                                   </InputAdornment>
                                 }
+                                onChange={(e) => setSearch(e.target.value)}
                                 inputProps={{ 'aria-label': 'search' }}
                                 />
                             </Search>
@@ -371,7 +377,7 @@ export default function ImportShipment() {
                             </TableRow>
                         </TableHead>
                         <TableBody className='table-body'>
-                            {rows
+                            {filteredRows
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((row, index) => {
                                 return (
@@ -477,7 +483,7 @@ export default function ImportShipment() {
                     <TablePagination
                         rowsPerPageOptions={[10, 25, 100]}
                         component="div"
-                        count={rows.length}
+                        count={filteredRows.length}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}
