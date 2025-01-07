@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 public class ProductRespone{
-    private String productId;
+    private String id;
     private String productName;
     private int inventory_quantity;
     private String supplierId;
@@ -18,7 +18,7 @@ public class ProductRespone{
     private Date production_date;
     private Date expiration_date;
     private int price;
-    private PRODUCT_STATUS status;
+    private PRODUCT_STATUS productStatus;
     private String supplierName;
     private String categoryName;
 }

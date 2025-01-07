@@ -47,8 +47,8 @@ public class ProductService implements com.example.backend.service.ProductServic
             productRespone.setExpiration_date(i.getExpiration_date());
             productRespone.setCategoryId(i.getCategoryId());
             productRespone.setSupplierId(i.getSupplierId());
-            productRespone.setStatus(i.getProductStatus());
-            productRespone.setProductId(i.getId());
+            productRespone.setProductStatus(i.getProductStatus());
+            productRespone.setId(i.getId());
             productRespone.setSupplierName(supplier.getNameSupplier());
             productRespone.setCategoryName(category.getCategoryName());
             productRespones.add(productRespone);

@@ -97,8 +97,11 @@ public class OrderService implements com.example.backend.service.OrderService {
     }
 
     @Override
-    public void deleteOrder(String id) {
+    public void deleteOrder(String id) throws Exception {
         Order order = orderRepository.findById(id).orElse(null);
+        if(order.getOrderStatus() == ORDER_STATUS.IN_EXPORT){
+            throw new Exception("Order is already in export so that cannot delete");
+        }
         for(String i : order.getOrderItem_code()){
             orderItemRepository.deleteByorderItemCode(i);
         }
