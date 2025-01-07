@@ -14,6 +14,7 @@ import {
   Paper,
   TableContainer,
   TextField,
+  TablePagination,
   Snackbar, Alert,Dialog, DialogActions, DialogContent, DialogTitle
 } from "@mui/material";
 import { Add, Edit, Delete, ExpandMore, ExpandLess } from "@mui/icons-material";
@@ -35,7 +36,16 @@ const ExportShipment = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [shipmentToDelete, setShipmentToDelete] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
 
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const fetchExportShipments = async () => {
     try {
@@ -368,7 +378,15 @@ const ExportShipment = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={filteredExportShipments.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
 
       {/* Modal for adding or editing export shipment */}
       <ModalExport
