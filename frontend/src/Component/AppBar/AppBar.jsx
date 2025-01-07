@@ -10,7 +10,7 @@ import {
   Menu,
   Modal,
   Fade, Grid,
-  Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText
+  Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, Divider
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -23,6 +23,7 @@ import ApiService from "../../Service/ApiService";
 
 import {CircularProgress, Alert} from "@mui/material";
 import { useEffect } from "react";
+import { format } from "date-fns";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -63,7 +64,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const PrimarySearchAppBar = () => {
+const PrimarySearchAppBar = ({addNotification}) => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const [selectedSection, setSelectedSection] = useState("info");
@@ -185,8 +186,6 @@ const PrimarySearchAppBar = () => {
   const [previewImage, setPreviewImage] = useState(null); 
   const [currentImage, setCurrentImage] = useState(null); 
 
-  
-  
   useEffect(() => {
     if (open) {
       const loadUserData = async () => {
@@ -214,7 +213,6 @@ const PrimarySearchAppBar = () => {
     }
   }, [open]);
   
-
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -222,7 +220,6 @@ const PrimarySearchAppBar = () => {
       setPreviewImage(URL.createObjectURL(file)); // Tạo URL để xem trước
     }
   };
-  
   const handleImageUpload = async () => {
     if (!imageFile) {
       alert("Vui lòng chọn một ảnh để tải lên.");
@@ -245,6 +242,35 @@ const PrimarySearchAppBar = () => {
     }
   };
 
+
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [anchorEl2, setAnchorEl2] = useState(null);
+
+  const open2 = Boolean(anchorEl2);
+
+  const handleNotificationClick = (event) => {
+    setAnchorEl2(event.currentTarget);
+    setUnreadCount(0); 
+  };
+
+  const handleAddNotification = (message) => {
+    const newNotification = {
+      id: Date.now(),
+      message,
+      time: new Date(),
+    };
+    setNotifications((prev) => [newNotification, ...prev]);
+    setUnreadCount((prev) => prev + 1);
+  };
+
+  const handleClose2 = () => {
+    setAnchorEl2(null);
+  };
+
+  const handleAddTestNotification = () => {
+    handleAddNotification("Thông báo mới từ hệ thống");
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -270,19 +296,59 @@ const PrimarySearchAppBar = () => {
               display: { xs: "none", md: "flex", width: "200px", border: "1px solid #9AA6B2", borderRadius: "0.5rem" },
             }}
           >
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="error">
+            <IconButton size="large" aria-label="show 4 new mails" color="inherit"
+              
+            >
+              <Badge badgeContent={3} color="error">
                 <MailIcon />
               </Badge>
             </IconButton>
-            <IconButton size="large" aria-label="show 17 new notifications" color="inherit">
-              <Badge badgeContent={17} color="error">
+
+          {/* Notification - START */}
+            <IconButton size="large" color="inherit"
+              onClick={handleNotificationClick}
+              aria-controls={open2 ? "notification-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open2 ? "true" : undefined}
+              >
+              <Badge badgeContent={unreadCount} color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
+            <Menu
+              id="notification-menu"
+              anchorEl={anchorEl2}
+              open={open2}
+              onClose={handleClose2}
+              PaperProps={{
+                style: { width: 300 },
+              }}
+            >
+              <MenuItem disabled>
+                <Typography variant="subtitle1">Thông báo</Typography>
+              </MenuItem>
+              <Divider />
+              {notifications.length === 0 ? (
+                <MenuItem>
+                  <ListItemText primary="Không có thông báo nào." />
+                </MenuItem>
+              ) : (
+                notifications.map((notification) => (
+                  <MenuItem key={notification.id} onClick={handleClose2}>
+                    <ListItemText
+                      primary={notification.message}
+                      secondary={format(notification.time, "dd/MM/yyyy HH:mm")}
+                    />
+                  </MenuItem>
+                ))
+              )}
+            </Menu>
+          {/* - END */}
+
             <IconButton size="large" edge="end" aria-label="settings" color="inherit">
               <SettingsIcon />
             </IconButton>
+            {/* <button onClick={handleAddTestNotification}>Thêm thông báo giả lập</button> */}
             <IconButton
               sx={{marginRight:"0.4rem"}}
               size="large"
@@ -502,6 +568,8 @@ const PrimarySearchAppBar = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      
     </Box>
   );
 };

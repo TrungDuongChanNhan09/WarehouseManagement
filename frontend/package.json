@@ -22,6 +22,7 @@
     "@mui/x-date-pickers": "^7.23.3",
     "axios": "^1.7.9",
     "crypto-js": "^4.2.0",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "frontend": "file:",
     "react": "^18.3.1",

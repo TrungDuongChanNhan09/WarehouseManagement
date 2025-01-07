@@ -257,6 +257,7 @@ const Shelf = () => {
                     capacity: parseInt(e.target.value, 10),
                   })
                 }
+                disabled
               />
               <Button
                 sx={{
