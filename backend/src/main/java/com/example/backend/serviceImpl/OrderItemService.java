@@ -145,6 +145,7 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
                     quantity -= shelf.getQuantity();
                     shelf.setQuantity(0);
                     shelfRepository.save(shelf);
+                    shelfRepository.deleteById(shelf.getId());
                 }
 
                 if(quantity <= shelf.getQuantity()){
@@ -172,6 +173,7 @@ public class OrderItemService implements com.example.backend.service.OrderItemSe
                     quantity -= shelf.getQuantity();
                     shelf.setQuantity(0);
                     shelfRepository.save(shelf);
+                    shelfRepository.deleteById(shelf.getId());
                 }
 
                 if(quantity <= shelf.getQuantity()){

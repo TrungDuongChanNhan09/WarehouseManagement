@@ -17,4 +17,6 @@ public class Export {
     private String export_address;
     private LocalDate createdAt;
     private LocalDate updatedAt;
+    private int price;
+    private double revenue;
 }
