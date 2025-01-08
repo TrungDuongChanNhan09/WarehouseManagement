@@ -1,6 +1,7 @@
 import axios from "axios";
 
 export default class ApiService {
+
     static BASE_URL = "http://localhost:6060";
 
     // Từ
@@ -243,6 +244,57 @@ export default class ApiService {
             throw error;  
         }
     }
+
+
+
+
+    static async addReport(formData) {
+        try {
+            const response = await axios.post(`${this.BASE_URL}/api/report`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async getAllReport() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/admin/report`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async updateReport(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/report/updateReport/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
+    static async getAllReportOrStaff() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/report`, {
+                headers: this.getHeader()
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    
 
 
     
@@ -563,6 +615,17 @@ export default class ApiService {
             throw error;
         }
     }
+    static async getUserrById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/getInformation/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
     static async getOrderByOrderCode(code) {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/order/getOrderByOrderCode/${code}`, {
@@ -786,6 +849,17 @@ export default class ApiService {
     static async updateExport(id, formData) {
         try {
             const response = await axios.put(`${this.BASE_URL}/api/admin/export/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    static async updateExportState(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/export/updateExportStatus/${id}`, formData, {
                 headers: this.getHeader(),
                 'Content-Type': 'application/json' 
             });

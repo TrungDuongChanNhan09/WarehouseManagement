@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
 import ApiService from "../../Service/ApiService.jsx";
+import NotificationBar from "./NotificationBar/NotificationBar.jsx";
 import TableInventory from "../../Hooks/TableInventory/TableInventory.jsx";
 
 const style = {
@@ -100,9 +101,14 @@ const Inventory = () => {
         }
     };
 
+    const [notification, setNotification] = useState({})
+
+    
+
     return (
         <Container maxWidth="xl" className="Dashboard">
-            <PrimarySearchAppBar />
+            <PrimarySearchAppBar addNotification={notification}/>
+            {/* <NotificationBar addNotification/> */}
             <Stack className="inventory-bar" sx={{backgroundColor: "#E2F1E7", padding: "1rem", borderRadius: "0.5rem"}}>
                 <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
                     <Typography sx={{fontWeight: 'bold', fontSize: "20px", paddingLeft: "20px", width: "200px"}} variant="p">

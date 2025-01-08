@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import './Product.css'
-import { alpha, Box, Button, Container, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Stack, styled, TextField, Typography } from "@mui/material";
+import { Alert, alpha, Box, Button, Container, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Snackbar, Stack, styled, TextField, Typography } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import MyTable from "../../Component/MyTable";
@@ -93,27 +93,48 @@ const style = {
 };
 
 const Product = () => {
-    const [filter, setFilter] = useState();
+    const [filter, setFilter] = useState("");
+    const [subfilter, setSubFilter] = useState("");
+    const [subFilterVisible, setSubFilterVisible] = useState(false);
+    const [search, setSearch] = useState('');
     const refInput = useRef({});
-    const [listCategory, setListCategory] = React.useState([]);
-    const [listSupplier, setListSupplier] = React.useState([]);
-    const [open, setOpen] = React.useState(false);
-    const [openEdit, setOpenEdit] = React.useState(false);
-    const [rows, setRows] = React.useState([]);
+    const [listCategory, setListCategory] = useState([]);
+    const [listSupplier, setListSupplier] = useState([]);
+    const [open, setOpen] = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
+    const [rows, setRows] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
     const nav = useNavigate();
 
-    useEffect(() => {
-      fetchRows();
-    }, []);
+    const [openSnackbar, setOpenSnackbar] = useState(false);  // Control Snackbar visibility
+    const [snackbarMessage, setSnackbarMessage] = useState(""); // Snackbar message content
+    const [snackbarSeverity, setSnackbarSeverity] = useState("success"); // Severity type (success, error, etc.)
 
     useEffect(() => {
         fetchRows();
-    }, [open,openEdit]);
+    }, []);
 
-    useEffect(() => {
-        console.log('change filter ' + filter);
-    },[filter]);
+    // useEffect(() => {
+    //     console.log('change filter ' + filter);
+    // },[filter]);
+
+    // useEffect(() => {
+    //     console.log('change sub filter ' + subfilter);
+    // },[subfilter]);
+
+    const handleFilterChange = async (e) => {
+        const value = e.target.value;
+        setFilter(value);
+        setSubFilter("");
+        setSubFilterVisible(value !== '');
+        setListCategory(await ApiService.getAllCategorys());
+        setListSupplier(await ApiService.getAllSupplier());
+    }
+
+    const handleSubFilterChange = ({target}) => {
+        const value = target.value;
+        setSubFilter(value);
+    }
     
     const handleChange = ({target}) => {
         refInput.current[target.name] = target.value;
@@ -131,9 +152,29 @@ const Product = () => {
     }
 
     const handleAddProduct = async () => {
-        await uploadImage();
-        const respond = await ApiService.addProduct(refInput.current);
-        if (respond.status === 201) setOpen(false);
+        if (refInput.current['productName'] !== undefined 
+            && refInput.current['categoryId'] !== undefined 
+            && refInput.current['supplierId'] !== undefined
+            && refInput.current['price'] !== undefined
+            && refInput.current['production_date'] !== undefined
+            && images !== null) {
+            await uploadImage();
+            const respond = await ApiService.addProduct(refInput.current);
+            if (respond.status === 201) {
+                setOpen(false);
+                setSnackbarMessage("Thêm đơn xuất hàng thành công!");
+                setSnackbarSeverity("success");
+                setOpenSnackbar(true);
+            } else {
+                setSnackbarMessage("Lỗi khi thêm đơn xuất hàng. Vui lòng thử lại.");
+                setSnackbarSeverity("error");
+                setOpenSnackbar(true);
+            }
+        } else {
+            setSnackbarMessage("Lỗi khi thêm đơn xuất hàng. Vui lòng thử lại.");
+            setSnackbarSeverity("error");
+            setOpenSnackbar(true);
+        }
     }
 
     const handleUpdateProduct = async () => {
@@ -141,7 +182,16 @@ const Product = () => {
         console.log(refInput.current);
         const respond = await ApiService.updateProduct(selectedRow.id, refInput.current);
         console.log(respond.data);
-        if (respond.status === 200) setOpenEdit(false);
+        if (respond.status === 200) {
+            setOpenEdit(false);
+            setSnackbarMessage("Cập nhật đơn xuất hàng thành công!");
+            setSnackbarSeverity("success");
+            setOpenSnackbar(true);
+        } else {
+            setSnackbarMessage("Lỗi khi cập nhật đơn xuất hàng. Vui lòng thử lại.");
+            setSnackbarSeverity("error");
+            setOpenSnackbar(true);
+        }
     }
 
     const handleDeleteButton = async (id) => {
@@ -153,6 +203,10 @@ const Product = () => {
         setSelectedRow(row);
         refInput.current = row;
         setImages(null);
+        setImageUrls(null);
+
+        setListCategory(await ApiService.getAllCategorys());
+        setListSupplier(await ApiService.getAllSupplier());
 
         const updateStates = async () => {
             if (row.image !== null) {
@@ -162,10 +216,9 @@ const Product = () => {
                 await setImageUrls(null);
                 await setPreviewUrl(null);
             }
-    
-            setListCategory(await ApiService.getAllCategorys());
-            setListSupplier(await ApiService.getAllSupplier());
             setOpenEdit(true);
+            console.log(images);
+            console.log(imageUrls);
         };
     
         updateStates();
@@ -175,47 +228,46 @@ const Product = () => {
         nav('/app/product/detail/' + row.id);
     }
 
-    const handleFilterChange = (e) => {
-        setFilter(e.target.value);
-    };
-
     const handleOpen = async () => {
         setOpen(true);
-        setListCategory(await ApiService.getAllCategorys());
-        setListSupplier(await ApiService.getAllSupplier());
         setImages();
         refInput.current = {};
+        setListCategory(await ApiService.getAllCategorys());
+        setListSupplier(await ApiService.getAllSupplier());
     }
-    const handleClose = () => setOpen(false);
-
-    
-
+    const handleClose = () => {
+        setOpen(false);
+        fetchRows();
+    }
+ 
     const fetchRows = async () => {
       try {
         const response = await ApiService.getAllProduct();
 
-        const updatedRows = await Promise.all(
-            response.map(async (row) => {
-                try {
-                    const supplier = await ApiService.getSupplierById(row.supplierId);
-                    const category = await ApiService.getCategoryById(row.categoryId);
-                    return { 
-                      ...row, 
-                      supplierName: supplier?.nameSupplier || '',
-                      categoryName: category?.categoryName || '',
-                    };
-                } catch (error) {
-                    console.error('Lỗi khi lấy dữ liệu:', error);
-                    return { 
-                      ...row, 
-                      supplierName: '',
-                      categoryName: '',
-                    };
-                }
-            })
-        );
+        // const updatedRows = await Promise.all(
+        //     response.map(async (row) => {
+        //         try {
+        //             const supplier = await ApiService.getSupplierById(row.supplierId);
+        //             const category = await ApiService.getCategoryById(row.categoryId);
+        //             return { 
+        //               ...row, 
+        //               supplierName: supplier?.nameSupplier || '',
+        //               categoryName: category?.categoryName || '',
+        //             };
+        //         } catch (error) {
+        //             console.error('Lỗi khi lấy dữ liệu:', error);
+        //             return { 
+        //               ...row, 
+        //               supplierName: '',
+        //               categoryName: '',
+        //             };
+        //         }
+        //     })
+        // );
 
-        setRows(updatedRows);
+        // setRows(updatedRows);
+        console.log(response);
+        setRows(response);
       } catch (error) {
         console.error("Lỗi khi tải thông tin các Product", error.message);
       }
@@ -226,9 +278,9 @@ const Product = () => {
     const [imageUrls, setImageUrls] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
 
-    useEffect(() => {
-        console.log('Updated images:', images);
-      }, [images]);
+    // useEffect(() => {
+    //     console.log('Updated images:', images);
+    //   }, [images]);
 
     const handleImageChange = (e) => {
         setImages(e.target.files[0]);
@@ -281,6 +333,11 @@ const Product = () => {
             console.error('Lỗi khi tải hình ảnh:', error);
         }
     };
+
+    const filteredRows = rows.filter(row => 
+        row.productName.toLowerCase().includes(search.toLowerCase()) &&
+        ((filter != "" && subfilter != "") ? (filter === 'Loại' ? row.categoryName === subfilter : row.supplierName === subfilter): true)
+    );
     
 
     return(
@@ -302,6 +359,7 @@ const Product = () => {
                                     <SearchIcon />
                                   </InputAdornment>
                                 }
+                                onChange={(e) => setSearch(e.target.value)}
                                 inputProps={{ 'aria-label': 'search' }}
                                 />
                             </Search>
@@ -328,17 +386,47 @@ const Product = () => {
                                     id="demo-simple-select"
                                     value={filter}
                                     label="Lọc theo"
-                                    onChange={handleFilterChange
-                                        
-                                    }
+                                    onChange={handleFilterChange}
                                 >
                                 <MenuItem value="">
                                     <em>Không chọn</em>
                                 </MenuItem>
-                                <MenuItem value={1}>Lớn đến nhỏ</MenuItem>
-                                <MenuItem value={2}>Nhỏ đến lớn</MenuItem>
+                                <MenuItem value={"Loại"}>Loại</MenuItem>
+                                <MenuItem value={"Nhà cung cấp"}>Nhà cung cấp</MenuItem>
                                 </Select>
                             </FormControl>
+
+                            {subFilterVisible && (
+                                <FormControl sx={{ width: "200px", marginRight: "0.5rem" }}>
+                                    <InputLabel id="sub-filter-label">
+                                        {filter === 'Loại' ? 'Chọn loại' : 'Chọn nhà cung cấp'}
+                                    </InputLabel>
+                                    <Select
+                                        labelId="sub-filter-label"
+                                        id="sub-filter"
+                                        value={subfilter}
+                                        label={filter === 'Loại' ? 'Chọn loại' : 'Chọn nhà cung cấp'}
+                                        onChange={handleSubFilterChange}
+                                    >
+                                        <MenuItem value="">
+                                            <em>Không chọn</em>
+                                        </MenuItem>
+                                        {filter === 'Loại' ? (
+                                            listCategory.map((category) => {
+                                                return (
+                                                    <MenuItem value={category.categoryName}>{category.categoryName}</MenuItem>
+                                                );
+                                            })
+                                        ) : (
+                                            listSupplier.map((supplier) => {
+                                                return (
+                                                    <MenuItem value={supplier.nameSupplier}>{supplier.nameSupplier}</MenuItem>
+                                                );
+                                            })
+                                        )}
+                                    </Select>
+                                </FormControl>
+                            )}
                         </Stack>
                         <Stack className="btn-add-inventory-bar" direction={"row"} alignItems={"center"}> 
                             <Button 
@@ -351,7 +439,7 @@ const Product = () => {
                         </Stack>
                     </Stack>
                 </Stack>
-                <MyTable tableColumns={columns} tableRows={rows} handleDeleteButton={handleDeleteButton} handleEditButton={handleEditButton} handleClickRow={handleClickRow}/>
+                <MyTable tableColumns={columns} tableRows={filteredRows} handleDeleteButton={handleDeleteButton} handleEditButton={handleEditButton} handleClickRow={handleClickRow}/>
             </Stack>
             <Modal
                 aria-labelledby="transition-modal-title"
@@ -475,7 +563,10 @@ const Product = () => {
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
                 open={openEdit}
-                onClose={()=>{setOpenEdit(false)}}
+                onClose={()=>{
+                    setOpenEdit(false)
+                    fetchRows()
+                }}
                 closeAfterTransition
             >
                 <Fade in={openEdit}>
@@ -608,7 +699,16 @@ const Product = () => {
                     </Box>
                 </Fade>
             </Modal>
-
+        <Snackbar
+            open={openSnackbar}
+            autoHideDuration={6000}
+            onClose={() => setOpenSnackbar(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+            <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity}>
+                {snackbarMessage}
+            </Alert>
+        </Snackbar>                        
         </Container>
     )
 }

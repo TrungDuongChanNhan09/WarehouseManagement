@@ -16,6 +16,7 @@ import {
   DialogContent,
   DialogActions,
   TablePagination,
+  Snackbar, Alert
 } from '@mui/material';
 import { ExpandMore, ExpandLess, Edit, Delete } from '@mui/icons-material';
 import ApiService from "../../Service/ApiService.jsx";
@@ -28,9 +29,13 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-
+  const [productNames, setProductNames] = useState({});
   const [page, setPage] = useState(0); 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); 
+
 
   // Expand/Collapse Row
   const handleExpandRow = async (orderId, orderItemCodes) => {
@@ -45,8 +50,30 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
       try {
         const fetchedItems = [];
         for (let code of orderItemCodes) {
+          console.log("Đang xử lý mã đơn hàng:", code); 
+  
           const item = await ApiService.getOrderItemByCode([code]);
           fetchedItems.push(item);
+  
+          console.log("Dữ liệu item nhận được từ API:", item); 
+          console.log("Đang gửi productId đến API:", item.product_id); 
+  
+          // Fetch product details by productId
+          const product = await ApiService.getProductById(item.product_id);
+  
+          console.log("Dữ liệu sản phẩm nhận được từ API:", product);
+  
+          if (product && product.productName) {
+            setProductNames((prevNames) => ({
+              ...prevNames,
+              [item.orderItemCode]: product.productName,
+            }));
+          } else {
+            setProductNames((prevNames) => ({
+              ...prevNames,
+              [item.orderItemCode]: "Không tìm thấy tên sản phẩm",
+            }));
+          }
         }
         setOrderItems((prevItems) => ({ ...prevItems, [orderId]: fetchedItems }));
       } catch (error) {
@@ -54,6 +81,7 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
       }
     }
   };
+  
 
   // Confirm Delete Handler
   const handleDeleteClick = (orderId) => {
@@ -65,15 +93,24 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
     if (orderToDelete) {
       try {
         await ApiService.deleteOrder(orderToDelete);
-        console.log(`Deleted order with ID: ${orderToDelete}`);
+        setSnackbarMessage('Xóa đơn hàng thành công!');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
+  
         setOrderToDelete(null);
         setOpenConfirmDialog(false);
+  
+        // Fetch lại danh sách đơn hàng
+        await fetchOrders();
       } catch (error) {
         console.error(`Error deleting order with ID ${orderToDelete}:`, error);
+        setSnackbarMessage('Có lỗi xảy ra khi xóa đơn hàng!');
+        setSnackbarSeverity('error');
+        setSnackbarOpen(true);
       }
     }
   };
-
+  
   const handleCancelDelete = () => {
     setOrderToDelete(null);
     setOpenConfirmDialog(false);
@@ -148,6 +185,9 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
                   <TableCell>
                     {order.state === "PENDING" ? "Đang chờ" : 
                     order.state === "DELIVERED" ? "Đã giao" : 
+                    order.state === "ON_GOING" ? "Đang giao" : 
+                    order.state === "CONFIRMED" ? "Đã xác nhận" : 
+                    order.state === "CANCELLED" ? "Đã hủy" : 
                     order.state || "Chưa có trạng thái"}
                   </TableCell>
                   <TableCell>
@@ -167,24 +207,25 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
                           Chi tiết gói hàng
                         </Typography>
                         <Table size="small">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>Mã gói hàng</TableCell>
-                              <TableCell>Mã kệ</TableCell>
-                              <TableCell>Số lượng</TableCell>
-                              <TableCell>Tổng giá</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {orderItems[order.id]?.map((item, index) => (
-                              <TableRow key={index}>
-                                <TableCell>{item.orderItemCode}</TableCell>
-                                <TableCell>{item.shelfCode}</TableCell>
-                                <TableCell>{item.quantity}</TableCell>
-                                <TableCell>{item.totalPrice} VND</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
+                        <TableHead>
+                        <TableRow>
+                          <TableCell>Mã gói hàng</TableCell>
+                          <TableCell>Tên sản phẩm</TableCell>
+                          <TableCell>Số lượng</TableCell>
+                          <TableCell>Tổng giá</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {orderItems[order.id]?.map((item, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{item.orderItemCode}</TableCell>
+                            <TableCell>{productNames[item.orderItemCode] || "Đang tải..."}</TableCell>
+                            <TableCell>{item.quantity}</TableCell>
+                            <TableCell>{item.totalPrice} VND</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+
                         </Table>
                       </Box>
                     </Collapse>
@@ -215,6 +256,20 @@ const OrderTable = ({ orders, searchQuery, statusFilter, fetchOrders }) => {
         fetchOrders ={ fetchOrders}
         reloadOrderItems={(orderId, orderItemCodes) => handleExpandRow(orderId, orderItemCodes)}
       />
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={() => setSnackbarOpen(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        >
+          <Alert
+            onClose={() => setSnackbarOpen(false)}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
 
       {/* Confirm Delete Dialog */}
       <Dialog open={openConfirmDialog} onClose={handleCancelDelete}>
