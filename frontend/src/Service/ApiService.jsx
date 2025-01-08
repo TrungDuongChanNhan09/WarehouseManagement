@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export default class ApiService {
-    static BASE_URL = "https://my-java-app-axud.onrender.com";
+    static BASE_URL = "http://localhost:6060";
 
     // Từ
     static getHeader() {
@@ -592,6 +592,18 @@ export default class ApiService {
             throw error;
         }
     }
+    static async getNotification() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/notification`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sach thong bao:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
     static async deleteOrder(id) {
         try {
             const response = await axios.delete(`${this.BASE_URL}/api/admin/order/deleteOrder/${id}`, {

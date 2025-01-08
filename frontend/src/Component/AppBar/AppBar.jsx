@@ -18,7 +18,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useAsyncError, useNavigate } from "react-router-dom";
 import ApiService from "../../Service/ApiService";
 
 import {CircularProgress, Alert} from "@mui/material";
@@ -183,10 +183,25 @@ const PrimarySearchAppBar = ({addNotification}) => {
   const [inforUser, setInforUser] = useState(null)
   
   const [imageFile, setImageFile] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null); 
-  const [currentImage, setCurrentImage] = useState(null); 
+  const [previewImage, setPreviewImage] = useState(null);
+  
+  const [currentImage, setCurrentImage] = useState(null);
+  const [notification, setNotification] = useState([]);
+  
+  const fetchNotification = async () => {
+    try {
+        const response = await ApiService.getNotification();
+        setNotification(response);
+
+        console.log(response);
+    } catch (error) {
+        console.error("Lỗi khi tải thông bao", error.message);
+    }
+  };
+
 
   useEffect(() => {
+    fetchNotification()
     if (open) {
       const loadUserData = async () => {
         setLoading(true);
@@ -328,16 +343,15 @@ const PrimarySearchAppBar = ({addNotification}) => {
                 <Typography variant="subtitle1">Thông báo</Typography>
               </MenuItem>
               <Divider />
-              {notifications.length === 0 ? (
+              {notification.length === 0 ? (
                 <MenuItem>
                   <ListItemText primary="Không có thông báo nào." />
                 </MenuItem>
               ) : (
-                notifications.map((notification) => (
+                notification.map((notification) => (
                   <MenuItem key={notification.id} onClick={handleClose2}>
                     <ListItemText
-                      primary={notification.message}
-                      secondary={format(notification.time, "dd/MM/yyyy HH:mm")}
+                      primary={notification}
                     />
                   </MenuItem>
                 ))
