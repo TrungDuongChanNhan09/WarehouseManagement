@@ -1,29 +1,41 @@
 import * as React from "react";
 import { styled, alpha } from "@mui/material/styles";
 import {
-  AppBar,Box,Toolbar,InputBase,
-  Stack,TextField,Button,List,ListItem,Switch,ListItemButton,ListItemText,
+  AppBar, InputBase,
+  Box, Switch,
+  Toolbar,
+  Stack,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
   IconButton,
   Typography,
   Badge,
   MenuItem,
   Menu,
   Modal,
-  Fade, Grid,
-  Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, Divider
+  Fade,
+  Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
+  Divider,
+  CircularProgress,
+  Alert,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { useState } from "react";
-import { useAsyncError, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ApiService from "../../Service/ApiService";
-
-import {CircularProgress, Alert} from "@mui/material";
-import { useEffect } from "react";
-import { format } from "date-fns";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -64,9 +76,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-const PrimarySearchAppBar = ({addNotification}) => {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [open, setOpen] = React.useState(false);
+const PrimarySearchAppBar = ({ addNotification }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [open, setOpen] = useState(false);
   const [selectedSection, setSelectedSection] = useState("info");
   const navigate = useNavigate();
 
@@ -83,7 +95,6 @@ const PrimarySearchAppBar = ({addNotification}) => {
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
 
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
@@ -126,14 +137,13 @@ const PrimarySearchAppBar = ({addNotification}) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: "90%", // Tăng chiều rộng Modal
-    maxWidth: "1200px", // Giới hạn chiều rộng tối đa
+    width: "90%",
+    maxWidth: "1200px",
     bgcolor: "background.paper",
     boxShadow: 24,
     p: 4,
     borderRadius: "8px",
   };
-  
 
   const [formData, setFormData] = useState({
     gender: "",
@@ -141,51 +151,11 @@ const PrimarySearchAppBar = ({addNotification}) => {
     dateOfBirth: "",
     address: "",
     email: "",
-    image:"",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-
-    let imageUrl = formData.image;
-    if (selectedFile) {
-      imageUrl = await uploadImage();
-      if (!imageUrl) {
-        alert("Failed to upload the image. Please try again.");
-        setLoading(false);
-        return;
-      }
-    }
-
-    const updatedData = { ...formData, image: imageUrl };
-
-    try {
-      await ApiService.updateInforUser(updatedData);
-      setSuccess(true);
-    } catch (err) {
-      setError(err.response?.data?.message || "Cập nhật thất bại.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const [inforUser, setInforUser] = useState(null)
-  
-  const [imageFile, setImageFile] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
-  
-  const [currentImage, setCurrentImage] = useState(null);
   const [notification, setNotification] = useState([]);
   
   const fetchNotification = async () => {
@@ -199,64 +169,28 @@ const PrimarySearchAppBar = ({addNotification}) => {
     }
   };
 
-
-  useEffect(() => {
-    fetchNotification()
-    if (open) {
-      const loadUserData = async () => {
-        setLoading(true);
-        try {
-          const response = await ApiService.getInforUser();
-          setInforUser(response);
-      
-          setFormData({
-            gender: response.gender || "",
-            identification: response.identification || "",
-            dateOfBirth: response.dateOfBirth || "",
-            address: response.address || "",
-            email: response.email || "",
-            image: response.image || "", 
-          });
-          setCurrentImage(response.image || ""); 
-        } catch (error) {
-          console.error("Lỗi khi tải thông tin người dùng", error.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-      loadUserData();
-    }
-  }, [open]);
-  
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImageFile(file);
-      setPreviewImage(URL.createObjectURL(file)); // Tạo URL để xem trước
-    }
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
-  const handleImageUpload = async () => {
-    if (!imageFile) {
-      alert("Vui lòng chọn một ảnh để tải lên.");
-      return;
-    }
-  
-    const formData = new FormData();
-    formData.append("image", imageFile);
-  
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
     try {
-      const response = await ApiService.uploadImage(formData);
-      if (response.url) {
-        alert("Tải ảnh thành công!");
-        setFormData({ ...formData, image: response.url }); 
-        setPreviewImage(null); 
-      }
+      await ApiService.updateInforUser(formData);
+      setSuccess(true);
     } catch (err) {
-      console.error("Lỗi tải ảnh:", err);
-      alert("Tải ảnh thất bại.");
+      setError(err.response?.data?.message || "Cập nhật thất bại.");
+    } finally {
+      setLoading(false);
     }
   };
 
+  const [inforUser, setInforUser] = useState(null);
 
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -287,6 +221,32 @@ const PrimarySearchAppBar = ({addNotification}) => {
     handleAddNotification("Thông báo mới từ hệ thống");
   };
 
+  useEffect(() => {
+    fetchNotification()
+    if (open) {
+      const loadUserData = async () => {
+        setLoading(true);
+        try {
+          const response = await ApiService.getInforUser();
+          setInforUser(response);
+
+          setFormData({
+            gender: response.gender || "",
+            identification: response.identification || "",
+            dateOfBirth: response.dateOfBirth || "",
+            address: response.address || "",
+            email: response.email || "",
+          });
+        } catch (error) {
+          console.error("Lỗi khi tải thông tin người dùng", error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadUserData();
+    }
+  }, [open]);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -311,15 +271,13 @@ const PrimarySearchAppBar = ({addNotification}) => {
               display: { xs: "none", md: "flex", width: "200px", border: "1px solid #9AA6B2", borderRadius: "0.5rem" },
             }}
           >
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit"
-              
-            >
+            <IconButton size="large" color="inherit">
               <Badge badgeContent={3} color="error">
                 <MailIcon />
               </Badge>
             </IconButton>
 
-          {/* Notification - START */}
+
             <IconButton size="large" color="inherit"
               onClick={handleNotificationClick}
               aria-controls={open2 ? "notification-menu" : undefined}
@@ -336,7 +294,7 @@ const PrimarySearchAppBar = ({addNotification}) => {
               open={open2}
               onClose={handleClose2}
               PaperProps={{
-                style: { width: 300 },
+                style: { width: 400 },
               }}
             >
               <MenuItem disabled>
@@ -357,17 +315,14 @@ const PrimarySearchAppBar = ({addNotification}) => {
                 ))
               )}
             </Menu>
-          {/* - END */}
 
-            <IconButton size="large" edge="end" aria-label="settings" color="inherit">
+
+            <IconButton size="large" edge="end" color="inherit">
               <SettingsIcon />
             </IconButton>
-            {/* <button onClick={handleAddTestNotification}>Thêm thông báo giả lập</button> */}
             <IconButton
-              sx={{marginRight:"0.4rem"}}
               size="large"
               edge="end"
-              aria-label="account of current user"
               aria-controls={menuId}
               aria-haspopup="true"
               onClick={handleProfileMenuOpen}
@@ -411,130 +366,97 @@ const PrimarySearchAppBar = ({addNotification}) => {
               </Box>
               <Box sx={{ width: "80%", padding: 2 }}>
                 {selectedSection === "info" && (
-                 
-
                   <Stack direction="column" spacing={2}>
-                <Typography variant="h5" fontWeight="bold" gutterBottom>
-                  Cập nhật thông tin người dùng
-                </Typography>
+                    <Typography variant="h5" fontWeight="bold" gutterBottom>
+                      Cập nhật thông tin người dùng
+                    </Typography>
 
-                {success && <Alert severity="success">Cập nhật thành công!</Alert>}
-                {error && <Alert severity="error">{error}</Alert>}
+                    {success && <Alert severity="success">Cập nhật thành công!</Alert>}
+                    {error && <Alert severity="error">{error}</Alert>}
 
-                <Box sx={{ textAlign: "center", marginBottom: "16px" }}>
-                  <img
-                    src={previewImage || currentImage} 
-                    alt="User Avatar"
-                    value={inforUser?.image || ""}
-                    style={{
-                      width: "150px",
-                      height: "150px",
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      border: "2px solid #ddd",
-                    }}
-                  />
-                </Box>
+                    <Grid container spacing={2} alignItems="center">
+                      <Grid item xs={4}>
+                        <TextField
+                          disabled
+                          label="Tên người dùng"
+                          value={inforUser?.userName || ""}
+                          fullWidth
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          disabled
+                          label="Họ tên đầy đủ"
+                          value={inforUser?.fullName || ""}
+                          fullWidth
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Giới tính"
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleInputChange}
+                          fullWidth
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="CMND/CCCD"
+                          name="identification"
+                          value={formData.identification}
+                          onChange={handleInputChange}
+                          fullWidth
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Ngày sinh"
+                          name="dateOfBirth"
+                          type="date"
+                          value={formData.dateOfBirth}
+                          onChange={handleInputChange}
+                          fullWidth
+                          InputLabelProps={{ shrink: true }}
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Địa chỉ"
+                          name="address"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          fullWidth
+                          variant="outlined"
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <TextField
+                          label="Email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          fullWidth
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
 
-                <Button variant="outlined" component="label">
-                  Tải ảnh mới
-                  <input type="file" accept="image/*" hidden onChange={handleImageChange} />
-                </Button>
-
-                <Button
-                  onClick={handleImageUpload}
-                  variant="contained"
-                  sx={{color: "white", height:"50px", backgroundColor: "#243642"}}
-                  color="primary"
-                  disabled={loading}
-                >
-                  {loading ? <CircularProgress size={24} /> : "Gửi ảnh"}
-                </Button>
-
-                <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={4}>
-                    <TextField
-                      disabled
-                      label="Tên người dùng"
-                      value={inforUser?.userName || ""}
-                      fullWidth
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      disabled
-                      label="Họ tên đầy đủ"
-                      value={inforUser?.fullName || ""}
-                      fullWidth
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Giới tính"
-                      name="gender"
-                      value={formData.gender}
-                      onChange={handleInputChange}
-                      fullWidth
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="CMND/CCCD"
-                      name="identification"
-                      value={formData.identification}
-                      onChange={handleInputChange}
-                      fullWidth
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Ngày sinh"
-                      name="dateOfBirth"
-                      type="date"
-                      value={formData.dateOfBirth}
-                      onChange={handleInputChange}
-                      fullWidth
-                      InputLabelProps={{ shrink: true }}
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Địa chỉ"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      fullWidth
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <TextField
-                      label="Email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      fullWidth
-                      variant="outlined"
-                    />
-                  </Grid>
-                </Grid>
-
-                <Button
-                  onClick={handleSubmit}
-                  variant="contained"
-                  color="primary"
-                  disabled={loading}
-                  sx={{color: "white", height:"50px", backgroundColor: "#243642"}}
-                >
-                  {loading ? <CircularProgress size={24} /> : "Cập nhật thông tin"}
-                </Button>
-              </Stack>
-
+                    <Button
+                      onClick={handleSubmit}
+                      variant="contained"
+                      color="primary"
+                      disabled={loading}
+                      sx={{ color: "white", height: "50px", backgroundColor: "#243642" }}
+                    >
+                      {loading ? <CircularProgress size={24} /> : "Cập nhật thông tin"}
+                    </Button>
+                  </Stack>
                 )}
                 {selectedSection === "security" && (
                   <Stack spacing={2}>
@@ -548,7 +470,6 @@ const PrimarySearchAppBar = ({addNotification}) => {
                     <TextField label="Mật khẩu hiện tại" type="password" fullWidth variant="outlined" />
                     <TextField label="Nhập mật khẩu mới" type="password" fullWidth variant="outlined" />
                     <Button
-                      className="btn-setting"
                       sx={{ color: "white", height: "50px", backgroundColor: "#243642" }}
                       variant="contained"
                     >
@@ -582,8 +503,6 @@ const PrimarySearchAppBar = ({addNotification}) => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      
     </Box>
   );
 };

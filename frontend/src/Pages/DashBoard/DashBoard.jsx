@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
 import './DashBoard.css';
-import { Container, Stack, Typography } from "@mui/material";
+import { Container, Stack, Typography, Dialog, DialogTitle, DialogContent, List, DialogActions, Button, ListItem, ListItemText } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -44,15 +44,49 @@ const DashBoard = () => {
     const [orders, setOrders] = useState([]);
     const [orderDelivered, setOrderDelivered] = useState([]);
     const [orderCanceled, setOrderCanceled] = useState([]);
-    const [totalRevenue, setTotalRevenue] = useState(0); // Thêm state để lưu tổng doanh thu
+    const [totalRevenue, setTotalRevenue] = useState(0); 
 
     const [deliveredData, setDeliveredData] = useState(new Array(12).fill(0));
     const [canceledData, setCanceledData] = useState(new Array(12).fill(0));
 
-    const [selectedYear, setSelectedYear] = useState(dayjs().year()); // Năm mặc định là năm hiện tại
+    const [selectedYear, setSelectedYear] = useState(dayjs().year()); 
 
     const [exports, setExports] = useState([])
-    const [totalExportCount, setTotalExportCount] = useState(0); // Thêm state để lưu số lượng đơn hàng xuất
+    const [totalExportCount, setTotalExportCount] = useState(0); 
+
+    const [imports, setImports] = useState([]);
+    const [totalImportCount, setTotalImportCount] = useState(0);
+
+    const [notification, setNotification] = useState([]);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const fetchNotification = async () => {
+        try {
+            const response = await ApiService.getNotification();
+            setNotification(response);
+            if (response.length > 0) {
+                setIsNotificationOpen(true); 
+            }
+            console.log(response);
+        } catch (error) {
+            console.error("Lỗi khi tải thông báo", error.message);
+        }
+    };
+    const handleNotificationClose = () => {
+        setIsNotificationOpen(false); 
+    };
+    const fetchImport = async () => {
+        try {
+            const response = await ApiService.getAllImportShipments();
+            setImports(response.data);
+    
+            const totalImportCount = response.data.length;
+            setTotalImportCount(totalImportCount); 
+    
+            console.log(response.data);
+        } catch (error) {
+            console.error("Lỗi khi tải thông tin import", error.message);
+        }
+    };
 
 
     const fetchExport = async () => {
@@ -118,9 +152,11 @@ const DashBoard = () => {
     };
 
     useEffect(() => {
+        fetchNotification();
         fetchQuantityProduct();
         fetchOrder();
         fetchExport();
+        fetchImport();
     }, []);
 
     return (
@@ -229,11 +265,12 @@ const DashBoard = () => {
                     <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
                         <WorkHistoryOutlined sx={{fontSize:"30px"}}/>
                         <Typography 
-                        sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
-                        variant="p">
-                            Tổng lô hàng nhập: 0
+                            sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
+                            variant="p">
+                            Tổng lô hàng nhập: {totalImportCount} 
                         </Typography>
                     </Stack>
+
                 </Stack>
 
                 <Typography 
@@ -268,6 +305,30 @@ const DashBoard = () => {
                     
                 </Stack>
             </Stack>
+            <Dialog
+                    open={isNotificationOpen}
+                    onClose={handleNotificationClose}
+                    aria-labelledby="notification-dialog-title"
+                >
+                    <DialogTitle id="notification-dialog-title">Thông báo</DialogTitle>
+                    <DialogContent>
+                        <List>
+                            {notification.map((item, index) => (
+                                <ListItem key={index}>
+                                    <ListItemText
+                                        primary={item.title || `Thông báo ${index + 1}`}
+                                        secondary={item.message || notification}
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleNotificationClose} color="primary">
+                            Đóng
+                        </Button>
+                    </DialogActions>
+                </Dialog>
         </Container>
     );
 };

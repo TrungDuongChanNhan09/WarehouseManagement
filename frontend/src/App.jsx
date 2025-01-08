@@ -1,4 +1,5 @@
 import React from "react";
+import { useState } from "react";
 import './App.css'
 import './style.css'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
@@ -18,7 +19,9 @@ import ExportShipment from "./Pages/ExportShipment/ExportShipment.jsx";
 import ProductDetail from "./Pages/Product/SubPages/ProductDetail.jsx";
 import Report from "./Pages/Report/Report.jsx";
 
+
 const App = () =>{
+  const [role, setRole] = useState(localStorage.getItem('role') || '');
   return(
     <div className="App">
       <BrowserRouter>
@@ -27,7 +30,12 @@ const App = () =>{
           <Route path='register' element={<Register/>}/>
           <Route path='login' element={<Login/>}/>
           <Route path='app' element={<Navbar/>}>
+          {role === "ROLE_ADMIN" && (
             <Route index element={<DashBoard/>}/>
+          )}
+          {role === "ROLE_STAFF" && (
+            <Route index element={<Inventory/>}/>
+          )}
             <Route path='home' element={<DashBoard/>}/>
             <Route path='order' element={<Order/>}/>
             <Route path='inventory' element={<Inventory/>}/>
