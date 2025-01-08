@@ -1,10 +1,11 @@
 package com.example.backend.respone;
 
-import java.util.Date;
 
 import com.example.backend.model.PRODUCT_STATUS;
-
 import lombok.Data;
+
+import java.util.Date;
+
 
 @Data
 public class ProductRespone{
@@ -19,7 +20,9 @@ public class ProductRespone{
     private Date production_date;
     private Date expiration_date;
     private int price;
+
     private String supplierName;
     private String categoryName;
     private PRODUCT_STATUS productStatus;
 }
+

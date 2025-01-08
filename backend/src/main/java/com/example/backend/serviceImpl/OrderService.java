@@ -97,8 +97,11 @@ public class OrderService implements com.example.backend.service.OrderService {
     }
 
     @Override
-    public void deleteOrder(String id) {
+    public void deleteOrder(String id) throws Exception {
         Order order = orderRepository.findById(id).orElse(null);
+        if(order.getOrderStatus() == ORDER_STATUS.IN_EXPORT){
+            throw new Exception("Order is already in export so that cannot delete");
+        }
         for(String i : order.getOrderItem_code()){
             orderItemRepository.deleteByorderItemCode(i);
         }
@@ -122,11 +125,7 @@ public class OrderService implements com.example.backend.service.OrderService {
         }
 
         existingOrder.setOrderState(state.getState());
-        if(state.getState() == ORDER_STATE.DELIVERED){
-            for (String orderItemCode : existingOrder.getOrderItem_code()){
-                orderItemRepository.deleteByorderItemCode(orderItemCode);
-            }
-        } else if (state.getState() == ORDER_STATE.CANCELLED) {
+        if (state.getState() == ORDER_STATE.CANCELLED) {
             for(String orderItemCode : existingOrder.getOrderItem_code()){
                 OrderItem orderItem = orderItemRepository.findByorderItemCode(orderItemCode);
                 orderItem.setOrderItemState(ORDER_ITEM_STATE.OUT_ORDER);

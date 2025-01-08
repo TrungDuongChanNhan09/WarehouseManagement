@@ -3,6 +3,7 @@ package com.example.backend.serviceImpl;
 import com.example.backend.model.Category;
 import com.example.backend.model.Product;
 import com.example.backend.model.Supplier;
+import com.example.backend.respone.ProductRespone;
 import com.example.backend.serviceImpl.ShelfService;
 
 import com.example.backend.repository.CategoryRepository;
@@ -35,7 +36,7 @@ public class ProductService implements com.example.backend.service.ProductServic
         List<ProductRespone> productRespones = new ArrayList<>();
         for(Product i : productRepository.findAll()){
             ProductRespone productRespone = new ProductRespone();
-            productRespone.setId(i.getId());
+
             Category category = categoryRepository.findById(i.getCategoryId()).orElse(null);
             Supplier supplier = supplierRepository.findById(i.getSupplierId()).orElse(null);
             productRespone.setProduction_date(i.getProduction_date());
@@ -48,10 +49,11 @@ public class ProductService implements com.example.backend.service.ProductServic
             productRespone.setExpiration_date(i.getExpiration_date());
             productRespone.setCategoryId(i.getCategoryId());
             productRespone.setSupplierId(i.getSupplierId());
+            productRespone.setProductStatus(i.getProductStatus());
+            productRespone.setId(i.getId());
             productRespone.setSupplierName(supplier.getNameSupplier());
             productRespone.setCategoryName(category.getCategoryName());
             productRespones.add(productRespone);
-            productRespone.setProductStatus(i.getProductStatus());
         }
 
         return productRespones;
