@@ -121,18 +121,49 @@ const DashBoard = () => {
         }
     };
 
+    // const fetchOrder = async () => {
+    //     try {
+    //         const response = await ApiService.getAllOrders();
+    //         setOrders(response);
+
+    //         // Tính tổng doanh thu từ các đơn hàng
+    //         const totalRevenue = response.reduce((acc, order) => acc + order.orderPrice, 0);
+    //         setTotalRevenue(totalRevenue); 
+
+    //         const delivered = new Array(12).fill(0);
+    //         const canceled = new Array(12).fill(0);
+
+    //         response.forEach((order) => {
+    //             const month = dayjs(order.createdAt).month();
+    //             if (order.orderState === "DELIVERED") {
+    //                 delivered[month]++;
+    //             } else if (order.orderState === "CANCELLED") {
+    //                 canceled[month]++;
+    //             }
+    //         });
+
+    //         setOrderDelivered(delivered);
+    //         setOrderCanceled(canceled);
+    //         setDeliveredData(delivered);
+    //         setCanceledData(canceled);
+    //     } catch (error) {
+    //         console.error("Lỗi khi tải thông tin các đơn hàng", error.message);
+    //     }
+    // };
+
     const fetchOrder = async () => {
         try {
             const response = await ApiService.getAllOrders();
             setOrders(response);
-
-            // Tính tổng doanh thu từ các đơn hàng
-            const totalRevenue = response.reduce((acc, order) => acc + order.orderPrice, 0);
-            setTotalRevenue(totalRevenue); // Lưu tổng doanh thu vào state
-
+    
+            const totalRevenue = response
+                .filter(order => order.orderState === "DELIVERED")
+                .reduce((acc, order) => acc + order.orderPrice, 0);
+            setTotalRevenue(totalRevenue);
+    
             const delivered = new Array(12).fill(0);
             const canceled = new Array(12).fill(0);
-
+    
             response.forEach((order) => {
                 const month = dayjs(order.createdAt).month();
                 if (order.orderState === "DELIVERED") {
@@ -141,7 +172,7 @@ const DashBoard = () => {
                     canceled[month]++;
                 }
             });
-
+    
             setOrderDelivered(delivered);
             setOrderCanceled(canceled);
             setDeliveredData(delivered);
@@ -150,6 +181,7 @@ const DashBoard = () => {
             console.error("Lỗi khi tải thông tin các đơn hàng", error.message);
         }
     };
+    
 
     useEffect(() => {
         fetchNotification();
