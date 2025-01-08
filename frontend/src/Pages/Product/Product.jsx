@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import './Product.css'
-import { Alert, alpha, Box, Button, Container, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Snackbar, Stack, styled, TextField, Typography } from "@mui/material";
+import { Alert, alpha, Box, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Snackbar, Stack, styled, TextField, Typography } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import MyTable from "../../Component/MyTable";
@@ -104,6 +104,8 @@ const Product = () => {
     const [openEdit, setOpenEdit] = useState(false);
     const [rows, setRows] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [idProductDelete, setIdProductDelete] = useState("");
     const nav = useNavigate();
 
     const [openSnackbar, setOpenSnackbar] = useState(false);  // Control Snackbar visibility
@@ -195,7 +197,13 @@ const Product = () => {
     }
 
     const handleDeleteButton = async (id) => {
-        await ApiService.deleteProduct(id);
+        setIdProductDelete(id);
+        setOpenConfirmDialog(true);
+    }
+
+    const deleteProduct = async () => {
+        await ApiService.deleteProduct(idProductDelete);
+        setOpenConfirmDialog(false);
         fetchRows();
     }
 
@@ -235,9 +243,9 @@ const Product = () => {
         setListCategory(await ApiService.getAllCategorys());
         setListSupplier(await ApiService.getAllSupplier());
     }
-    const handleClose = () => {
+    const handleClose = async () => {
+        await fetchRows();
         setOpen(false);
-        fetchRows();
     }
  
     const fetchRows = async () => {
@@ -708,7 +716,26 @@ const Product = () => {
             <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity}>
                 {snackbarMessage}
             </Alert>
-        </Snackbar>                        
+        </Snackbar>
+        <Dialog
+            open={openConfirmDialog}
+            onClose={() => setOpenConfirmDialog(false)}
+        >
+            <DialogTitle>Xác Nhận Xóa</DialogTitle>
+            <DialogContent>
+                <Typography variant="body1">
+                    Bạn có chắc chắn muốn xóa sản phẩm này không?
+                </Typography>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setOpenConfirmDialog(false)} color="default">
+                    Hủy
+                </Button>
+                <Button onClick={deleteProduct} color="primary">
+                    Xóa
+                </Button>
+            </DialogActions>
+        </Dialog>                        
         </Container>
     )
 }
