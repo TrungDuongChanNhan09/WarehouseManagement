@@ -32,7 +32,7 @@ const Inventory = () => {
         typeInventory: "",
         nameInventory: "",
         typeInventoryDescription: "",
-        status: "",
+        // status: "",
         number_shelf: 0,
         capacity_shelf: 0,
     });
@@ -80,7 +80,7 @@ const Inventory = () => {
             !inventoryDetails.nameInventory || 
             !inventoryDetails.typeInventory || 
             !inventoryDetails.number_shelf || 
-            !inventoryDetails.status || 
+            // !inventoryDetails.status || 
             !inventoryDetails.capacity_shelf || 
             !inventoryDetails.typeInventoryDescription
         ) {
@@ -150,13 +150,13 @@ const Inventory = () => {
                             <TextField label="Loại kho hàng" variant="outlined" name="typeInventory" value={inventoryDetails.typeInventory} onChange={handleChange} />
                             <TextField label="Tổng số kệ" variant="outlined" name="number_shelf" value={inventoryDetails.number_shelf} onChange={handleChange} />
 
-                            <TextField 
-                                label="Tình trạng" 
+                            {/* <TextField 
+                                label="Tình trạng"  
                                 variant="outlined" 
                                 name="status" 
                                 value={inventoryDetails.status} 
                                 onChange={handleChange} 
-                            />
+                            /> */}
 
 
                             <TextField label="Sức chứa" variant="outlined" name="capacity_shelf" value={inventoryDetails.capacity_shelf} onChange={handleChange} />
