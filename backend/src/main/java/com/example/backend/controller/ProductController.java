@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.model.Product;
 import com.example.backend.model.User;
 import com.example.backend.request.ProductRequest;
+import com.example.backend.respone.ProductRespone;
 import com.example.backend.service.ProductService;
 import com.example.backend.service.UserService;
 
@@ -58,7 +59,7 @@ public class ProductController {
     }
 
     @GetMapping("")
-    private ResponseEntity<List<Product>> getAllProduct(@RequestHeader("Authorization") String jwt) throws Exception{
+    private ResponseEntity<List<ProductRespone>> getAllProduct(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.getAllProduct(), HttpStatus.OK);
     }
