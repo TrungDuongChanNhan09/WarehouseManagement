@@ -9,6 +9,7 @@ import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.repository.SupplierRepository;
 import com.example.backend.request.ProductRequest;
+import com.example.backend.respone.ProductRespone;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -30,8 +31,30 @@ public class ProductService implements com.example.backend.service.ProductServic
     @Autowired
     private SupplierRepository supplierRepository;
     @Override
-    public List<Product> getAllProduct() {
-        return productRepository.findAll();
+    public List<ProductRespone> getAllProduct() {
+        List<ProductRespone> productRespones = new ArrayList<>();
+        for(Product i : productRepository.findAll()){
+            ProductRespone productRespone = new ProductRespone();
+            productRespone.setId(i.getId());
+            Category category = categoryRepository.findById(i.getCategoryId()).orElse(null);
+            Supplier supplier = supplierRepository.findById(i.getSupplierId()).orElse(null);
+            productRespone.setProduction_date(i.getProduction_date());
+            productRespone.setProductName(i.getProductName());
+            productRespone.setDescription(i.getDescription());
+            productRespone.setImage(i.getImage());
+            productRespone.setUnit(i.getUnit());
+            productRespone.setPrice(i.getPrice());
+            productRespone.setInventory_quantity(i.getInventory_quantity());
+            productRespone.setExpiration_date(i.getExpiration_date());
+            productRespone.setCategoryId(i.getCategoryId());
+            productRespone.setSupplierId(i.getSupplierId());
+            productRespone.setSupplierName(supplier.getNameSupplier());
+            productRespone.setCategoryName(category.getCategoryName());
+            productRespones.add(productRespone);
+            productRespone.setProductStatus(i.getProductStatus());
+        }
+
+        return productRespones;
     }
 
     @Override

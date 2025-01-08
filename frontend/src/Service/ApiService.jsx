@@ -1,7 +1,8 @@
 import axios from "axios";
 
 export default class ApiService {
-    static BASE_URL = "https://wmshehe.onrender.com";
+
+    static BASE_URL = "http://localhost:6060";
 
     // Từ
     static getHeader() {
