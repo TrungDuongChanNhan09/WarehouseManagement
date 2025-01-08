@@ -3,7 +3,7 @@ import axios from "axios";
 export default class ApiService {
 
     static BASE_URL = "https://wmshehe.onrender.com";
-
+    // static BASE_URL = "http://localhost:6060";
     // Từ
     static getHeader() {
         const token = localStorage.getItem("jwt");  
@@ -23,6 +23,19 @@ export default class ApiService {
             throw error;
         }
     }
+
+    static async changePass(formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/auth/changePass`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
     static async logout() {
         try {
             const response = await axios.post(

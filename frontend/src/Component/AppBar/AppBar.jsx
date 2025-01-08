@@ -247,6 +247,31 @@ const PrimarySearchAppBar = ({ addNotification }) => {
     }
   }, [open]);
 
+  const handleInputChange2 = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handlePasswordChange = async () => {
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+  
+    try {
+      await ApiService.changePass({
+        oldPass: formData.oldPass,
+        newPass: formData.newPass,
+      });
+      setSuccess(true); 
+    } catch (err) {
+      setError(err.response?.data?.message || "Đổi mật khẩu thất bại.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -458,7 +483,7 @@ const PrimarySearchAppBar = ({ addNotification }) => {
                     </Button>
                   </Stack>
                 )}
-                {selectedSection === "security" && (
+                {/* {selectedSection === "security" && (
                   <Stack spacing={2}>
                     <Typography variant="h6" fontWeight="bold">
                       Bảo mật
@@ -476,7 +501,54 @@ const PrimarySearchAppBar = ({ addNotification }) => {
                       Cập nhật mật khẩu
                     </Button>
                   </Stack>
+                )} */}
+
+                {selectedSection === "security" && (
+                  <Stack spacing={2}>
+                    <Typography variant="h6" fontWeight="bold">
+                      Bảo mật
+                    </Typography>
+                    <Typography>
+                      Bật xác thực hai yếu tố (2FA):
+                      <Switch defaultChecked />
+                    </Typography>
+
+                    {/* State for Password Change */}
+                    <TextField
+                      label="Mật khẩu hiện tại"
+                      name="oldPass"
+                      type="password"
+                      value={formData.oldPass || ""}
+                      onChange={handleInputChange2}
+                      fullWidth
+                      variant="outlined"
+                    />
+                    <TextField
+                      label="Nhập mật khẩu mới"
+                      name="newPass"
+                      type="password"
+                      value={formData.newPass || ""}
+                      onChange={handleInputChange2}
+                      fullWidth
+                      variant="outlined"
+                    />
+
+                    {/* Error or Success Messages */}
+                    {error && <Alert severity="error">{error}</Alert>}
+                    {success && <Alert severity="success">Cập nhật mật khẩu thành công!</Alert>}
+
+                    {/* Submit Button */}
+                    <Button
+                      sx={{ color: "white", height: "50px", backgroundColor: "#243642" }}
+                      variant="contained"
+                      onClick={handlePasswordChange}
+                      disabled={loading}
+                    >
+                      {loading ? <CircularProgress size={24} /> : "Cập nhật mật khẩu"}
+                    </Button>
+                  </Stack>
                 )}
+
               </Box>
             </Stack>
           </Box>

@@ -149,7 +149,16 @@ const Inventory = () => {
                             <TextField  label="Tên kho hàng" variant="outlined" name="nameInventory" value={inventoryDetails.nameInventory} onChange={handleChange} />
                             <TextField label="Loại kho hàng" variant="outlined" name="typeInventory" value={inventoryDetails.typeInventory} onChange={handleChange} />
                             <TextField label="Tổng số kệ" variant="outlined" name="number_shelf" value={inventoryDetails.number_shelf} onChange={handleChange} />
-                            <TextField label="Tình trạng" variant="outlined" name="status" value={inventoryDetails.status} onChange={handleChange} />
+
+                            <TextField 
+                                label="Tình trạng" 
+                                variant="outlined" 
+                                name="status" 
+                                value={inventoryDetails.status} 
+                                onChange={handleChange} 
+                            />
+
+
                             <TextField label="Sức chứa" variant="outlined" name="capacity_shelf" value={inventoryDetails.capacity_shelf} onChange={handleChange} />
                             <TextField label="Mô tả" variant="outlined" name="typeInventoryDescription" value={inventoryDetails.typeInventoryDescription} onChange={handleChange} />
                             <Button sx={{color: "white", height: "50px", backgroundColor: "#243642"}} variant="contained" onClick={handleAddInventory}>Thêm kho hàng</Button>
