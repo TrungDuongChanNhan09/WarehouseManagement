@@ -2,8 +2,7 @@ import axios from "axios";
 
 export default class ApiService {
 
-    static BASE_URL = "https://backend-n4qi.onrender.com";
-    // https://backend-n4qi.onrender.com
+    static BASE_URL = "https://wmshehe.onrender.com";
 
     // Từ
     static getHeader() {
