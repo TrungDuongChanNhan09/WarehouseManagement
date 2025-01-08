@@ -124,6 +124,11 @@ const Product = () => {
     //     console.log('change sub filter ' + subfilter);
     // },[subfilter]);
 
+    useEffect(() => {
+        if (!open || !openEdit)
+            fetchRows();
+    }, [openEdit,open]);
+
     const handleFilterChange = async (e) => {
         const value = e.target.value;
         setFilter(value);
@@ -164,16 +169,16 @@ const Product = () => {
             const respond = await ApiService.addProduct(refInput.current);
             if (respond.status === 201) {
                 setOpen(false);
-                setSnackbarMessage("Thêm đơn xuất hàng thành công!");
+                setSnackbarMessage("Thêm sản phẩm thành công!");
                 setSnackbarSeverity("success");
                 setOpenSnackbar(true);
             } else {
-                setSnackbarMessage("Lỗi khi thêm đơn xuất hàng. Vui lòng thử lại.");
+                setSnackbarMessage("Lỗi khi thêm sản phẩm. Vui lòng thử lại.");
                 setSnackbarSeverity("error");
                 setOpenSnackbar(true);
             }
         } else {
-            setSnackbarMessage("Lỗi khi thêm đơn xuất hàng. Vui lòng thử lại.");
+            setSnackbarMessage("Lỗi khi thêm sản phẩm. Vui lòng thử lại.");
             setSnackbarSeverity("error");
             setOpenSnackbar(true);
         }
@@ -186,11 +191,11 @@ const Product = () => {
         console.log(respond.data);
         if (respond.status === 200) {
             setOpenEdit(false);
-            setSnackbarMessage("Cập nhật đơn xuất hàng thành công!");
+            setSnackbarMessage("Cập nhật sản phẩm thành công!");
             setSnackbarSeverity("success");
             setOpenSnackbar(true);
         } else {
-            setSnackbarMessage("Lỗi khi cập nhật đơn xuất hàng. Vui lòng thử lại.");
+            setSnackbarMessage("Lỗi khi cập nhật sản phẩm. Vui lòng thử lại.");
             setSnackbarSeverity("error");
             setOpenSnackbar(true);
         }
@@ -244,7 +249,6 @@ const Product = () => {
         setListSupplier(await ApiService.getAllSupplier());
     }
     const handleClose = async () => {
-        await fetchRows();
         setOpen(false);
     }
  
@@ -573,7 +577,6 @@ const Product = () => {
                 open={openEdit}
                 onClose={()=>{
                     setOpenEdit(false)
-                    fetchRows()
                 }}
                 closeAfterTransition
             >
