@@ -63,9 +63,7 @@ const OrderPage = () => {
       const orderData = await ApiService.getAllOrders();
       
       const formattedOrders = orderData.map((order) => {
-        // Log giá trị created_at và orderState để kiểm tra
-        console.log("created_at:", order.created_at);
-        console.log("orderState:", order.orderState);
+
   
         // Chuyển đổi định dạng ngày từ ISO string sang định dạng ngày giờ chuẩn của người dùng
         const formattedDate = new Date(order.created_at).toLocaleString("vi-VN", {
