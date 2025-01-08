@@ -63,7 +63,7 @@ public class ExportService implements com.example.backend.service.ExportService 
         existingExport.setExport_address(export.getExport_address());
         existingExport.setOrderCode(export.getOrderCode());
         existingExport.setOrderQuantity(export.getOrderCode().size());
-        existingExport.setUpdatedAt(export.getUpdated_at());
+        existingExport.setUpdatedAt(currentDate);
         int totalPrice = 0;
 
         for (String i : export.getOrderCode()){
@@ -115,7 +115,7 @@ public class ExportService implements com.example.backend.service.ExportService 
         return exports;
     }
 
-    @Override
+   @Override
     public Export updateExportStatus(String exportId, EXPORT_STATE exportState) throws Exception {
         Export existingExport = exportRepository.findById(exportId).orElse(null);
         if(existingExport == null){
@@ -129,7 +129,7 @@ public class ExportService implements com.example.backend.service.ExportService 
                 orderRepository.save(order);
             }
         }
-        return existingExport;
+        return exportRepository.save(existingExport);
     }
 
     @Override
