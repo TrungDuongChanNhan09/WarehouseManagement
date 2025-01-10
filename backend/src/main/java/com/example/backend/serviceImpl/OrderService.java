@@ -11,6 +11,7 @@ import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +41,8 @@ public class OrderService implements com.example.backend.service.OrderService {
             throw new Exception("Order code is already used");
         }
         Order newOrder = new Order();
-        newOrder.setCreated_at(order.getCreated_at());
+        LocalDate date = LocalDate.now();
+        newOrder.setCreated_at(date);
         newOrder.setDelivery_Address(order.getDelivery_Address());
         newOrder.setOrderItem_code(order.getOrderItem_code());
         newOrder.setUserId(user.getId());
@@ -67,8 +69,9 @@ public class OrderService implements com.example.backend.service.OrderService {
         if(existingOrder.getOrderState() == ORDER_STATE.ON_GOING || existingOrder.getOrderState() == ORDER_STATE.DELIVERED){
             throw new Exception("Cannot update order");
         }
-
-        existingOrder.setUpdate_at(order.getUpdate_at());
+        Order newOrder = new Order();
+        LocalDate date = LocalDate.now();
+        existingOrder.setUpdate_at(date);
         existingOrder.setDelivery_Address(order.getDelivery_Address());
         existingOrder.setOrderItem_code(order.getOrderItem_code());
         existingOrder.setOrderItem_quantity(order.getOrderItem_code().size());
@@ -94,8 +97,11 @@ public class OrderService implements com.example.backend.service.OrderService {
     }
 
     @Override
-    public void deleteOrder(String id) {
+    public void deleteOrder(String id) throws Exception {
         Order order = orderRepository.findById(id).orElse(null);
+        if(order.getOrderStatus() == ORDER_STATUS.IN_EXPORT){
+            throw new Exception("Order is already in export so that cannot delete");
+        }
         for(String i : order.getOrderItem_code()){
             orderItemRepository.deleteByorderItemCode(i);
         }
@@ -119,11 +125,7 @@ public class OrderService implements com.example.backend.service.OrderService {
         }
 
         existingOrder.setOrderState(state.getState());
-        if(state.getState() == ORDER_STATE.DELIVERED){
-            for (String orderItemCode : existingOrder.getOrderItem_code()){
-                orderItemRepository.deleteByorderItemCode(orderItemCode);
-            }
-        } else if (state.getState() == ORDER_STATE.CANCELLED) {
+        if (state.getState() == ORDER_STATE.CANCELLED) {
             for(String orderItemCode : existingOrder.getOrderItem_code()){
                 OrderItem orderItem = orderItemRepository.findByorderItemCode(orderItemCode);
                 orderItem.setOrderItemState(ORDER_ITEM_STATE.OUT_ORDER);
@@ -205,5 +207,39 @@ public class OrderService implements com.example.backend.service.OrderService {
         }
         existingOrder.setOrderStatus(status.getOrderStatus());
         return orderRepository.save(existingOrder);
+    }
+
+    @Override
+    public OrderQuantity getOrderQuantityByMonth(int month, int year) {
+        int on_pending = 0;
+        int confirmed = 0;
+        int delivered = 0;
+        int on_going = 0;
+        int cancel = 0;
+        OrderQuantity orderQuantity = new OrderQuantity();
+        for(Order order : orderRepository.findOrdersByMonthAndYear(month, year)){
+            if(order.getOrderState() == ORDER_STATE.ON_GOING){
+                on_going += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.DELIVERED){
+                delivered += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.CANCELLED){
+                cancel += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.PENDING){
+                on_pending += 1;
+            }
+            if(order.getOrderState() == ORDER_STATE.CONFIRMED){
+                confirmed += 1;
+            }
+        }
+        orderQuantity.setCancelQuantity(cancel);
+        orderQuantity.setConfirmedQuantity(confirmed);
+        orderQuantity.setPendingQuantity(on_pending);
+        orderQuantity.setDeliveredQuantity(delivered);
+        orderQuantity.setOnGoingQuantity(on_going);
+
+        return orderQuantity;
     }
 }

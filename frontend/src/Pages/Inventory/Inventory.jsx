@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
 import ApiService from "../../Service/ApiService.jsx";
+import NotificationBar from "./NotificationBar/NotificationBar.jsx";
 import TableInventory from "../../Hooks/TableInventory/TableInventory.jsx";
 
 const style = {
@@ -31,7 +32,7 @@ const Inventory = () => {
         typeInventory: "",
         nameInventory: "",
         typeInventoryDescription: "",
-        status: "",
+        // status: "",
         number_shelf: 0,
         capacity_shelf: 0,
     });
@@ -79,7 +80,7 @@ const Inventory = () => {
             !inventoryDetails.nameInventory || 
             !inventoryDetails.typeInventory || 
             !inventoryDetails.number_shelf || 
-            !inventoryDetails.status || 
+            // !inventoryDetails.status || 
             !inventoryDetails.capacity_shelf || 
             !inventoryDetails.typeInventoryDescription
         ) {
@@ -100,9 +101,14 @@ const Inventory = () => {
         }
     };
 
+    const [notification, setNotification] = useState({})
+
+    
+
     return (
         <Container maxWidth="xl" className="Dashboard">
-            <PrimarySearchAppBar />
+            <PrimarySearchAppBar addNotification={notification}/>
+            {/* <NotificationBar addNotification/> */}
             <Stack className="inventory-bar" sx={{backgroundColor: "#E2F1E7", padding: "1rem", borderRadius: "0.5rem"}}>
                 <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
                     <Typography sx={{fontWeight: 'bold', fontSize: "20px", paddingLeft: "20px", width: "200px"}} variant="p">
@@ -143,7 +149,16 @@ const Inventory = () => {
                             <TextField  label="Tên kho hàng" variant="outlined" name="nameInventory" value={inventoryDetails.nameInventory} onChange={handleChange} />
                             <TextField label="Loại kho hàng" variant="outlined" name="typeInventory" value={inventoryDetails.typeInventory} onChange={handleChange} />
                             <TextField label="Tổng số kệ" variant="outlined" name="number_shelf" value={inventoryDetails.number_shelf} onChange={handleChange} />
-                            <TextField label="Tình trạng" variant="outlined" name="status" value={inventoryDetails.status} onChange={handleChange} />
+
+                            {/* <TextField 
+                                label="Tình trạng"  
+                                variant="outlined" 
+                                name="status" 
+                                value={inventoryDetails.status} 
+                                onChange={handleChange} 
+                            /> */}
+
+
                             <TextField label="Sức chứa" variant="outlined" name="capacity_shelf" value={inventoryDetails.capacity_shelf} onChange={handleChange} />
                             <TextField label="Mô tả" variant="outlined" name="typeInventoryDescription" value={inventoryDetails.typeInventoryDescription} onChange={handleChange} />
                             <Button sx={{color: "white", height: "50px", backgroundColor: "#243642"}} variant="contained" onClick={handleAddInventory}>Thêm kho hàng</Button>

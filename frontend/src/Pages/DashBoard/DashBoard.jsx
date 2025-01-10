@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import './DashBoard.css'
-import { Container, Stack, Typography } from "@mui/material";
+import './DashBoard.css';
+import { Container, Stack, Typography, Dialog, DialogTitle, DialogContent, List, DialogActions, Button, ListItem, ListItemText } from "@mui/material";
 import PrimarySearchAppBar from "../../Component/AppBar/AppBar.jsx";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -20,151 +20,201 @@ import { BarChart } from '@mui/x-charts/BarChart';
 
 import ApiService from "../../Service/ApiService.jsx";
 import { roRO } from "@mui/x-date-pickers/locales";
+import dayjs from "dayjs";
 
-const chartSetting = {
-    xAxis: [
-      {
-        label: 'Tổng số đơn hàng',
-      },
-    ],
-    width: 500,
-    height: 400,
-  };
-  
-const dataset = [
-    {
-      london: 59,
-      paris: 57,
-      newYork: 86,
-      seoul: 21,
-      month: 'Jan',
-    },
-    {
-      london: 50,
-      paris: 52,
-      newYork: 78,
-      seoul: 28,
-      month: 'Feb',
-    },
-    {
-      london: 47,
-      paris: 53,
-      newYork: 106,
-      seoul: 41,
-      month: 'Mar',
-    },
-    {
-      london: 54,
-      paris: 56,
-      newYork: 92,
-      seoul: 73,
-      month: 'Apr',
-    },
-    {
-      london: 57,
-      paris: 69,
-      newYork: 92,
-      seoul: 99,
-      month: 'May',
-    },
-    {
-      london: 60,
-      paris: 63,
-      newYork: 103,
-      seoul: 144,
-      month: 'June',
-    },
-    {
-      london: 59,
-      paris: 60,
-      newYork: 105,
-      seoul: 319,
-      month: 'July',
-    },
-    {
-      london: 65,
-      paris: 60,
-      newYork: 106,
-      seoul: 249,
-      month: 'Aug',
-    },
-    {
-      london: 51,
-      paris: 51,
-      newYork: 95,
-      seoul: 131,
-      month: 'Sept',
-    },
-    {
-      london: 60,
-      paris: 65,
-      newYork: 97,
-      seoul: 55,
-      month: 'Oct',
-    },
-    {
-      london: 67,
-      paris: 64,
-      newYork: 76,
-      seoul: 48,
-      month: 'Nov',
-    },
-    {
-      london: 61,
-      paris: 70,
-      newYork: 103,
-      seoul: 25,
-      month: 'Dec',
-    },
+
+const xLabels = [
+  'Tháng 1',
+  'Tháng 2',
+  'Tháng 3',
+  'Tháng 4',
+  'Tháng 5',
+  'Tháng 6',
+  'Tháng 7',
+  'Tháng 8',
+  'Tháng 9',
+  'Tháng 10',
+  'Tháng 11',
+  'Tháng 12',
 ];
-
-function valueFormatter(value) {
-    return `${value}mm`;
-  }
 
 const DashBoard = () => {
     const [quantityProduct, setQuantityProduct] = useState([]);
     const [totalProduct, setTotalProduct] = useState(0);
-    const [orders, setOrders] = useState([])
-    const fetchQuantityProduct = async () => {
-      try {
-        const response = await ApiService.getAllQuantityProduct();
-        setQuantityProduct(response);
-        setTotalProduct(response.cancelQuantity + response.confirmedQuantity + response.deliveredQuantity + response.onGoingQuantity + response.pendingQuantity);
-      } catch (error) {
-        console.error("Lỗi khi tải thông tin đơn hàng theo trạng thái", error.message);
-      }
+    const [orders, setOrders] = useState([]);
+    const [orderDelivered, setOrderDelivered] = useState([]);
+    const [orderCanceled, setOrderCanceled] = useState([]);
+    const [totalRevenue, setTotalRevenue] = useState(0); 
+
+    const [deliveredData, setDeliveredData] = useState(new Array(12).fill(0));
+    const [canceledData, setCanceledData] = useState(new Array(12).fill(0));
+
+    const [selectedYear, setSelectedYear] = useState(dayjs().year()); 
+
+    const [exports, setExports] = useState([])
+    const [totalExportCount, setTotalExportCount] = useState(0); 
+
+    const [imports, setImports] = useState([]);
+    const [totalImportCount, setTotalImportCount] = useState(0);
+
+    const [notification, setNotification] = useState([]);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+    const fetchNotification = async () => {
+        try {
+            const response = await ApiService.getNotification();
+            setNotification(response);
+            if (response.length > 0) {
+                setIsNotificationOpen(true); 
+            }
+            console.log(response);
+        } catch (error) {
+            console.error("Lỗi khi tải thông báo", error.message);
+        }
+    };
+    const handleNotificationClose = () => {
+        setIsNotificationOpen(false); 
+    };
+    const fetchImport = async () => {
+        try {
+            const response = await ApiService.getAllImportShipments();
+            setImports(response.data);
+    
+            const totalImportCount = response.data.length;
+            setTotalImportCount(totalImportCount); 
+    
+            console.log(response.data);
+        } catch (error) {
+            console.error("Lỗi khi tải thông tin import", error.message);
+        }
     };
 
-    const fetchOrder = async() => {
-      try{
-        const response = await ApiService.getAllOrders();
-        setOrders(response);
-      }catch (error){
-        console.error("Lỗi khi tải thông tin các đơn hàng", error.message);
-      }
-    }
+
+    const fetchExport = async () => {
+        try {
+            const response = await ApiService.getAllExport();
+            setExports(response);
+    
+            const ongoingExports = response.filter(exportItem => exportItem.exportState === "ON_GOING");
+            const ongoingExportCount = ongoingExports.length;
+    
+            setTotalExportCount(ongoingExportCount);
+            console.log(response);
+        } catch (error) {
+            console.error("Lỗi khi tải thông tin export", error.message);
+        }
+    };
+    
+
+    const fetchQuantityProduct = async () => {
+        try {
+            const response = await ApiService.getAllQuantityProduct();
+            setQuantityProduct(response);
+            setTotalProduct(
+                response.cancelQuantity +
+                    response.confirmedQuantity +
+                    response.deliveredQuantity +
+                    response.onGoingQuantity +
+                    response.pendingQuantity
+            );
+        } catch (error) {
+            console.error("Lỗi khi tải thông tin đơn hàng theo trạng thái", error.message);
+        }
+    };
+
+    // const fetchOrder = async () => {
+    //     try {
+    //         const response = await ApiService.getAllOrders();
+    //         setOrders(response);
+
+    //         // Tính tổng doanh thu từ các đơn hàng
+    //         const totalRevenue = response.reduce((acc, order) => acc + order.orderPrice, 0);
+    //         setTotalRevenue(totalRevenue); 
+
+    //         const delivered = new Array(12).fill(0);
+    //         const canceled = new Array(12).fill(0);
+
+    //         response.forEach((order) => {
+    //             const month = dayjs(order.createdAt).month();
+    //             if (order.orderState === "DELIVERED") {
+    //                 delivered[month]++;
+    //             } else if (order.orderState === "CANCELLED") {
+    //                 canceled[month]++;
+    //             }
+    //         });
+
+    //         setOrderDelivered(delivered);
+    //         setOrderCanceled(canceled);
+    //         setDeliveredData(delivered);
+    //         setCanceledData(canceled);
+    //     } catch (error) {
+    //         console.error("Lỗi khi tải thông tin các đơn hàng", error.message);
+    //     }
+    // };
+
+    const fetchOrder = async () => {
+        try {
+            const response = await ApiService.getAllOrders();
+            setOrders(response);
+    
+            const totalRevenue = response
+                .filter(order => order.orderState === "DELIVERED")
+                .reduce((acc, order) => acc + order.orderPrice, 0);
+            setTotalRevenue(totalRevenue);
+    
+            const delivered = new Array(12).fill(0);
+            const canceled = new Array(12).fill(0);
+    
+            response.forEach((order) => {
+                const month = dayjs(order.createdAt).month();
+                if (order.orderState === "DELIVERED") {
+                    delivered[month]++;
+                } else if (order.orderState === "CANCELLED") {
+                    canceled[month]++;
+                }
+            });
+    
+            setOrderDelivered(delivered);
+            setOrderCanceled(canceled);
+            setDeliveredData(delivered);
+            setCanceledData(canceled);
+        } catch (error) {
+            console.error("Lỗi khi tải thông tin các đơn hàng", error.message);
+        }
+    };
+    
 
     useEffect(() => {
-      fetchQuantityProduct();
-      fetchOrder();
+        fetchNotification();
+        fetchQuantityProduct();
+        fetchOrder();
+        fetchExport();
+        fetchImport();
     }, []);
-    return(
-        <Container maxWidth="xl" className="Dashboard" sx={{ width: "100%" , height: "100%", display: "flex", flexDirection: "column" }}>
+
+    return (
+        <Container
+            maxWidth="xl"
+            className="Dashboard"
+            sx={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+            }}
+        >
             <PrimarySearchAppBar />
             <Stack
-                sx={{marginTop:"1rem", flexGrow: 1, overflowY: "auto"}} 
-                overflow={"auto"} 
-                className="body-dashboard" 
-                direction="column" 
+                sx={{ marginTop: "1rem", flexGrow: 1, overflowY: "auto" }}
+                overflow={"auto"}
+                className="body-dashboard"
+                direction="column"
                 spacing={2}
-                
-                >
+            >
                 <Typography 
                     sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"20px", width:"300px"}} 
                     variant="p">
                         Tổng quan
-                    </Typography>
+                </Typography>
 
                 <Stack  sx={{backgroundColor: "#E2F1E7",padding:"1rem", borderRadius:"0.5rem"}} className="overview" direction="row" spacing={2}>
                     <LocalizationProvider dateAdapter={AdapterDayjs} >
@@ -174,8 +224,8 @@ const DashBoard = () => {
                         flexWrap="wrap" 
                         direction={"row"} 
                         className="infor" 
-                        sx={{padding:"1rem", width:"70%"
-                        }}>
+                        sx={{padding:"1rem", width:"70%"}}
+                    >
                         <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", width:"250px",margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
                             <FormatAlignJustifyOutlinedIcon sx={{fontSize:"30px"}}/>
                             <Typography 
@@ -183,7 +233,6 @@ const DashBoard = () => {
                             variant="p">
                                 Tổng đơn hàng: {totalProduct}
                             </Typography>
-                           
                         </Stack>
                         <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", width:"250px",margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
                             <WorkHistoryOutlined sx={{fontSize:"30px"}}/>
@@ -217,7 +266,7 @@ const DashBoard = () => {
                                 Đã hủy: {quantityProduct.cancelQuantity}
                             </Typography>
                         </Stack>
-                        <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px",width:"250px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
+                        <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", width:"250px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
                             <DoneAllOutlined sx={{fontSize:"30px"}}/>
                             <Typography 
                             sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px", width:"200px"}} 
@@ -229,30 +278,31 @@ const DashBoard = () => {
                 </Stack>
 
                 <Stack justifyContent={"center"} sx={{backgroundColor: "#E2F1E7",borderRadius:"0.5rem", padding:"1rem"}} direction={"row"}>
-                      <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
+                    <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
                         <WorkHistoryOutlined sx={{fontSize:"30px"}}/>
                         <Typography 
                         sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
                         variant="p">
-                            Tổng doanh thu: 0
+                            Tổng doanh thu: {totalRevenue} {/* Hiển thị tổng doanh thu */}
                         </Typography>
                     </Stack>
-                      <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px",margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
+                    <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
                         <WorkHistoryOutlined sx={{fontSize:"30px"}}/>
                         <Typography 
-                        sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
-                        variant="p">
-                            Tổng lô hàng xuất: 0
+                            sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
+                            variant="p">
+                            Tổng lô hàng xuất: {totalExportCount} {/* Hiển thị tổng số lô hàng xuất */}
                         </Typography>
                     </Stack>
-                      <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px",margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
+                    <Stack direction={"row"} alignItems={"center"} sx={{backgroundColor:"white", height:"80px", margin:"0.5rem", padding:"1rem", borderRadius:"0.5rem"}}>
                         <WorkHistoryOutlined sx={{fontSize:"30px"}}/>
                         <Typography 
-                        sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
-                        variant="p">
-                            Tổng lô hàng nhập: 0
+                            sx={{fontWeight: 'bold', fontSize:"20px", paddingLeft:"10px"}} 
+                            variant="p">
+                            Tổng lô hàng nhập: {totalImportCount} 
                         </Typography>
                     </Stack>
+
                 </Stack>
 
                 <Typography 
@@ -261,17 +311,59 @@ const DashBoard = () => {
                     component="p">Thống kê
                 </Typography>
                 <Stack sx={{backgroundColor: "#E2F1E7",padding:"1rem", borderRadius:"0.5rem"}} className="analysis-chart" direction="row" spacing={2}>
-                <BarChart
-                    dataset={dataset}
-                    yAxis={[{ scaleType: 'band', dataKey: 'month' }]}
-                    series={[{ dataKey: 'seoul', label: 'Đơn hoàn thành', valueFormatter }]}
-                    layout="horizontal"
-                    {...chartSetting}
+                    <BarChart
+                        width={700}
+                        height={300}
+                        series={[
+                            {
+                                data: deliveredData,
+                                label: "Số đơn hàng đã giao",
+                                id: "deliveredId",
+                            },
+                            {
+                                data: canceledData,
+                                label: "Số đơn hàng bị hủy",
+                                id: "canceledId",
+                            },
+                        ]}
+                        xAxis={[
+                            {
+                                data: xLabels,
+                                scaleType: "band",
+                            },
+                        ]}
                     />
+
+                    
                 </Stack>
             </Stack>
+            <Dialog
+                    open={isNotificationOpen}
+                    onClose={handleNotificationClose}
+                    aria-labelledby="notification-dialog-title"
+                >
+                    <DialogTitle id="notification-dialog-title">Thông báo</DialogTitle>
+                    <DialogContent>
+                        <List>
+                            {notification.map((item, index) => (
+                                <ListItem key={index}>
+                                    <ListItemText
+                                        primary={item.title || `Thông báo ${index + 1}`}
+                                        secondary={item.message || notification}
+                                    />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleNotificationClose} color="primary">
+                            Đóng
+                        </Button>
+                    </DialogActions>
+                </Dialog>
         </Container>
-    )
-}
-export default DashBoard
+    );
+};
 
+
+export default DashBoard;

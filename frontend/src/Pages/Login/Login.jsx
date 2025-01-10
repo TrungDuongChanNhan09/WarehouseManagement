@@ -31,7 +31,6 @@ const Login = () => {
         try {
             const response = await ApiService.loginUser({ userName, password });
 
-            // Kiểm tra xem response có chứa jwt và role không
             if (response.jwt) {
                 localStorage.setItem('jwt', response.jwt);  // Lưu jwt vào localStorage
                 localStorage.setItem('role', response.role);  // Lưu role vào localStorage

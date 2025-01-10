@@ -16,7 +16,7 @@ public interface OrderService {
     Order updateOrder(OrderItemRequest order, String orderId) throws Exception;
     List<Order> getAllOrder();
     Optional<Order> getOrderById(String id);
-    void deleteOrder(String id);
+    void deleteOrder(String id) throws Exception;
     List<Order> getOrderByUserId(String userId);
     Order updateOrderState(OrderStateRequest state, String orderId) throws Exception;
     List<Order> getOrderByState(ORDER_STATE orderState);
@@ -24,4 +24,5 @@ public interface OrderService {
     OrderQuantity getOrderQuantity();
     Order getOrderByOrderCode(String orderCode);
     Order updateOrderStatus(OrderStatusRequest status, String orderId) throws Exception;
+    OrderQuantity getOrderQuantityByMonth(int month, int year);
 }

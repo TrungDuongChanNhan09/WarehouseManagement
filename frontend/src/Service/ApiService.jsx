@@ -1,8 +1,9 @@
 import axios from "axios";
 
 export default class ApiService {
-    static BASE_URL = "http://localhost:6060";
 
+    static BASE_URL = "https://wmshehe.onrender.com";
+    // static BASE_URL = "http://localhost:6060";
     // Từ
     static getHeader() {
         const token = localStorage.getItem("jwt");  
@@ -22,6 +23,19 @@ export default class ApiService {
             throw error;
         }
     }
+
+    static async changePass(formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/auth/changePass`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+
     static async logout() {
         try {
             const response = await axios.post(
@@ -592,6 +606,18 @@ export default class ApiService {
             throw error;
         }
     }
+    static async getNotification() {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/product/notification`, {
+                headers: this.getHeader(),
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi lấy danh sach thong bao:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+
     static async deleteOrder(id) {
         try {
             const response = await axios.delete(`${this.BASE_URL}/api/admin/order/deleteOrder/${id}`, {
@@ -606,6 +632,17 @@ export default class ApiService {
     static async getOrderById(id) {
         try {
             const response = await axios.get(`${this.BASE_URL}/api/order/${id}`, {
+                headers: this.getHeader(),
+            });
+            return response.data; 
+        } catch (error) {
+            console.error("Lỗi khi lấy thông tin:", error.response?.data || error.message);
+            throw error;
+        }
+    }
+    static async getUserrById(id) {
+        try {
+            const response = await axios.get(`${this.BASE_URL}/api/getInformation/${id}`, {
                 headers: this.getHeader(),
             });
             return response.data; 
@@ -837,6 +874,17 @@ export default class ApiService {
     static async updateExport(id, formData) {
         try {
             const response = await axios.put(`${this.BASE_URL}/api/admin/export/${id}`, formData, {
+                headers: this.getHeader(),
+                'Content-Type': 'application/json' 
+            });
+            return response.data;
+        } catch (error) {
+            throw error;  
+        }
+    }
+    static async updateExportState(id, formData) {
+        try {
+            const response = await axios.put(`${this.BASE_URL}/api/admin/export/updateExportStatus/${id}`, formData, {
                 headers: this.getHeader(),
                 'Content-Type': 'application/json' 
             });

@@ -17,6 +17,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Snackbar, Alert
 } from "@mui/material";
 import ApiService from "../../Service/ApiService";
 
@@ -24,6 +25,10 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
   const [orderItems, setOrderItems] = useState([]);
   const [shelves, setShelves] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [error, setError] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -120,12 +125,12 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
             orderItemState: item.orderItemState,
             shelfCode: item.shelf ? [item.shelf] : [],
           };
-  
+    
           // Log the order item data before submitting
           console.log("Submitting order item:", orderItemData);
-  
+    
           const response = await ApiService.addOrderItem(orderItemData);
-  
+    
           setNewOrder({
             ...newOrder,
             orderItems: newOrder.orderItems.map((orderItem) =>
@@ -134,11 +139,11 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
                 : orderItem
             ),
           });
-  
+    
           return response.orderItemCode;
         })
       );
-  
+    
       const orderData = {
         orderItem_code: orderItemResponses,
         delivery_Address: newOrder.address,
@@ -146,19 +151,34 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
         created_at: new Date().toISOString(),
         update_at: new Date().toISOString(),
       };
-  
+    
       // Log the complete order data before submitting
       console.log("Submitting order data:", orderData);
-  
+    
       const response = await ApiService.addOrder(orderData);
       setOrders((prevOrders) => [...prevOrders, response]);
+      
+      // Hiển thị Snackbar thông báo thành công
+      setSnackbarMessage('Đơn hàng đã được thêm thành công!');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
   
-      handleCloseModal();
+      // Thêm 2 giây delay trước khi đóng modal
+      setTimeout(() => {
+        handleCloseModal();
+      }, 2000);
+      
       fetchOrders();
     } catch (error) {
       console.error("Error submitting order", error);
+      
+      // Hiển thị Snackbar thông báo lỗi
+      setSnackbarMessage('Có lỗi xảy ra khi thêm đơn hàng!');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
     }
   };
+  
   
 
   const totalAmount = newOrder.orderItems.reduce(
@@ -349,9 +369,20 @@ const OrderModal = ({ openModal, handleCloseModal, newOrder, setNewOrder, setOrd
             >
               Thêm
             </Button>
+            <Snackbar
+              open={snackbarOpen}
+              autoHideDuration={3000} // Tự động đóng snackbar sau 3 giây
+              onClose={() => setSnackbarOpen(false)}
+            >
+              <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
+                {snackbarMessage}
+              </Alert>
+            </Snackbar>
+
           </Stack>
         </Box>
       </Fade>
+      
     </Modal>
   );
 };

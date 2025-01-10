@@ -33,12 +33,15 @@ public class ExportService implements com.example.backend.service.ExportService 
         newExport.setOrderCode(export.getOrderCode());
         newExport.setOrderQuantity(export.getOrderCode().size());
         newExport.setExport_address(export.getExport_address());
-
+        int totalPrice = 0;
         for (String i : export.getOrderCode()){
             Order order = orderRepository.findByorderCode(i);
             order.setOrderStatus(ORDER_STATUS.IN_EXPORT);
+            totalPrice += order.getOrderPrice();
             orderRepository.save(order);
         }
+        newExport.setPrice(totalPrice);
+        newExport.setRevenue(totalPrice*0.1);
         return exportRepository.save(newExport);
     }
 
@@ -60,14 +63,17 @@ public class ExportService implements com.example.backend.service.ExportService 
         existingExport.setExport_address(export.getExport_address());
         existingExport.setOrderCode(export.getOrderCode());
         existingExport.setOrderQuantity(export.getOrderCode().size());
-        existingExport.setUpdatedAt(export.getUpdated_at());
+        existingExport.setUpdatedAt(currentDate);
+        int totalPrice = 0;
 
         for (String i : export.getOrderCode()){
             Order order = orderRepository.findByorderCode(i);
             order.setOrderStatus(ORDER_STATUS.IN_EXPORT);
+            totalPrice += order.getOrderPrice();
             orderRepository.save(order);
         }
-
+        existingExport.setPrice(totalPrice);
+        existingExport.setRevenue(totalPrice*0.1);
         return exportRepository.save(existingExport);
     }
 
@@ -109,7 +115,7 @@ public class ExportService implements com.example.backend.service.ExportService 
         return exports;
     }
 
-    @Override
+   @Override
     public Export updateExportStatus(String exportId, EXPORT_STATE exportState) throws Exception {
         Export existingExport = exportRepository.findById(exportId).orElse(null);
         if(existingExport == null){
@@ -123,7 +129,7 @@ public class ExportService implements com.example.backend.service.ExportService 
                 orderRepository.save(order);
             }
         }
-        return existingExport;
+        return exportRepository.save(existingExport);
     }
 
     @Override

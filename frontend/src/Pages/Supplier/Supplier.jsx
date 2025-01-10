@@ -59,6 +59,7 @@ const style = {
 
 export default function Supplier() {
     const [filter, setFilter] = useState();
+    const [search, setSearch] = useState('');
     const [open, setOpen] = React.useState(false);
     const [openEdit, setOpenEdit] = React.useState(false);
     const [rows, setRows] = React.useState([]);
@@ -110,6 +111,10 @@ export default function Supplier() {
       }
     };
 
+    const filteredRows = rows.filter(row => 
+        row.nameSupplier.toLowerCase().includes(search.toLowerCase())
+    );
+
     useEffect(() => {
         console.log('change filter ' + filter);
     },[filter]);
@@ -132,7 +137,7 @@ export default function Supplier() {
                             Quản lý nhà cung cấp
                     </Typography>
                     <Stack direction={"row"} alignItems={"center"}>
-                        <Stack className="search-bar" direction={"row"} alignItems={"center"}>
+                        <Stack className="search-bar" direction={"row"} alignItems={"center"} sx={{marginRight: "0.5rem"}}>
                             <Search>
                                 <StyledInputBase sx={{padding:"0rem"}}
                                 placeholder="Tìm kiếm"
@@ -141,44 +146,12 @@ export default function Supplier() {
                                     <SearchIcon />
                                   </InputAdornment>
                                 }
+                                onChange={(e) => setSearch(e.target.value)}
                                 inputProps={{ 'aria-label': 'search' }}
                                 />
                             </Search>
                         </Stack>
 
-                        <Stack className="filter-bar" direction={"row"} alignItems={"center"}> 
-                            <FormControl sx={{width:"200px", marginLeft:"0.5rem", marginRight: "0.5rem"}}>
-                                <InputLabel sx={{
-                                    "&.Mui-focused": { 
-                                        color: "#297342" 
-                                    }}} 
-                                    id="demo-simple-select-label">
-                                        Lọc theo
-                                </InputLabel>
-                                <Select
-                                sx={{
-                                        backgroundColor:"white", 
-                                        border:"none",
-                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                            borderColor: '#297342',
-                                        },
-                                    }}
-                                    labelId="demo-simple-select-label"
-                                    id="demo-simple-select"
-                                    value={filter}
-                                    label="Lọc theo"
-                                    onChange={handleFilterChange
-                                        
-                                    }
-                                >
-                                <MenuItem value="">
-                                    <em>Không chọn</em>
-                                </MenuItem>
-                                <MenuItem value={1}>Lớn đến nhỏ</MenuItem>
-                                <MenuItem value={2}>Nhỏ đến lớn</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Stack>
                         <Stack className="btn-add-inventory-bar" direction={"row"} alignItems={"center"}> 
                             <Button 
                                 onClick={handleOpen} 
@@ -190,7 +163,7 @@ export default function Supplier() {
                         </Stack>
                     </Stack>
                 </Stack>
-                <MyTable tableColumns={columns} tableRows={rows} handleDeleteButton={handleDeleteButton} handleEditButton={handleEditButton}/>
+                <MyTable tableColumns={columns} tableRows={filteredRows} handleDeleteButton={handleDeleteButton} handleEditButton={handleEditButton}/>
             </Stack>
             {/* Modal Add */}
             <Modal

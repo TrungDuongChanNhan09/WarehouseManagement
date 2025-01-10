@@ -20,6 +20,7 @@ import {
   DialogContent,
   DialogTitle,
   Alert,
+  Snackbar,
 } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import AppBarMenu from "../../Component/AppBar/AppBar";
@@ -31,14 +32,20 @@ const Employee = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [openDialog, setOpenDialog] = useState(false);
-  const [openConfirmDialog, setOpenConfirmDialog] = useState(false); // State for confirm delete dialog
-  const [employeeToDelete, setEmployeeToDelete] = useState(null); // Employee selected for deletion
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null); 
   const [newEmployee, setNewEmployee] = useState({
     userName: "",
     fullName: "",
     password: "",
   });
-  const [errorMessage, setErrorMessage] = useState(""); // State to hold error messages
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+  
+  const [errorMessage, setErrorMessage] = useState(""); 
 
   // Fetch employees from API when the component mounts
   useEffect(() => {
@@ -69,46 +76,48 @@ const Employee = () => {
     setPage(0);
   };
 
-  // Add a new employee
   const handleAddEmployee = async () => {
-    // Kiểm tra nếu có trường thông tin nào trống
     if (!newEmployee.userName || !newEmployee.fullName || !newEmployee.password) {
       setErrorMessage("Vui lòng nhập đầy đủ thông tin!");
-      return; // Dừng nếu có trường bị trống
+      return;
     }
-
-    // Tạo đối tượng dữ liệu theo kiểu yêu cầu
+  
     const formData = {
-      username: newEmployee.userName, // Đặt tên theo đúng kiểu dữ liệu yêu cầu
+      username: newEmployee.userName,
       fullName: newEmployee.fullName,
       password: newEmployee.password,
     };
-
+  
     try {
       await ApiService.addEmployee(formData); // Gọi API thêm nhân viên
       setOpenDialog(false);
       setEmployees(await ApiService.getAllEmployees()); // Làm mới danh sách nhân viên
-      setErrorMessage(""); // Reset error message after success
+      setErrorMessage("");
+      showSnackbar("Thêm nhân viên thành công!", "success");
     } catch (error) {
       console.error("Error adding employee:", error);
-      setErrorMessage("Lỗi khi thêm nhân viên. Vui lòng thử lại.");
+      showSnackbar("Lỗi khi thêm nhân viên. Vui lòng thử lại.", "error");
     }
   };
-
+  
   // Confirm delete action
   const handleConfirmDelete = async () => {
     if (employeeToDelete) {
       try {
         await ApiService.deleteEmployee(employeeToDelete); // Gọi API xóa nhân viên
-        setEmployees(await ApiService.getAllEmployees()); // Làm mới danh sách nhân viên sau khi xóa
+        setEmployees(await ApiService.getAllEmployees());
+        showSnackbar("Xóa nhân viên thành công!", "success"); // Làm mới danh sách nhân viên sau khi xóa
         setOpenConfirmDialog(false); // Đóng dialog confirm
       } catch (error) {
+        showSnackbar("Lỗi khi xóa nhân viên", "error");
         console.error("Error deleting employee:", error);
         setOpenConfirmDialog(false);
       }
     }
   };
-
+  const showSnackbar = (message, severity) => {
+    setSnackbar({ open: true, message, severity });
+  };  
   // Handle delete action
   const handleDelete = (id) => {
     setEmployeeToDelete(id); // Lưu ID nhân viên sẽ bị xóa
@@ -185,7 +194,13 @@ const Employee = () => {
                     {new Date(employee.dateOfBirth).toLocaleDateString()}
                   </TableCell>
                   <TableCell>{employee.email}</TableCell>
-                  <TableCell>{employee.role}</TableCell>
+                  <TableCell>
+                  {employee.role === 'ROLE_STAFF'
+                    ? 'Nhân viên'
+                    : employee.role === 'ROLE_ADMIN'
+                    ? 'Quản lý'
+                    : 'Vai trò không xác định'}
+                </TableCell>
                   <TableCell>
                     <IconButton onClick={() => handleDelete(employee.id)}>
                       <Delete />
@@ -203,6 +218,7 @@ const Employee = () => {
         component="div"
         count={filteredEmployees.length}
         rowsPerPage={rowsPerPage}
+        
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
@@ -272,6 +288,20 @@ const Employee = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

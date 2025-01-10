@@ -3,6 +3,8 @@ package com.example.backend.controller;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.backend.respone.ProductRespone;
+import com.example.backend.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.model.Product;
 import com.example.backend.model.User;
 import com.example.backend.request.ProductRequest;
+import com.example.backend.respone.ProductRespone;
 import com.example.backend.service.ProductService;
 import com.example.backend.service.UserService;
 
@@ -33,6 +36,9 @@ public class ProductController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @PostMapping("")
     public ResponseEntity<Product> createProduct(@RequestBody ProductRequest product, @RequestHeader("Authorization") String jwt) throws Exception{
@@ -54,7 +60,7 @@ public class ProductController {
     }
 
     @GetMapping("")
-    private ResponseEntity<List<Product>> getAllProduct(@RequestHeader("Authorization") String jwt) throws Exception{
+    private ResponseEntity<List<ProductRespone>> getAllProduct(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.getAllProduct(), HttpStatus.OK);
     }
@@ -81,5 +87,11 @@ public class ProductController {
     private ResponseEntity<List<Product>> getProductBySupplier(@PathVariable String supplierName, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.filterProductBySupplier(supplierName), HttpStatus.OK);
+    }
+
+    @GetMapping("/notification")
+    private ResponseEntity<List<String>> getNotification(@RequestHeader("Authorization") String jwt) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(notificationService.notifyProductExpiry(), HttpStatus.OK);
     }
 }
