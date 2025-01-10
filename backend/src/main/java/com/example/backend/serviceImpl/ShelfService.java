@@ -18,10 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ShelfService implements com.example.backend.service.ShelfService{
+public class ShelfService implements com.example.backend.service.ShelfService {
     @Autowired
     private ShelfRepository shelfRepository;
-    
+
     @Autowired
     private InventoryRepository inventoryRepository;
     @Autowired
@@ -31,47 +31,61 @@ public class ShelfService implements com.example.backend.service.ShelfService{
     public List<Shelf> getShelvesByInventory(String inventoryId) {
         return shelfRepository.findByinventoryid(inventoryId);
     }
+
     @Override
     public Shelf addShelf(Shelf shelf) throws Exception {
         List<Shelf> shelfs = shelfRepository.findByproductId(shelf.getProductId());
         Inventory inventory = inventoryRepository.findById(shelf.getInventoryid()).orElse(null);
-        if(inventory == null){
+
+        if (inventory == null) {
             throw new Exception("Inventory no have");
-        }
-        else{
-            if(inventory.getStatus() == INVENTORY_STATE.CLOSE){
+        } else {
+            if (CheckNameExistsShelf(shelf)) {
+                throw new Exception("Shelf name already exists");
+            }
+            if (inventory.getStatus() == INVENTORY_STATE.CLOSE) {
                 throw new Exception("INVENTORY CLOSE");
             }
             List<Shelf> shelfs_inventory = shelfRepository.findByinventoryid(shelf.getInventoryid());
-            if(shelfs_inventory.size() + 1 > inventory.getNumber_shelf()){
+            if (shelfs_inventory.size() + 1 > inventory.getNumber_shelf()) {
                 throw new Exception("Inventory không thể lưu thêm shelfs nữa");
             }
-            
+
             shelf.setCapacity(inventory.getCapacity_shelf());
         }
+        String checkposition = CheckPositionExistsShelf(shelf);
+        if (!((shelf.getColoum() >= 0 && shelf.getColoum() < inventory.getNumber_coloum())
+                && (shelf.getRow() >= 0 && shelf.getRow() < inventory.getNumber_row()))) {
 
-        if(shelfs == null){
-            if(shelf.getQuantity() <= inventory.getCapacity_shelf() && productRepository.findById(shelf.getProductId()).get().getInventory_quantity() >= shelf.getQuantity()){
+            throw new Exception("Vị trí này không tồn tại trong kho");
+
+        } else if (checkposition == "1") {
+            throw new Exception("Vị trí này thêm không được vì kệ đã có sản phẩm");
+        }
+
+        if (shelfs == null) {
+            if (shelf.getQuantity() <= inventory.getCapacity_shelf() && productRepository.findById(shelf.getProductId())
+                    .get().getInventory_quantity() >= shelf.getQuantity()) {
                 inventory.setQuantity(shelf.getQuantity());
                 inventoryRepository.save(inventory);
                 return shelfRepository.save(shelf);
-            }
-            else {
+            } else {
                 throw new Exception("Product quantity is not sufficient");
             }
-        }
-        else{
+        } else {
             int totalQuantity = 0;
-            for(Shelf i : shelfs){
+            for (Shelf i : shelfs) {
                 totalQuantity += i.getQuantity();
             }
-            if(productRepository.findById(shelf.getProductId()).get().getInventory_quantity() - totalQuantity >= shelf.getQuantity() ){
-                
+            if (productRepository.findById(shelf.getProductId()).get().getInventory_quantity() - totalQuantity >= shelf
+                    .getQuantity()) {
+                if (checkposition != "2" && checkposition != "3") {
+                    deleteShelf(checkposition);
+                }
                 inventory.setQuantity(inventory.getQuantity() + shelf.getQuantity());
                 inventoryRepository.save(inventory);
                 return shelfRepository.save(shelf);
-            }
-            else {
+            } else {
                 throw new Exception("Product quantity is not sufficient");
             }
         }
@@ -81,48 +95,62 @@ public class ShelfService implements com.example.backend.service.ShelfService{
     public Shelf updateShelf(String shelfId, Shelf updatedShelf) throws Exception {
 
         Shelf existingShelf = shelfRepository.findById(shelfId).orElse(null);
-        
+        updatedShelf.setId(shelfId);
         if (existingShelf != null) {
             Inventory inventory = inventoryRepository.findById(existingShelf.getInventoryid()).orElse(null);
-            if(inventory.getStatus() == INVENTORY_STATE.CLOSE){
+            String s = CheckPositionExistsShelf(updatedShelf);
+            if (!((updatedShelf.getColoum() >= 0 && updatedShelf.getColoum() < inventory.getNumber_coloum())
+                    && (updatedShelf.getRow() >= 0 && updatedShelf.getRow() < inventory.getNumber_row()))) {
+
+                throw new Exception("Vị trí này không tồn tại trong kho");
+
+            } else if (s == "1") {
+                throw new Exception("Vị trí này thêm không được vì kệ đã có sản phẩm");
+            }
+
+            if (inventory.getStatus() == INVENTORY_STATE.CLOSE) {
                 throw new Exception("INVENTORY CLOSE");
             }
             List<Shelf> shelfs = shelfRepository.findByproductId(existingShelf.getProductId());
             int totalQuantity = 0;
-            for(Shelf i : shelfs){
-                if(!Objects.equals(i.getShelfCode(), existingShelf.getShelfCode()))
-                totalQuantity += i.getQuantity();
+            for (Shelf i : shelfs) {
+                if (!Objects.equals(i.getShelfCode(), existingShelf.getShelfCode()))
+                    totalQuantity += i.getQuantity();
             }
 
-            if(updatedShelf.getQuantity() <= existingShelf.getCapacity() && productRepository.findById(existingShelf.getProductId()).get().getInventory_quantity() - totalQuantity >= updatedShelf.getQuantity() ){
-                updatequantityShelf(shelfId,updatedShelf.getQuantity());
+            if (updatedShelf.getQuantity() <= existingShelf.getCapacity()
+                    && productRepository.findById(existingShelf.getProductId()).get().getInventory_quantity()
+                            - totalQuantity >= updatedShelf.getQuantity()) {
+                updatequantityShelf(shelfId, updatedShelf.getQuantity());
                 existingShelf.setQuantity(updatedShelf.getQuantity());
                 existingShelf.setShelfCode(updatedShelf.getShelfCode());
+                existingShelf.setRow(updatedShelf.getRow());
+                existingShelf.setColoum(updatedShelf.getColoum());
+                inventoryRepository.save(inventory);
                 return shelfRepository.save(existingShelf);
- 
-            }
-            else {
+
+            } else {
                 throw new Exception("Product quantity is not sufficient");
             }
-            
-            
+
         } else {
             throw new Exception("Shelf with ID " + shelfId + " not found");
         }
     }
 
     @Override
-    public void deleteShelf(String shelfId){
-        Inventory inventory = inventoryRepository.findById(shelfRepository.findById(shelfId).get().getInventoryid()).orElse(null);
-        if(inventory != null){
-            inventory.setQuantity(inventory.getQuantity()-shelfRepository.findById(shelfId).get().getQuantity());
+    public void deleteShelf(String shelfId) {
+        Inventory inventory = inventoryRepository.findById(shelfRepository.findById(shelfId).get().getInventoryid())
+                .orElse(null);
+        if (inventory != null) {
+            inventory.setQuantity(inventory.getQuantity() - shelfRepository.findById(shelfId).get().getQuantity());
             inventoryRepository.save(inventory);
         }
         shelfRepository.deleteById(shelfId);
     }
 
     @Override
-    public Optional<Shelf> getShelfById(String shelfId){
+    public Optional<Shelf> getShelfById(String shelfId) {
         return shelfRepository.findById(shelfId);
     }
 
@@ -142,27 +170,27 @@ public class ShelfService implements com.example.backend.service.ShelfService{
         System.out.println(product.getId());
         List<Shelf> shelves = shelfRepository.findByproductId(product.getId());
         List<String> shelfCode = new ArrayList<>();
-        for(Shelf shelf : shelves){
+        for (Shelf shelf : shelves) {
             shelfCode.add(shelf.getShelfCode());
         }
         System.out.println(shelfCode);
         return shelfCode;
     }
 
-    public List<Shelf> searchShelfByCode(String keyword){
+    public List<Shelf> searchShelfByCode(String keyword) {
         return shelfRepository.searchByshelfCode(keyword);
     }
 
     @Override
-    public void updatequantityShelf(String shelfId, int quantity) throws Exception{
+    public void updatequantityShelf(String shelfId, int quantity) throws Exception {
         Shelf shelf = shelfRepository.findById(shelfId).orElse(null);
         if (shelf != null) {
             Inventory inventory = inventoryRepository.findById(shelf.getInventoryid()).orElse(null);
-            if(inventory.getStatus() == INVENTORY_STATE.CLOSE){
+            if (inventory.getStatus() == INVENTORY_STATE.CLOSE) {
                 throw new Exception("INVENTORY CLOSE");
             }
             int totalQuantitybefore = shelf.getQuantity();
-            if(inventory != null){
+            if (inventory != null) {
                 int sub_quantity = quantity - totalQuantitybefore;
                 int quantity_inventory = inventory.getQuantity() + sub_quantity;
                 inventory.setQuantity(quantity_inventory);
@@ -170,4 +198,42 @@ public class ShelfService implements com.example.backend.service.ShelfService{
             }
         }
     }
+
+    private String CheckPositionExistsShelf(Shelf shelf) {
+        Inventory inventory = inventoryRepository.findById(shelf.getInventoryid()).orElse(null);
+        List<Shelf> shelfs = shelfRepository.findByinventoryid(inventory.getId());
+
+        if (inventory != null) {
+            int x = shelf.getRow();
+            int y = shelf.getColoum();
+            int count = 0;
+            for (Shelf i : shelfs) {
+                if (x == i.getRow() && y == i.getColoum()) {
+                    if (shelf.getId() == i.getId()) {
+                        return "3"; // vị trí của chính nó
+                    }
+                    if (i.getQuantity() == 0) {
+                        return i.getId(); // được phép thêm
+                    }
+                } else {
+                    count++;
+                }
+            }
+            if (count == shelfs.size() && count < inventory.getNumber_shelf()) {
+                return "2"; // thêm vì còn chỗ
+            }
+        }
+        return "1";
+    }
+
+    private boolean CheckNameExistsShelf(Shelf shelf) {
+        List<Shelf> shelfs = shelfRepository.findByinventoryid(shelf.getInventoryid());
+        for (Shelf i : shelfs) {
+            if (i.getShelfCode().equals(shelf.getShelfCode())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
