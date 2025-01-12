@@ -62,6 +62,7 @@ const TableShelf = ({ searchShelfs }) => {
   const fetchShelfs = async () => {
     try {
       const response = await ApiService.getAllShelf();
+      console.log(response)
       setShelfs(response);
       const inventoryNameMap = {};
       const productNameMap = {};
@@ -255,6 +256,22 @@ const TableShelf = ({ searchShelfs }) => {
                 onChange={(e) =>
                   setEditData({ ...editData, capacity: e.target.value })
                 }
+              />
+              <TextField
+                label="Vị trí cột"
+                value={editData.coloum || ""}
+                onChange={(e) =>
+                  setEditData({ ...editData, coloum: e.target.value })
+                }
+                disabled
+              />
+              <TextField
+                label="Vị trí hàng"
+                value={editData.row || ""}
+                onChange={(e) =>
+                  setEditData({ ...editData, row: e.target.value })
+                }
+                disabled
               />
               <Stack direction="row" spacing={2} justifyContent="flex-end">
                 <Button onClick={() => setIsEditModalOpen(false)}>Hủy</Button>

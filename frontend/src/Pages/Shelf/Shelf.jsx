@@ -111,7 +111,9 @@ const Shelf = () => {
       inventoryid: "",
       productId: "",
       quantity: 0,
-      capacity: 0,
+      // capacity: 0,
+      coloum: 0,
+      row: 0
     });
     setSelectedInventoryName(""); 
   };
@@ -248,6 +250,28 @@ const Shelf = () => {
                 }
               />
               <TextField
+                label="Vị trí cột"
+                type="number"
+                value={newShelfData.coloum}
+                onChange={(e) =>
+                  setNewShelfData({
+                    ...newShelfData,
+                    coloum: parseInt(e.target.value, 10),
+                  })
+                }
+              />
+              <TextField
+                label="Vị trí hàng"
+                type="number"
+                value={newShelfData.row}
+                onChange={(e) =>
+                  setNewShelfData({
+                    ...newShelfData,
+                    row: parseInt(e.target.value, 10),
+                  })
+                }
+              />
+              {/* <TextField
                 label="Sức chứa (sản phẩm)"
                 type="number"
                 value={newShelfData.capacity}
@@ -258,7 +282,7 @@ const Shelf = () => {
                   })
                 }
                 disabled
-              />
+              /> */}
               <Button
                 sx={{
                   backgroundColor: "#243642",
