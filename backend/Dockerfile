@@ -9,7 +9,7 @@ ARG FILE_JAR=target/backend-0.0.1-SNAPSHOT.jar
 COPY ./target/backend-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose port của ứng dụng (ví dụ 8080)
-EXPOSE 8080
+EXPOSE 4357
 
 # Lệnh để chạy ứng dụng
 ENTRYPOINT ["java", "-jar", "app.jar"]
