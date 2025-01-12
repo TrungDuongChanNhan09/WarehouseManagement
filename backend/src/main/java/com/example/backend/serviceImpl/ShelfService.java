@@ -13,6 +13,8 @@ import com.example.backend.model.Shelf;
 import com.example.backend.repository.InventoryRepository;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.repository.ShelfRepository;
+import com.example.backend.respone.ShelfEmpty;
+import com.example.backend.respone.ShelfPosition;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -197,6 +199,36 @@ public class ShelfService implements com.example.backend.service.ShelfService {
                 inventoryRepository.save(inventory);
             }
         }
+    }
+
+    @Override
+    public ShelfEmpty getPositionShelfEmpty(String Inventoryid) {
+        Inventory inventory = inventoryRepository.findById(Inventoryid).orElse(null);
+        if (inventory != null) {
+            List<Shelf> shelfs = shelfRepository.findByinventoryid(Inventoryid);
+            ShelfEmpty shelfEmpty = new ShelfEmpty();
+            shelfEmpty.setInventoryId(Inventoryid);
+            List<ShelfPosition> shelfallPositions = new ArrayList<>();
+            List<ShelfPosition> shelfexistsPositions = new ArrayList<>();
+            for (int i = 0; i < inventory.getNumber_row(); i++) {
+                for (int j = 0; j < inventory.getNumber_coloum(); j++) {
+                    ShelfPosition shelf = new ShelfPosition();
+                    shelf.setColoum(j);
+                    shelf.setRow(i);
+                    shelfallPositions.add(shelf);
+                }
+            }
+            for (Shelf i : shelfs) {
+                ShelfPosition shelf = new ShelfPosition();
+                shelf.setColoum(i.getColoum());
+                shelf.setRow(i.getRow());
+                shelfexistsPositions.add(shelf);
+            }
+            shelfallPositions.removeAll(shelfexistsPositions);
+            shelfEmpty.setPosition(shelfallPositions);
+            return shelfEmpty;
+        }
+        return null;
     }
 
     private String CheckPositionExistsShelf(Shelf shelf) {
