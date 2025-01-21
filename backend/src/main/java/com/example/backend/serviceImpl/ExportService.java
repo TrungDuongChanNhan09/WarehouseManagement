@@ -1,18 +1,19 @@
 package com.example.backend.serviceImpl;
 
+import com.example.backend.ENUM.EXPORT_STATE;
+import com.example.backend.ENUM.ORDER_STATE;
+import com.example.backend.ENUM.ORDER_STATUS;
 import com.example.backend.model.*;
 import com.example.backend.repository.ExportRepository;
 import com.example.backend.repository.OrderRepository;
 import com.example.backend.request.ExportRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.aggregation.BooleanOperators;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+
 @Service
 public class ExportService implements com.example.backend.service.ExportService {
     @Autowired
@@ -56,9 +57,6 @@ public class ExportService implements com.example.backend.service.ExportService 
             existingExport.setCreatedAt(currentDate);
         else if (export.getUpdated_at().compareTo(currentDate) > 0) {
             throw new IllegalArgumentException("Ngày nhập không được lớn hơn ngày hiện tại.");
-        }
-        if(existingExport.getExportState() != EXPORT_STATE.PENDING){
-            throw new Exception("Khong cho phep chinh sua thong tin export");
         }
         existingExport.setExport_address(export.getExport_address());
         existingExport.setOrderCode(export.getOrderCode());

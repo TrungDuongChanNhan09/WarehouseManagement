@@ -1,12 +1,11 @@
 package com.example.backend.serviceImpl;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.example.backend.model.INVENTORY_STATE;
+import com.example.backend.ENUM.INVENTORY_STATE;
 import com.example.backend.model.Inventory;
 import com.example.backend.model.Product;
 import com.example.backend.model.Shelf;

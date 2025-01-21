@@ -1,12 +1,13 @@
 package com.example.backend.model;
 
+import com.example.backend.ENUM.ORDER_STATE;
+import com.example.backend.ENUM.ORDER_STATUS;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Data

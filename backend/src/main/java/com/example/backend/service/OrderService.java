@@ -1,7 +1,7 @@
 package com.example.backend.service;
 
-import com.example.backend.model.ORDER_STATE;
-import com.example.backend.model.ORDER_STATUS;
+import com.example.backend.ENUM.ORDER_STATE;
+import com.example.backend.ENUM.ORDER_STATUS;
 import com.example.backend.model.Order;
 import com.example.backend.model.OrderQuantity;
 import com.example.backend.request.OrderItemRequest;

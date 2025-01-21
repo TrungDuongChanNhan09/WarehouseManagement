@@ -1,6 +1,6 @@
 package com.example.backend.request;
 
-import com.example.backend.model.USER_ROLE;
+import com.example.backend.ENUM.USER_ROLE;
 import lombok.Data;
 
 @Data

@@ -1,7 +1,7 @@
 package com.example.backend.respone;
 
 
-import com.example.backend.model.PRODUCT_STATUS;
+import com.example.backend.ENUM.PRODUCT_STATUS;
 import lombok.Data;
 
 import java.util.Date;

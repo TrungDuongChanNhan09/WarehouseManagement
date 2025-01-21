@@ -1,4 +1,4 @@
-package com.example.backend.model;
+package com.example.backend.ENUM;
 
 public enum EXPORT_STATE {
     PENDING,

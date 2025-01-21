@@ -1,8 +1,7 @@
 package com.example.backend.model;
 
+import com.example.backend.ENUM.INVENTORY_STATE;
 import lombok.Data;
-
-import java.lang.reflect.Array;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

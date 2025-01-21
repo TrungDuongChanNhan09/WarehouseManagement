@@ -1,5 +1,6 @@
 package com.example.backend.model;
 
+import com.example.backend.ENUM.PRODUCT_STATUS;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
