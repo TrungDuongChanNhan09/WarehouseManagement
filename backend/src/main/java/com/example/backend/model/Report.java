@@ -1,5 +1,7 @@
 package com.example.backend.model;
 
+import com.example.backend.ENUM.REPORT_PRIORITY;
+import com.example.backend.ENUM.REPORT_STATUS;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 

@@ -1,11 +1,12 @@
 package com.example.backend.serviceImpl;
 
+import com.example.backend.ENUM.ORDER_ITEM_STATE;
+import com.example.backend.ENUM.PRODUCT_STATUS;
 import com.example.backend.model.*;
 import com.example.backend.repository.InventoryRepository;
 import com.example.backend.repository.OrderItemRepository;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.repository.ShelfRepository;
-import com.example.backend.request.OrderItemRequest;
 import com.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

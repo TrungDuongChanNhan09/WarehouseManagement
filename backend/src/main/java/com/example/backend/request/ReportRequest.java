@@ -1,6 +1,6 @@
 package com.example.backend.request;
 
-import com.example.backend.model.REPORT_PRIORITY;
+import com.example.backend.ENUM.REPORT_PRIORITY;
 import lombok.Data;
 
 import java.time.LocalDate;

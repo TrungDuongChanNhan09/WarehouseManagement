@@ -1,6 +1,6 @@
 package com.example.backend.request;
 
-import com.example.backend.model.ORDER_STATUS;
+import com.example.backend.ENUM.ORDER_STATUS;
 import lombok.Data;
 
 @Data

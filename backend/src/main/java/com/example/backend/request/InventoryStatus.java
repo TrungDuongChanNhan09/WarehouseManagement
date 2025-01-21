@@ -1,6 +1,6 @@
 package com.example.backend.request;
 
-import com.example.backend.model.INVENTORY_STATE;
+import com.example.backend.ENUM.INVENTORY_STATE;
 import lombok.Data;
 @Data
 public class InventoryStatus {

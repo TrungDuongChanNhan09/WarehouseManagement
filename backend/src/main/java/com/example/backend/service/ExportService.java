@@ -1,6 +1,6 @@
 package com.example.backend.service;
 
-import com.example.backend.model.EXPORT_STATE;
+import com.example.backend.ENUM.EXPORT_STATE;
 import com.example.backend.model.Export;
 import com.example.backend.request.ExportRequest;
 import org.springframework.stereotype.Repository;
