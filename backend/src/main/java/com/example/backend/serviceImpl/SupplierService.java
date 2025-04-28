@@ -18,8 +18,8 @@ public class SupplierService implements com.example.backend.service.SupplierServ
 
     @Override
     public Supplier addSupplier(SupplierRequest supplier) throws Exception {
-        Supplier existingSupplier = supplierRepository.findBynameSupplier(supplier.getNameSupplier());
-        if(existingSupplier != null) {
+        Optional existingSupplier = supplierRepository.findBynameSupplier(supplier.getNameSupplier());
+        if (existingSupplier != null) {
             throw new Exception("Supplier is already exist");
         }
         Supplier newSupplier = new Supplier();
@@ -35,7 +35,7 @@ public class SupplierService implements com.example.backend.service.SupplierServ
     @Override
     public Supplier updateSupplier(SupplierRequest supplier, String supplierId) throws Exception {
         Supplier existingSupplier = this.supplierRepository.findById(supplierId).orElse(null);
-        if(existingSupplier == null) {
+        if (existingSupplier == null) {
             throw new Exception("Supplier not found...");
         } else {
             existingSupplier.setNameSupplier(supplier.getNameSupplier());
@@ -70,6 +70,5 @@ public class SupplierService implements com.example.backend.service.SupplierServ
     public List<Supplier> getAllSupplier() {
         return supplierRepository.findAll();
     }
-
 
 }
