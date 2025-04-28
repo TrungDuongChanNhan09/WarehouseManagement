@@ -7,15 +7,15 @@ import com.example.backend.model.*;
 import com.example.backend.repository.ExportRepository;
 import com.example.backend.repository.OrderRepository;
 import com.example.backend.request.ExportRequest;
-import com.example.backend.request.OrderStatusRequest; // Import request cho OrderService
-import com.example.backend.service.OrderService; // Import OrderService
+import com.example.backend.request.OrderStatusRequest;
+import com.example.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Import Transactional
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet; // Dùng Set để xử lý hiệu quả hơn
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,13 +28,12 @@ public class ExportService implements com.example.backend.service.ExportService 
     @Autowired
     private OrderRepository orderRepository;
 
-    @Autowired // Inject OrderService
+    @Autowired
     private OrderService orderService;
 
-    // Helper method để đảm bảo currentState của Order được khởi tạo
     private Order initializeOrderState(Order order) {
         if (order != null) {
-            order.getCurrentState(); // Gọi getter để khởi tạo state nếu cần
+            order.getCurrentState();
         }
         return order;
     }
@@ -115,8 +114,6 @@ public class ExportService implements com.example.backend.service.ExportService 
             throw new Exception("Không thể cập nhật phiếu xuất ở trạng thái " + existingExport.getExportState());
         }
 
-        // ... (phần còn lại của phương thức giữ nguyên) ...
-
         LocalDate currentDate = LocalDate.now();
         // Chỉ cập nhật ngày tạo nếu được cung cấp và hợp lệ
         if (exportRequest.getCreated_at() != null) {
@@ -194,14 +191,11 @@ public class ExportService implements com.example.backend.service.ExportService 
         Export export = exportRepository.findById(exportId)
                 .orElseThrow(() -> new Exception("Phiếu xuất không tồn tại với ID: " + exportId));
 
-        // Chỉ cho phép xóa khi phiếu xuất ở trạng thái PENDING (hoặc có thể thêm trạng
-        // thái khác nếu cần)
         if (export.getExportState() != EXPORT_STATE.PENDING) {
             throw new Exception(
                     "Chỉ có thể xóa phiếu xuất ở trạng thái PENDING. Trạng thái hiện tại: " + export.getExportState());
         }
 
-        // Cập nhật lại trạng thái xuất kho của các Order liên quan về OUT_EXPORT
         for (String orderCode : export.getOrderCode()) {
             Order order = orderRepository.findByOrderCode(orderCode);
             if (order != null && order.getOrderStatus() == ORDER_STATUS.IN_EXPORT) {
@@ -210,10 +204,8 @@ public class ExportService implements com.example.backend.service.ExportService 
                     statusRequest.setOrderStatus(ORDER_STATUS.OUT_EXPORT);
                     orderService.updateOrderStatus(statusRequest, order.getId());
                 } catch (Exception e) {
-                    // Ghi log hoặc xử lý nếu không cập nhật được trạng thái Order
                     System.err.println("Lỗi khi cập nhật trạng thái OUT_EXPORT cho đơn hàng " + orderCode
                             + " khi xóa phiếu xuất " + exportId + ": " + e.getMessage());
-                    // Có thể throw lại lỗi hoặc tiếp tục tùy logic nghiệp vụ
                 }
             }
         }
@@ -234,12 +226,7 @@ public class ExportService implements com.example.backend.service.ExportService 
 
     @Override
     public List<Export> getExportByState(EXPORT_STATE exportState) {
-        // Sử dụng phương thức query của repository thay vì findAll và lọc
         return exportRepository.findByExportState(exportState);
-        // Cần thêm phương thức findByExportState vào ExportRepository
-        // interface ExportRepository extends MongoRepository<Export, String> {
-        // List<Export> findByExportState(EXPORT_STATE exportState);
-        // }
     }
 
     @Override
@@ -248,12 +235,8 @@ public class ExportService implements com.example.backend.service.ExportService 
         Export existingExport = exportRepository.findById(exportId)
                 .orElseThrow(() -> new Exception("Phiếu xuất không tồn tại với ID: " + exportId));
 
-        // Có thể thêm logic kiểm tra tính hợp lệ của việc chuyển trạng thái Export ở
-        // đây
-        // Ví dụ: không thể chuyển từ DONE về PENDING
-
         existingExport.setExportState(exportState);
-        existingExport.setUpdatedAt(LocalDate.now()); // Cập nhật thời gian
+        existingExport.setUpdatedAt(LocalDate.now());
 
         // Nếu phiếu xuất chuyển sang trạng thái ON_GOING, cập nhật trạng thái các Order
         // liên quan
@@ -283,35 +266,21 @@ public class ExportService implements com.example.backend.service.ExportService 
                 }
             }
         }
-        // Có thể thêm logic khác cho các trạng thái Export khác (ví dụ: DONE)
 
         return exportRepository.save(existingExport);
     }
 
     @Override
     public List<Export> getExportByDateRange(LocalDate startDate, LocalDate endDate) throws Exception {
-        // Nên dùng phương thức query trong repository nếu có
-        // List<Export> exports = exportRepository.findByCreatedAtBetween(startDate,
-        // endDate);
-        // Tạm thời giữ lại logic cũ nếu chưa có phương thức repo
         List<Export> exports = exportRepository.findAll().stream()
                 .filter(e -> !e.getCreatedAt().isBefore(startDate) && !e.getCreatedAt().isAfter(endDate))
                 .collect(Collectors.toList());
 
         if (exports.isEmpty()) {
-            // Không nên throw Exception nếu không tìm thấy, trả về danh sách rỗng là hợp lý
-            // hơn
-            // throw new Exception("Không tìm thấy phiếu xuất nào trong khoảng ngày đã
-            // cho.");
+
             return new ArrayList<>(); // Trả về danh sách rỗng
         }
         return exports;
     }
 
-    // Cần thêm các phương thức cần thiết vào ExportRepository:
-    // interface ExportRepository extends MongoRepository<Export, String> {
-    // List<Export> findByExportState(EXPORT_STATE exportState);
-    // List<Export> findByCreatedAtBetween(LocalDate startDate, LocalDate endDate);
-    // // Nếu cần lọc hiệu quả ở DB
-    // }
 }

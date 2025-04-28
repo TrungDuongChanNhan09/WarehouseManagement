@@ -1,7 +1,6 @@
 package com.example.backend.serviceImpl;
 
 import com.example.backend.ENUM.ORDER_ITEM_STATE;
-// ... các import khác ...
 import com.example.backend.ENUM.ORDER_STATE;
 import com.example.backend.ENUM.ORDER_STATUS;
 import com.example.backend.model.Order;
@@ -11,13 +10,13 @@ import com.example.backend.model.User;
 import com.example.backend.repository.OrderItemRepository;
 import com.example.backend.repository.OrderRepository;
 import com.example.backend.request.OrderItemRequest;
-import com.example.backend.request.OrderStateRequest; // Sẽ sửa đổi cách dùng
+import com.example.backend.request.OrderStateRequest;
 import com.example.backend.request.OrderStatusRequest;
 import com.example.backend.service.UserService;
-import com.example.backend.state.OrderStateFactory; // Import Factory
+import com.example.backend.state.OrderStateFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; // Nên dùng Transactional
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,24 +27,15 @@ public class OrderService implements com.example.backend.service.OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
-    // OrderItemRepository cần được inject vì các State có thể cần dùng
     @Autowired
     private OrderItemRepository orderItemRepository;
 
     @Autowired
-    private ProductService productService; // Vẫn giữ nếu cần cho logic khác
-
-    // @Autowired // Không cần inject OrderItemService trực tiếp nữa nếu logic item
-    // đã chuyển vào State hoặc Order
-    // private OrderItemService orderItemService;
-
-    @Autowired
     private UserService userService;
 
-    // --- Helper method để đảm bảo currentState được khởi tạo khi lấy Order ---
     private Order initializeOrderState(Order order) {
         if (order != null) {
-            order.getCurrentState(); // Gọi getter để đảm bảo currentState được khởi tạo từ stateEnum
+            order.getCurrentState();
         }
         return order;
     }
@@ -54,13 +44,12 @@ public class OrderService implements com.example.backend.service.OrderService {
         orders.forEach(this::initializeOrderState);
         return orders;
     }
-    // --- Kết thúc Helper method ---
 
     @Override
-    @Transactional // Đảm bảo tính nhất quán
+    @Transactional
     public Order createOrder(OrderItemRequest orderRequest, String jwt) throws Exception {
         User user = userService.findUserByJwtToken(jwt);
-        if (orderRepository.existsByOrderCode(orderRequest.getOrderCode())) { // Dùng existsBy... hiệu quả hơn
+        if (orderRepository.existsByOrderCode(orderRequest.getOrderCode())) {
             throw new Exception("Order code is already used");
         }
 
@@ -71,7 +60,7 @@ public class OrderService implements com.example.backend.service.OrderService {
         newOrder.setUserId(user.getId());
         newOrder.setOrderItem_quantity(orderRequest.getOrderItem_code().size());
         newOrder.setOrderCode(orderRequest.getOrderCode());
-        newOrder.setOrderStatus(ORDER_STATUS.OUT_EXPORT); // Trạng thái xuất kho ban đầu
+        newOrder.setOrderStatus(ORDER_STATUS.OUT_EXPORT);
 
         // Thiết lập trạng thái ban đầu bằng Factory và setter
         newOrder.setCurrentState(OrderStateFactory.getState(ORDER_STATE.PENDING));
@@ -152,21 +141,13 @@ public class OrderService implements com.example.backend.service.OrderService {
                 }
             }
         }
-        // Xóa các OrderItem liên quan (Cẩn thận: có thể không nên xóa cứng nếu cần lưu
-        // lịch sử)
-        // Thay vì xóa, có thể chỉ cần cập nhật trạng thái OrderItem
-        /*
-         * for(String i : order.getOrderItem_code()){
-         * orderItemRepository.deleteByorderItemCode(i); // Xem xét lại việc xóa cứng
-         * }
-         */
 
         orderRepository.deleteById(id);
     }
 
     @Override
     public List<Order> getOrderByUserId(String userId) {
-        return initializeOrderStates(orderRepository.findByUserId(userId)); // Sử dụng findByUserId
+        return initializeOrderStates(orderRepository.findByUserId(userId));
     }
 
     @Override
@@ -207,35 +188,17 @@ public class OrderService implements com.example.backend.service.OrderService {
 
     @Override
     public List<Order> getOrderByState(ORDER_STATE orderState) {
-        // Dùng query của Spring Data JPA/Mongo cho hiệu quả
         return initializeOrderStates(orderRepository.findByStateEnum(orderState));
     }
 
-    // Cần thêm phương thức findByStateEnum vào OrderRepository
-    // interface OrderRepository extends MongoRepository<Order, String> {
-    // List<Order> findByStateEnum(ORDER_STATE stateEnum);
-    // // ... các phương thức khác
-    // }
-
     @Override
     public List<Order> getOrderByStatus(ORDER_STATUS orderStatus) {
-        // Dùng query của Spring Data JPA/Mongo cho hiệu quả
         return initializeOrderStates(orderRepository.findByOrderStatus(orderStatus));
     }
 
-    // Cần thêm phương thức findByOrderStatus vào OrderRepository
-    // interface OrderRepository extends MongoRepository<Order, String> {
-    // List<Order> findByOrderStatus(ORDER_STATUS orderStatus);
-    // // ... các phương thức khác
-    // }
-
-    // Phương thức getOrderQuantity và getOrderQuantityByMonth giữ nguyên logic đếm
-    // Nhưng nên dùng query DB để đếm sẽ hiệu quả hơn là tải tất cả về rồi duyệt
-    // Ví dụ: dùng countByStateEnum...
-
     @Override
     public OrderQuantity getOrderQuantity() {
-        // Tối ưu: Dùng aggregation query hoặc count query thay vì findAll
+
         long on_pending = orderRepository.countByStateEnum(ORDER_STATE.PENDING);
         long confirmed = orderRepository.countByStateEnum(ORDER_STATE.CONFIRMED);
         long delivered = orderRepository.countByStateEnum(ORDER_STATE.DELIVERED);
@@ -243,7 +206,7 @@ public class OrderService implements com.example.backend.service.OrderService {
         long cancel = orderRepository.countByStateEnum(ORDER_STATE.CANCELLED);
 
         OrderQuantity orderQuantity = new OrderQuantity();
-        orderQuantity.setCancelQuantity((int) cancel); // Ép kiểu nếu cần
+        orderQuantity.setCancelQuantity((int) cancel);
         orderQuantity.setConfirmedQuantity((int) confirmed);
         orderQuantity.setPendingQuantity((int) on_pending);
         orderQuantity.setDeliveredQuantity((int) delivered);
@@ -251,18 +214,12 @@ public class OrderService implements com.example.backend.service.OrderService {
 
         return orderQuantity;
     }
-    // Cần thêm phương thức countByStateEnum vào OrderRepository
-    // interface OrderRepository extends MongoRepository<Order, String> {
-    // long countByStateEnum(ORDER_STATE stateEnum);
-    // // ... các phương thức khác
-    // }
 
     @Override
     public Order getOrderByOrderCode(String orderCode) {
         // Khởi tạo state khi tìm thấy
-        return initializeOrderState(orderRepository.findByOrderCode(orderCode)); // Sửa tên phương thức repo
+        return initializeOrderState(orderRepository.findByOrderCode(orderCode));
     }
-    // Cần sửa tên phương thức trong OrderRepository: findByOrderCode
 
     @Override
     @Transactional
@@ -270,16 +227,7 @@ public class OrderService implements com.example.backend.service.OrderService {
         // Logic cập nhật orderStatus (trạng thái xuất kho) có thể độc lập với
         // orderState
         Order existingOrder = orderRepository.findById(orderId)
-                // .map(this::initializeOrderState) // Không nhất thiết cần khởi tạo state ở đây
                 .orElseThrow(() -> new Exception("Order not found with id: " + orderId));
-
-        // Có thể thêm kiểm tra logic ở đây nếu cần, ví dụ: chỉ cho phép chuyển sang
-        // IN_EXPORT khi state là CONFIRMED hoặc ON_GOING
-        // if (existingOrder.getStateEnum() != ORDER_STATE.CONFIRMED &&
-        // existingOrder.getStateEnum() != ORDER_STATE.ON_GOING) {
-        // throw new Exception("Cannot update export status for order in state " +
-        // existingOrder.getStateEnum());
-        // }
 
         existingOrder.setOrderStatus(status.getOrderStatus());
         existingOrder.setUpdate_at(LocalDate.now()); // Cập nhật thời gian
@@ -288,9 +236,8 @@ public class OrderService implements com.example.backend.service.OrderService {
 
     @Override
     public OrderQuantity getOrderQuantityByMonth(int month, int year) {
-        // Tối ưu: Dùng aggregation query hoặc count query thay vì tải hết về
-        List<Order> ordersInMonth = orderRepository.findOrdersByMonthAndYear(month, year); // Giả sử repo có phương thức
-                                                                                           // này
+
+        List<Order> ordersInMonth = orderRepository.findOrdersByMonthAndYear(month, year);
 
         long on_pending = ordersInMonth.stream().filter(o -> o.getStateEnum() == ORDER_STATE.PENDING).count();
         long confirmed = ordersInMonth.stream().filter(o -> o.getStateEnum() == ORDER_STATE.CONFIRMED).count();
@@ -307,9 +254,4 @@ public class OrderService implements com.example.backend.service.OrderService {
 
         return orderQuantity;
     }
-    // Cần định nghĩa phương thức findOrdersByMonthAndYear trong OrderRepository
-    // Ví dụ dùng @Query cho MongoDB:
-    // @Query("{'$expr': {'$and': [{'$eq': [{'$month': '$created_at'}, ?0]}, {'$eq':
-    // [{'$year': '$created_at'}, ?1]}]}}")
-    // List<Order> findOrdersByMonthAndYear(int month, int year);
 }

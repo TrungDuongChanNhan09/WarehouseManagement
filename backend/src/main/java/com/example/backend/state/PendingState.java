@@ -52,19 +52,11 @@ public class PendingState implements OrderState {
   @Override
   public void updateOrderDetails(Order order, OrderItemRequest request, OrderItemRepository orderItemRepository)
       throws Exception {
-    // Logic cập nhật chi tiết đơn hàng (như trong service cũ)
-    // Lưu ý: Cần xem xét logic hoàn trả/cập nhật số lượng sản phẩm nếu cần
+
     order.setUpdate_at(LocalDate.now());
     order.setDelivery_Address(request.getDelivery_Address());
 
-    // Xử lý cập nhật order items (có thể phức tạp hơn, cần logic hoàn trả item cũ,
-    // thêm item mới)
-    // Ví dụ đơn giản: chỉ cập nhật danh sách mã và số lượng
-    // *** CẢNH BÁO: Logic cập nhật order items cần chi tiết hơn nhiều trong thực tế
-    // ***
-    // Ví dụ: cần đánh dấu item cũ là OUT_ORDER, item mới là IN_ORDER, tính lại
-    // giá,...
-    List<String> oldItemCodes = new ArrayList<>(order.getOrderItem_code()); // Sao lưu để xử lý item cũ nếu cần
+    List<String> oldItemCodes = new ArrayList<>(order.getOrderItem_code());
 
     order.setOrderItem_code(request.getOrderItem_code());
     order.setOrderItem_quantity(request.getOrderItem_code().size());
@@ -82,9 +74,6 @@ public class PendingState implements OrderState {
         orderItemRepository.save(orderItem);
       }
     }
-    // Cần thêm logic xử lý những item bị loại bỏ khỏi đơn hàng (oldItemCodes không
-    // có trong request.getOrderItem_code())
-    // ví dụ: chuyển state của chúng về OUT_ORDER
 
     order.setOrderPrice(totalPrice);
     System.out.println("Order " + order.getOrderCode() + " details updated.");
