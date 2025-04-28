@@ -159,7 +159,6 @@ export default function Supplier () {
     if (!selectedRowId) return
     try {
       const dataToSend = { ...formData }
-      // delete dataToSend.id; // Bỏ ID khỏi body nếu API lấy ID từ URL
       const respond = await ApiService.updateSupplier(selectedRowId, dataToSend)
       if (respond && respond.status === 200) {
         handleCloseEdit()
