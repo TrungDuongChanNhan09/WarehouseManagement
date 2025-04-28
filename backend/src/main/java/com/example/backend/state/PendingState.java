@@ -9,8 +9,6 @@ import com.example.backend.repository.OrderItemRepository;
 import com.example.backend.request.OrderItemRequest;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PendingState implements OrderState {
 
@@ -55,8 +53,6 @@ public class PendingState implements OrderState {
 
     order.setUpdate_at(LocalDate.now());
     order.setDelivery_Address(request.getDelivery_Address());
-
-    List<String> oldItemCodes = new ArrayList<>(order.getOrderItem_code());
 
     order.setOrderItem_code(request.getOrderItem_code());
     order.setOrderItem_quantity(request.getOrderItem_code().size());

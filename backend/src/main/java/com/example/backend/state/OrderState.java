@@ -2,7 +2,6 @@ package com.example.backend.state;
 
 import com.example.backend.ENUM.ORDER_STATE;
 import com.example.backend.model.Order;
-import com.example.backend.model.OrderItem;
 import com.example.backend.repository.OrderItemRepository;
 import com.example.backend.request.OrderItemRequest;
 

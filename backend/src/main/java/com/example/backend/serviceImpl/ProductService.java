@@ -4,26 +4,21 @@ import com.example.backend.model.Category;
 import com.example.backend.model.Product;
 import com.example.backend.model.Supplier;
 import com.example.backend.respone.ProductRespone;
-import com.example.backend.serviceImpl.ShelfService;
 
 import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.repository.SupplierRepository;
 import com.example.backend.request.ProductRequest;
-import com.example.backend.respone.ProductRespone;
-import com.example.backend.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 @Service
 public class ProductService implements com.example.backend.service.ProductService {
-    @Autowired
-    private UserService userService;
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -31,10 +26,11 @@ public class ProductService implements com.example.backend.service.ProductServic
 
     @Autowired
     private SupplierRepository supplierRepository;
+
     @Override
     public List<ProductRespone> getAllProduct() {
         List<ProductRespone> productRespones = new ArrayList<>();
-        for(Product i : productRepository.findAll()){
+        for (Product i : productRepository.findAll()) {
             ProductRespone productRespone = new ProductRespone();
 
             Category category = categoryRepository.findById(i.getCategoryId()).orElse(null);
@@ -62,8 +58,9 @@ public class ProductService implements com.example.backend.service.ProductServic
     @Override
     public Product addProduct(ProductRequest product) {
         Product existingProduct = this.productRepository.findByproductName(product.getProductName());
-        if(existingProduct != null) {
-            existingProduct.setInventory_quantity(existingProduct.getInventory_quantity() + product.getInventory_quantity());
+        if (existingProduct != null) {
+            existingProduct
+                    .setInventory_quantity(existingProduct.getInventory_quantity() + product.getInventory_quantity());
             return productRepository.save(existingProduct);
         }
 
@@ -106,13 +103,13 @@ public class ProductService implements com.example.backend.service.ProductServic
     @Override
     public List<Product> filterProductByCategory(String categoryName) throws Exception {
         Category category = categoryRepository.findBycategoryName(categoryName);
-        if(category == null){
+        if (category == null) {
             throw new Exception("Product with category not found...");
         }
         List<Product> products = productRepository.findAll();
         List<Product> filterProduct = new ArrayList<>();
-        for (Product product : products){
-            if(product.getCategoryId().equals(category.getId())){
+        for (Product product : products) {
+            if (product.getCategoryId().equals(category.getId())) {
                 filterProduct.add(product);
             }
         }
@@ -122,13 +119,13 @@ public class ProductService implements com.example.backend.service.ProductServic
     @Override
     public List<Product> filterProductBySupplier(String supplierName) throws Exception {
         Supplier supplier = supplierRepository.findBynameSupplier(supplierName);
-        if(supplier == null){
+        if (supplier == null) {
             throw new Exception("Product with supplier not found...");
         }
         List<Product> products = productRepository.findAll();
         List<Product> filterProduct = new ArrayList<>();
-        for (Product product : products){
-            if(product.getSupplierId().equals(supplier.getId())){
+        for (Product product : products) {
+            if (product.getSupplierId().equals(supplier.getId())) {
                 filterProduct.add(product);
             }
         }
@@ -142,11 +139,12 @@ public class ProductService implements com.example.backend.service.ProductServic
 
     @Override
     public List<Product> searchProductByName(String productName) {
-//        Product product = new Product();
-//        product.setProductName(productName);
-//        ExampleMatcher matcher = ExampleMatcher.matchingAny()
-//                .withMatcher("productName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-//        Example<Product> example = Example.of(product, matcher);
+        // Product product = new Product();
+        // product.setProductName(productName);
+        // ExampleMatcher matcher = ExampleMatcher.matchingAny()
+        // .withMatcher("productName",
+        // ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+        // Example<Product> example = Example.of(product, matcher);
         return this.productRepository.searchByProductName(productName);
     }
 
