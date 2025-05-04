@@ -23,7 +23,8 @@ public class StandardCategoryService implements CategoryService {
 
     @Override
     public Category createCategory(CategoryRequest category) throws Exception {
-        Category existingCategory = categoryRepository.findBycategoryName(category.getCategoryName());
+        Optional<Category> existingCategory = categoryRepository.findBycategoryName(category.getCategoryName());
+
         if (existingCategory != null) {
             throw new Exception("Category is already exist");
         }

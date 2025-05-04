@@ -27,7 +27,7 @@ public class EnhancedCategoryService implements CategoryService {
         if (category.getCategoryName() == null || category.getCategoryName().trim().isEmpty()) {
             throw new Exception("Category name cannot be empty");
         }
-        Category existingCategory = categoryRepository.findBycategoryName(category.getCategoryName());
+        Optional<Category> existingCategory = categoryRepository.findBycategoryName(category.getCategoryName());
         if (existingCategory != null) {
             throw new Exception("Category is already exist");
         }
