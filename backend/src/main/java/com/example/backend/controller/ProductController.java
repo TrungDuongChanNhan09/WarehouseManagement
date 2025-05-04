@@ -1,19 +1,35 @@
 package com.example.backend.controller;
 
-import com.example.backend.model.Product;
-import com.example.backend.model.User;
-import com.example.backend.service.ProductService;
-import com.example.backend.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 
+import com.example.backend.respone.ProductRespone;
+import com.example.backend.service.NotificationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.backend.model.Product;
+import com.example.backend.model.User;
+import com.example.backend.request.ProductRequest;
+import com.example.backend.respone.ProductRespone;
+import com.example.backend.service.ProductService;
+import com.example.backend.service.UserService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/product")
+@Tag(name = "Product API")
 public class ProductController {
     @Autowired
     private ProductService productService;
@@ -21,8 +37,11 @@ public class ProductController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @PostMapping("")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product, @RequestHeader("Authorization") String jwt) throws Exception{
+    public ResponseEntity<Product> createProduct(@RequestBody ProductRequest product, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.addProduct(product), HttpStatus.CREATED);
     }
@@ -41,7 +60,7 @@ public class ProductController {
     }
 
     @GetMapping("")
-    private ResponseEntity<List<Product>> getAllProduct(@RequestHeader("Authorization") String jwt) throws Exception{
+    private ResponseEntity<List<ProductRespone>> getAllProduct(@RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.getAllProduct(), HttpStatus.OK);
     }
@@ -68,5 +87,11 @@ public class ProductController {
     private ResponseEntity<List<Product>> getProductBySupplier(@PathVariable String supplierName, @RequestHeader("Authorization") String jwt) throws Exception{
         User user = userService.findUserByJwtToken(jwt);
         return new ResponseEntity<>(productService.filterProductBySupplier(supplierName), HttpStatus.OK);
+    }
+
+    @GetMapping("/notification")
+    private ResponseEntity<List<String>> getNotification(@RequestHeader("Authorization") String jwt) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        return new ResponseEntity<>(notificationService.notifyProductExpiry(), HttpStatus.OK);
     }
 }

@@ -1,10 +1,9 @@
 package com.example.backend.controller;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 
-import com.example.backend.model.Category;
+import com.example.backend.request.ChangePasswordRequest;
 import com.example.backend.serviceImpl.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.backend.config.JwtProvider;
-import com.example.backend.model.USER_ROLE;
+import com.example.backend.ENUM.USER_ROLE;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.request.LoginRequest;
@@ -30,7 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Authentication API", description = "Đăng ký, đăng nhập tài khoản")
+@Tag(name = "Authentication API")
 public class AuthController {
     @Autowired
     private UserRepository userRepository;
@@ -107,6 +106,13 @@ public class AuthController {
         user.setStatus("off");
         userRepository.save(user);
         return new ResponseEntity<>("Successfully logged out", HttpStatus.OK);
+    }
+
+    @PutMapping("/changePass")
+    public ResponseEntity<String> changePass(@RequestHeader("Authorization") String jwt, @RequestBody ChangePasswordRequest changePasswordRequest) throws Exception{
+        User user = userService.findUserByJwtToken(jwt);
+        userService.changePassword(changePasswordRequest, user);
+        return new ResponseEntity<>("Change password successfully", HttpStatus.OK);
     }
 
     private Authentication authenticate(String username, String password) {

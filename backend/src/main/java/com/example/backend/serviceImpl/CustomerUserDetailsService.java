@@ -1,6 +1,6 @@
 package com.example.backend.serviceImpl;
 
-import com.example.backend.model.USER_ROLE;
+import com.example.backend.ENUM.USER_ROLE;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

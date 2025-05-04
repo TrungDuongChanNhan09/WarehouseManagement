@@ -3,11 +3,14 @@ package com.example.backend.serviceImpl;
 import com.example.backend.model.Category;
 import com.example.backend.model.Product;
 import com.example.backend.model.Supplier;
+import com.example.backend.respone.ProductRespone;
 import com.example.backend.serviceImpl.ShelfService;
 
 import com.example.backend.repository.CategoryRepository;
 import com.example.backend.repository.ProductRepository;
 import com.example.backend.repository.SupplierRepository;
+import com.example.backend.request.ProductRequest;
+import com.example.backend.respone.ProductRespone;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -29,18 +32,54 @@ public class ProductService implements com.example.backend.service.ProductServic
     @Autowired
     private SupplierRepository supplierRepository;
     @Override
-    public List<Product> getAllProduct() {
-        return productRepository.findAll();
+    public List<ProductRespone> getAllProduct() {
+        List<ProductRespone> productRespones = new ArrayList<>();
+        for(Product i : productRepository.findAll()){
+            ProductRespone productRespone = new ProductRespone();
+
+            Category category = categoryRepository.findById(i.getCategoryId()).orElse(null);
+            Supplier supplier = supplierRepository.findById(i.getSupplierId()).orElse(null);
+            productRespone.setProduction_date(i.getProduction_date());
+            productRespone.setProductName(i.getProductName());
+            productRespone.setDescription(i.getDescription());
+            productRespone.setImage(i.getImage());
+            productRespone.setUnit(i.getUnit());
+            productRespone.setPrice(i.getPrice());
+            productRespone.setInventory_quantity(i.getInventory_quantity());
+            productRespone.setExpiration_date(i.getExpiration_date());
+            productRespone.setCategoryId(i.getCategoryId());
+            productRespone.setSupplierId(i.getSupplierId());
+            productRespone.setProductStatus(i.getProductStatus());
+            productRespone.setId(i.getId());
+            productRespone.setSupplierName(supplier.getNameSupplier());
+            productRespone.setCategoryName(category.getCategoryName());
+            productRespones.add(productRespone);
+        }
+
+        return productRespones;
     }
 
     @Override
-    public Product addProduct(Product product) {
+    public Product addProduct(ProductRequest product) {
         Product existingProduct = this.productRepository.findByproductName(product.getProductName());
         if(existingProduct != null) {
             existingProduct.setInventory_quantity(existingProduct.getInventory_quantity() + product.getInventory_quantity());
             return productRepository.save(existingProduct);
         }
-        return productRepository.save(product);
+
+        Product newProduct = new Product();
+
+        newProduct.setProductName(product.getProductName());
+        newProduct.setProduction_date(product.getProduction_date());
+        newProduct.setUnit(product.getUnit());
+        newProduct.setSupplierId(product.getSupplierId());
+        newProduct.setCategoryId(product.getCategoryId());
+        newProduct.setExpiration_date(product.getExpiration_date());
+        newProduct.setImage(product.getImage());
+        newProduct.setDescription(product.getDescription());
+        newProduct.setInventory_quantity(product.getInventory_quantity());
+        newProduct.setPrice(product.getPrice());
+        return productRepository.save(newProduct);
     }
 
     @Override
@@ -58,7 +97,9 @@ public class ProductService implements com.example.backend.service.ProductServic
             existingProduct.setCategoryId(product.getCategoryId());
             existingProduct.setUnit(product.getUnit());
             existingProduct.setSupplierId(product.getSupplierId());
-            return this.productRepository.save(product);
+            existingProduct.setPrice(product.getPrice());
+            existingProduct.setProductStatus(product.getProductStatus());
+            return this.productRepository.save(existingProduct);
         }
     }
 
@@ -87,7 +128,7 @@ public class ProductService implements com.example.backend.service.ProductServic
         List<Product> products = productRepository.findAll();
         List<Product> filterProduct = new ArrayList<>();
         for (Product product : products){
-            if(product.getCategoryId().equals(supplier.getId())){
+            if(product.getSupplierId().equals(supplier.getId())){
                 filterProduct.add(product);
             }
         }
@@ -101,12 +142,12 @@ public class ProductService implements com.example.backend.service.ProductServic
 
     @Override
     public List<Product> searchProductByName(String productName) {
-        Product product = new Product();
-        product.setProductName(productName);
-        ExampleMatcher matcher = ExampleMatcher.matchingAny()
-                .withMatcher("productName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
-        Example<Product> example = Example.of(product, matcher);
-        return this.productRepository.findAll(example);
+//        Product product = new Product();
+//        product.setProductName(productName);
+//        ExampleMatcher matcher = ExampleMatcher.matchingAny()
+//                .withMatcher("productName", ExampleMatcher.GenericPropertyMatchers.contains().ignoreCase());
+//        Example<Product> example = Example.of(product, matcher);
+        return this.productRepository.searchByProductName(productName);
     }
 
     @Override

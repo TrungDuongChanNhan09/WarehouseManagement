@@ -1,0 +1,82 @@
+.login {
+  width: 100%;
+  height: 100vh;
+}
+.login .body-login {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  height: 100vh;
+  width: 100vw;
+}
+.login .body-login .background-page {
+  width: 68%;
+}
+.login .body-login .background-page img {
+  width: 100%;
+  height: 100%;
+}
+.login .body-login .background-page .background-title {
+  position: absolute;
+  bottom: 20%;
+  left: 2%;
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  z-index: 1;
+}
+.login .body-login .background-page .background-content {
+  position: absolute;
+  bottom: 5%;
+  left: 2%;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: justify;
+  z-index: 1;
+  max-width: 62vw;
+}
+.login .body-login .information-page {
+  min-width: auto;
+  width: 32%;
+  background-color: #EEEEEE;
+  border-radius: 0.5rem;
+  padding: 3rem;
+}
+.login .body-login .information-page .infor-email {
+  margin-bottom: 0.8rem;
+}
+.login .body-login .information-page .infor-pass {
+  margin-bottom: 0.8rem;
+}
+.login .body-login .information-page .title img {
+  min-width: 100px;
+  width: 45%;
+}
+.login .body-login .information-page .title .title-login {
+  text-align: center;
+  padding: 2rem;
+}
+.login .body-login .information-page .button-login {
+  background-color: #45474B;
+  margin-top: 1rem;
+  width: 100%;
+  border-radius: 1rem;
+}
+.login .body-login .information-page .button-login .link {
+  color: white;
+  font-size: 1.1rem;
+  text-decoration: none;
+  text-align: center;
+}
+
+@media (max-aspect-ratio: 1) {
+  .login .body-login .background-page {
+    display: none;
+  }
+  .login .body-login .information-page {
+    width: 100%;
+  }
+}/*# sourceMappingURL=Login.css.map */

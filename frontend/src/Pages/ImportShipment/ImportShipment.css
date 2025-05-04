@@ -1,0 +1,35 @@
+.ImportShipment .ImportShipment-bar .search-bar {
+  border: 2px solid gray;
+  border-radius: 10px;
+}
+.ImportShipment .ImportShipment-bar .search-bar .input-adornment {
+  margin: 0px;
+}
+.ImportShipment .ImportShipment-bar .search-bar:focus-within {
+  border: 2px solid #297342;
+}
+.ImportShipment .ImportShipment-bar {
+  .my-table{
+    margin-top: 10px;
+    .table{
+      .table-head{
+        background-color: #E2F1E7;
+        .table-head-cell{
+          font-size: medium;
+          font-weight: bold;
+          color: #000000;
+          padding: 15px;
+        }
+      }
+      .table-head .MuiTableCell-root {
+        border-bottom: none !important;
+      }
+      .table-body{
+        .table-body-cell{
+          padding-top: 12px;
+          padding-bottom: 12px;
+        }
+      }
+    }
+  }
+}

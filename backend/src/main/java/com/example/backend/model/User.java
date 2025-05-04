@@ -2,6 +2,7 @@ package com.example.backend.model;
 
 import java.util.Date;
 
+import com.example.backend.ENUM.USER_ROLE;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
