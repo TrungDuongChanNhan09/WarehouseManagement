@@ -103,17 +103,16 @@ export default function Supplier () {
   const fetchRows = async () => {
     try {
       const response = await ApiService.getAllSupplier()
-      // Thêm STT vào dữ liệu (nếu response là mảng)
       const rowsWithStt = Array.isArray(response)
         ? response.map((row, index) => ({
             ...row,
             stt: index + 1
           }))
-        : [] // Xử lý trường hợp response không phải mảng
+        : []
       setRows(rowsWithStt)
     } catch (error) {
       console.error('Lỗi khi tải thông tin nhà cung cấp:', error.message)
-      setRows([]) // Đặt lại rows thành mảng rỗng khi có lỗi
+      setRows([])
     }
   }
 
@@ -138,8 +137,7 @@ export default function Supplier () {
   // Xử lý đóng Modal Edit
   const handleCloseEdit = () => {
     setOpenEdit(false)
-    setSelectedRowId(null) // Reset ID đã chọn
-    // Không cần reset formData ở đây vì khi mở lại Edit/Add sẽ set lại
+    setSelectedRowId(null)
   }
 
   // Xử lý submit form Add
@@ -187,12 +185,10 @@ export default function Supplier () {
 
   // Xử lý nút Delete
   const handleDeleteButton = async id => {
-    // Thêm xác nhận trước khi xóa
     if (window.confirm(`Bạn có chắc muốn xóa nhà cung cấp này không?`)) {
       try {
         const response = await ApiService.deleteSupplier(id)
         if (response && (response.status === 200 || response.status === 204)) {
-          // Cập nhật state ở client thay vì gọi lại fetchRows để tối ưu hơn
           setRows(prevRows => prevRows.filter(row => row.id !== id))
         } else {
           console.error('Xóa nhà cung cấp thất bại:', response)
@@ -206,7 +202,7 @@ export default function Supplier () {
   // Lọc dữ liệu dựa trên thanh tìm kiếm (client-side)
   const filteredRows = rows.filter(
     row =>
-      row.nameSupplier && // Kiểm tra nameSupplier tồn tại trước khi gọi toLowerCase
+      row.nameSupplier &&
       row.nameSupplier.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -323,7 +319,6 @@ export default function Supplier () {
             }}
           >
             {' '}
-            {/* Thêm component="form" và onSubmit */}
             <Stack
               className='template-add-iventory'
               direction={'column'}
@@ -426,7 +421,6 @@ export default function Supplier () {
             }}
           >
             {' '}
-            {/* Thêm component="form" và onSubmit */}
             <Stack
               className='template-add-iventory'
               direction={'column'}
