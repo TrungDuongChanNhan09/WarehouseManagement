@@ -3,17 +3,19 @@ package com.example.backend.serviceImpl;
 import com.example.backend.model.Category;
 import com.example.backend.repository.CategoryRepository;
 import com.example.backend.request.CategoryRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.example.backend.service.CategoryService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class CategoryService implements com.example.backend.service.CategoryService {
-    @Autowired
-    private CategoryRepository categoryRepository;
+public class StandardCategoryService implements CategoryService {
+    private final CategoryRepository categoryRepository;
+
+    public StandardCategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
+
     @Override
     public List<Category> getAllCategory() {
         return categoryRepository.findAll();
@@ -22,7 +24,7 @@ public class CategoryService implements com.example.backend.service.CategoryServ
     @Override
     public Category createCategory(CategoryRequest category) throws Exception {
         Category existingCategory = categoryRepository.findBycategoryName(category.getCategoryName());
-        if(existingCategory != null){
+        if (existingCategory != null) {
             throw new Exception("Category is already exist");
         }
         Category newCategory = new Category();
@@ -37,10 +39,10 @@ public class CategoryService implements com.example.backend.service.CategoryServ
     }
 
     @Override
-    public List<String> getCategoryName(){
+    public List<String> getCategoryName() {
         List<Category> categories = categoryRepository.findAll();
         List<String> categoryName = new ArrayList<>();
-        for(Category category : categories){
+        for (Category category : categories) {
             categoryName.add(category.getCategoryName());
         }
         return categoryName;
