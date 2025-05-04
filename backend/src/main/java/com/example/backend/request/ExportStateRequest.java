@@ -1,6 +1,6 @@
 package com.example.backend.request;
 
-import com.example.backend.model.EXPORT_STATE;
+import com.example.backend.ENUM.EXPORT_STATE;
 import lombok.Data;
 
 @Data

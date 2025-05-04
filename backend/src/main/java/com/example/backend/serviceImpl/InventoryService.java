@@ -1,23 +1,18 @@
 package com.example.backend.serviceImpl;
 
-import com.example.backend.model.INVENTORY_STATE;
+import com.example.backend.ENUM.INVENTORY_STATE;
 import com.example.backend.model.Inventory;
 import com.example.backend.model.Shelf;
 import com.example.backend.repository.InventoryRepository;
 import com.example.backend.repository.ShelfRepository;
 import com.example.backend.request.InventoryStatus;
-import com.example.backend.service.ShelfService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +33,7 @@ public class InventoryService implements com.example.backend.service.InventorySe
         if (existingInventory != null)
             throw new Exception("Inventory is already exist");
         else {
-            if(item.getNumber_coloum() < 1 || item.getNumber_row() < 1 ){
+            if (item.getNumber_coloum() < 1 || item.getNumber_row() < 1) {
                 throw new Exception("Yêu cầu hàng hoặc cột không được bé hơn 1 ");
             }
             item.setNumber_shelf(item.getNumber_coloum() * item.getNumber_row());
@@ -61,9 +56,11 @@ public class InventoryService implements com.example.backend.service.InventorySe
             if (updatedInventory.getNumber_coloum() < 1 || updatedInventory.getNumber_row() < 1) {
                 throw new Exception("Yêu cầu hàng hoặc cột không được bé hơn 1 ");
             }
-            //if (updatedInventory.getNumber_coloum() < existingInventory.getNumber_coloum() || updatedInventory.getNumber_row() > existingInventory.getNumber_row()) {
-             //   throw new Exception("Yêu cầu hàng hoặc cột không được bé hơn 1 ");
-           // }
+            // if (updatedInventory.getNumber_coloum() <
+            // existingInventory.getNumber_coloum() || updatedInventory.getNumber_row() >
+            // existingInventory.getNumber_row()) {
+            // throw new Exception("Yêu cầu hàng hoặc cột không được bé hơn 1 ");
+            // }
             existingInventory.setStatus(updatedInventory.getStatus());
             existingInventory.setNameInventory(updatedInventory.getNameInventory());
             existingInventory.setTypeInventory(updatedInventory.getTypeInventory());

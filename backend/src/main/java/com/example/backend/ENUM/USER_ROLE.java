@@ -1,4 +1,4 @@
-package com.example.backend.model;
+package com.example.backend.ENUM;
 
 public enum USER_ROLE {
     ROLE_STAFF,

@@ -1,12 +1,11 @@
 package com.example.backend.serviceImpl;
 
-import java.io.Console;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.example.backend.model.INVENTORY_STATE;
+import com.example.backend.ENUM.INVENTORY_STATE;
 import com.example.backend.model.Inventory;
 import com.example.backend.model.Product;
 import com.example.backend.model.Shelf;
@@ -168,15 +167,23 @@ public class ShelfService implements com.example.backend.service.ShelfService {
 
     @Override
     public List<String> getShelfContainProduct(String productName) {
-        Product product = productRepository.findByproductName(productName);
-        System.out.println(product.getId());
-        List<Shelf> shelves = shelfRepository.findByproductId(product.getId());
-        List<String> shelfCode = new ArrayList<>();
+        Optional<Product> productOptional = productRepository.findByProductName(productName);
+
+        Product foundProduct = productOptional.orElseThrow(
+                () -> new RuntimeException("Không tìm thấy sản phẩm với tên: " + productName));
+
+        String productId = foundProduct.getId();
+        System.out.println("Tìm thấy Product ID: " + productId);
+
+        List<Shelf> shelves = shelfRepository.findByproductId(productId);
+
+        List<String> shelfCodes = new ArrayList<>();
         for (Shelf shelf : shelves) {
-            shelfCode.add(shelf.getShelfCode());
+            shelfCodes.add(shelf.getShelfCode());
         }
-        System.out.println(shelfCode);
-        return shelfCode;
+
+        System.out.println("Các mã kệ chứa sản phẩm: " + shelfCodes);
+        return shelfCodes;
     }
 
     public List<Shelf> searchShelfByCode(String keyword) {

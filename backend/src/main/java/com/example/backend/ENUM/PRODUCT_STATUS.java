@@ -1,4 +1,4 @@
-package com.example.backend.model;
+package com.example.backend.ENUM;
 
 public enum PRODUCT_STATUS {
     IN_STOCK,

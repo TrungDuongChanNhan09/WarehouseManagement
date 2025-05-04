@@ -1,4 +1,4 @@
-package com.example.backend.service;
+package com.example.backend.serviceImpl;
 
 import java.util.Map;
 
@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
-import com.example.backend.serviceImpl.CloudinaryImageImpl;
+import com.example.backend.service.CloudinaryImage;
 
 @Service
-public class FileUploadService implements CloudinaryImageImpl {
+public class FileUploadService implements CloudinaryImage {
     @Autowired 
     private Cloudinary cloudinary;
 
