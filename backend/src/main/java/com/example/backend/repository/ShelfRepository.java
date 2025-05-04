@@ -10,9 +10,11 @@ import com.example.backend.model.Shelf;
 
 public interface ShelfRepository extends MongoRepository<Shelf, String> {
     List<Shelf> findByinventoryid(String inventoryId);
-    List<Shelf> findByproductId(String productId);
+
+    List<Shelf> findByproductId(Object productId);
 
     Shelf findByshelfCode(String shelfCode);
+
     @Query("{ 'shelfCode': { $regex: ?0, $options: 'i' } }")
     List<Shelf> searchByshelfCode(String shelfCode);
 }

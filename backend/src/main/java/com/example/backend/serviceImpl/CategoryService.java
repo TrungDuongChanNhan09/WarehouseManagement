@@ -14,6 +14,7 @@ import java.util.Optional;
 public class CategoryService implements com.example.backend.service.CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
+
     @Override
     public List<Category> getAllCategory() {
         return categoryRepository.findAll();
@@ -21,8 +22,8 @@ public class CategoryService implements com.example.backend.service.CategoryServ
 
     @Override
     public Category createCategory(CategoryRequest category) throws Exception {
-        Category existingCategory = categoryRepository.findBycategoryName(category.getCategoryName());
-        if(existingCategory != null){
+        Optional existingCategory = categoryRepository.findBycategoryName(category.getCategoryName());
+        if (existingCategory != null) {
             throw new Exception("Category is already exist");
         }
         Category newCategory = new Category();
@@ -37,10 +38,10 @@ public class CategoryService implements com.example.backend.service.CategoryServ
     }
 
     @Override
-    public List<String> getCategoryName(){
+    public List<String> getCategoryName() {
         List<Category> categories = categoryRepository.findAll();
         List<String> categoryName = new ArrayList<>();
-        for(Category category : categories){
+        for (Category category : categories) {
             categoryName.add(category.getCategoryName());
         }
         return categoryName;
