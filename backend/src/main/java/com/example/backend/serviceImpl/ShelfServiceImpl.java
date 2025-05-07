@@ -1,32 +1,38 @@
 package com.example.backend.serviceImpl;
 
+import com.example.backend.ENUM.INVENTORY_STATE;
+import com.example.backend.model.Inventory;
+import com.example.backend.model.Product;
+import com.example.backend.model.Shelf;
+import com.example.backend.respone.ShelfEmpty;
+import com.example.backend.repository.InventoryRepository;
+import com.example.backend.repository.ProductRepository;
+import com.example.backend.repository.ShelfRepository;
+import com.example.backend.respone.ShelfPosition;
+import com.example.backend.service.ShelfService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.example.backend.ENUM.INVENTORY_STATE;
-import com.example.backend.model.Inventory;
-import com.example.backend.model.Product;
-import com.example.backend.model.Shelf;
-import com.example.backend.repository.InventoryRepository;
-import com.example.backend.repository.ProductRepository;
-import com.example.backend.repository.ShelfRepository;
-import com.example.backend.respone.ShelfEmpty;
-import com.example.backend.respone.ShelfPosition;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 @Service
-public class ShelfService implements com.example.backend.service.ShelfService {
+public class ShelfServiceImpl implements ShelfService {
     @Autowired
     private ShelfRepository shelfRepository;
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
     @Autowired
     private ProductRepository productRepository;
+
+    @Override
+    public List<Shelf> getAllShelves() {
+        return shelfRepository.findAll();
+    }
 
     @Override
     public List<Shelf> getShelvesByInventory(String inventoryId) {
@@ -57,9 +63,7 @@ public class ShelfService implements com.example.backend.service.ShelfService {
         String checkposition = CheckPositionExistsShelf(shelf);
         if (!((shelf.getColoum() >= 0 && shelf.getColoum() < inventory.getNumber_coloum())
                 && (shelf.getRow() >= 0 && shelf.getRow() < inventory.getNumber_row()))) {
-
             throw new Exception("Vị trí này không tồn tại trong kho");
-
         } else if (checkposition == "1") {
             throw new Exception("Vị trí này thêm không được vì kệ đã có sản phẩm");
         }
@@ -94,7 +98,6 @@ public class ShelfService implements com.example.backend.service.ShelfService {
 
     @Override
     public Shelf updateShelf(String shelfId, Shelf updatedShelf) throws Exception {
-
         Shelf existingShelf = shelfRepository.findById(shelfId).orElse(null);
         updatedShelf.setId(shelfId);
         if (existingShelf != null) {
@@ -102,9 +105,7 @@ public class ShelfService implements com.example.backend.service.ShelfService {
             String s = CheckPositionExistsShelf(updatedShelf);
             if (!((updatedShelf.getColoum() >= 0 && updatedShelf.getColoum() < inventory.getNumber_coloum())
                     && (updatedShelf.getRow() >= 0 && updatedShelf.getRow() < inventory.getNumber_row()))) {
-
                 throw new Exception("Vị trí này không tồn tại trong kho");
-
             } else if (s == "1") {
                 throw new Exception("Vị trí này thêm không được vì kệ đã có sản phẩm");
             }
@@ -129,11 +130,9 @@ public class ShelfService implements com.example.backend.service.ShelfService {
                 existingShelf.setColoum(updatedShelf.getColoum());
                 inventoryRepository.save(inventory);
                 return shelfRepository.save(existingShelf);
-
             } else {
                 throw new Exception("Product quantity is not sufficient");
             }
-
         } else {
             throw new Exception("Shelf with ID " + shelfId + " not found");
         }
@@ -161,11 +160,6 @@ public class ShelfService implements com.example.backend.service.ShelfService {
     }
 
     @Override
-    public List<Shelf> getAllShelves() {
-        return shelfRepository.findAll();
-    }
-
-    @Override
     public List<String> getShelfContainProduct(String productName) {
         Product product = productRepository.findByproductName(productName);
         System.out.println(product.getId());
@@ -178,6 +172,7 @@ public class ShelfService implements com.example.backend.service.ShelfService {
         return shelfCode;
     }
 
+    @Override
     public List<Shelf> searchShelfByCode(String keyword) {
         return shelfRepository.searchByshelfCode(keyword);
     }
@@ -230,7 +225,7 @@ public class ShelfService implements com.example.backend.service.ShelfService {
         return null;
     }
 
-    private String CheckPositionExistsShelf(Shelf shelf) {
+    public String CheckPositionExistsShelf(Shelf shelf) {
         Inventory inventory = inventoryRepository.findById(shelf.getInventoryid()).orElse(null);
         List<Shelf> shelfs = shelfRepository.findByinventoryid(inventory.getId());
 
@@ -257,7 +252,7 @@ public class ShelfService implements com.example.backend.service.ShelfService {
         return "1";
     }
 
-    private boolean CheckNameExistsShelf(Shelf shelf) {
+    public boolean CheckNameExistsShelf(Shelf shelf) {
         List<Shelf> shelfs = shelfRepository.findByinventoryid(shelf.getInventoryid());
         for (Shelf i : shelfs) {
             if (i.getShelfCode().equals(shelf.getShelfCode())) {
@@ -266,5 +261,4 @@ public class ShelfService implements com.example.backend.service.ShelfService {
         }
         return false;
     }
-
 }

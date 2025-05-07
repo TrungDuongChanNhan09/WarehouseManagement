@@ -1,12 +1,13 @@
 package com.example.backend.serviceImpl;
-
 import com.example.backend.model.ImportShipment;
 import com.example.backend.model.ImportShipmentItem;
+import com.example.backend.model.Product;
 import com.example.backend.repository.ImportShipmentRepository;
 import com.example.backend.repository.ImportShipmentItemRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
@@ -14,8 +15,7 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
-public class ImportShipmentService implements com.example.backend.service.ImportShipmentService {
+public class ImportShipmentService implements com.example.backend.service.ImportShipmentService{
     @Autowired
     private ImportShipmentRepository importShipmentRepository;
     @Autowired
@@ -24,7 +24,7 @@ public class ImportShipmentService implements com.example.backend.service.Import
     @Override
     public ImportShipment createImportShipment(ImportShipment importShipment) {
         LocalDate currentDate = LocalDate.now();
-        if (importShipment.getCreatedAt() == null)
+        if(importShipment.getCreatedAt() == null)
             importShipment.setCreatedAt(currentDate);
         else if (importShipment.getCreatedAt().compareTo(currentDate) > 0) {
             throw new IllegalArgumentException("Ngày nhập không được lớn hơn ngày hiện tại.");
@@ -40,12 +40,12 @@ public class ImportShipmentService implements com.example.backend.service.Import
             ImportShipment existingShipment = existingShipmentOpt.get();
 
             LocalDate currentDate = LocalDate.now();
-            if (updatedShipment.getCreatedAt() == null)
+            if(updatedShipment.getCreatedAt() == null)
                 updatedShipment.setCreatedAt(currentDate);
             if (updatedShipment.getCreatedAt().compareTo(currentDate) > 0) {
                 throw new IllegalArgumentException("Ngày nhập không được lớn hơn ngày hiện tại.");
             }
-
+    
             existingShipment.setSuppiler(updatedShipment.getSuppiler());
             existingShipment.setCreatedAt(updatedShipment.getCreatedAt());
 
@@ -54,7 +54,6 @@ public class ImportShipmentService implements com.example.backend.service.Import
             throw new RuntimeException("ImportShipment not found with id: " + id);
         }
     }
-
     @Override
     public ImportShipment getImportShipmentById(String id) {
         return importShipmentRepository.findById(id).orElse(null);
@@ -66,18 +65,19 @@ public class ImportShipmentService implements com.example.backend.service.Import
     }
 
     @Override
-    public List<ImportShipmentItem> getImportShipmentItemsByImportShipmentId(String importshipmentId) throws Exception {
+    public List<ImportShipmentItem> getImportShipmentItemsByImportShipmentId(String importshipmentId) throws Exception{
         ImportShipment importShipment = importShipmentRepository.findById(importshipmentId).orElse(null);
-        if (importShipment == null) {
+        if(importShipment == null){
             throw new Exception("ImportShipment no found.");
-        } else {
+        }
+        else{
             List<ImportShipmentItem> listitem = new ArrayList<>();
-            for (String i : importShipment.getItems()) {
+            for(String i : importShipment.getItems()){
                 ImportShipmentItem item1 = importShipmentItemRepository.findById(i).orElse(null);
-                if (item1 != null) {
+                if(item1 != null){
                     listitem.add(item1);
                 }
-            }
+            } 
             return listitem;
         }
     }
@@ -85,8 +85,8 @@ public class ImportShipmentService implements com.example.backend.service.Import
     @Override
     public void deleteImportShipment(String id) throws Exception {
         List<ImportShipmentItem> items = getImportShipmentItemsByImportShipmentId(id);
-        if (items != null && !items.isEmpty())
-            for (ImportShipmentItem item : items) {
+        if(items != null && !items.isEmpty())
+            for(ImportShipmentItem item : items){
                 importShipmentItemRepository.deleteById(item.getId());
             }
         importShipmentRepository.deleteById(id);
@@ -96,16 +96,15 @@ public class ImportShipmentService implements com.example.backend.service.Import
     public BigDecimal getImportShipmentTotalCost(String importShipmentId) throws Exception {
         List<ImportShipmentItem> items = getImportShipmentItemsByImportShipmentId(importShipmentId);
         BigDecimal totalCost = BigDecimal.ZERO;
-        for (ImportShipmentItem i : items) {
+        for(ImportShipmentItem i : items){
             if (i.getTotalPrice() != null) {
                 totalCost = totalCost.add(i.getTotalPrice());
             }
         }
         return totalCost;
     }
-
     @Override
-    public int getQuantityItem(String id) throws Exception {
+    public int getQuantityItem(String id) throws Exception{
         List<ImportShipmentItem> items = getImportShipmentItemsByImportShipmentId(id);
         return items.size();
     }

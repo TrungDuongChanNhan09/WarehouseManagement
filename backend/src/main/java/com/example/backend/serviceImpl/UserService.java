@@ -4,6 +4,7 @@ import com.example.backend.config.JwtProvider;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.request.ChangePasswordRequest;
+import com.example.backend.request.LoginRequest;
 import com.example.backend.request.UserAccountRequest;
 import com.example.backend.request.UserInforRequest;
 import com.example.backend.respone.AuthRespone;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserService implements com.example.backend.service.UserService {
@@ -38,7 +40,7 @@ public class UserService implements com.example.backend.service.UserService {
     public User findUserByUserName(String username) throws Exception {
         User user = userRepository.findByuserName(username);
 
-        if (user == null) {
+        if(user == null){
             throw new Exception("user not found..." + username);
         }
         return user;
@@ -75,8 +77,7 @@ public class UserService implements com.example.backend.service.UserService {
 
         User savedUser = userRepository.save(createdUser);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userAccountRequest.getUsername(),
-                userAccountRequest.getPassword());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userAccountRequest.getUsername(), userAccountRequest.getPassword());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = jwtProvider.generatedToken(authentication);
@@ -90,8 +91,8 @@ public class UserService implements com.example.backend.service.UserService {
 
     @Override
     public void changePassword(ChangePasswordRequest changePasswordRequest, User user) throws Exception {
-        if (passwordEncoder.matches(changePasswordRequest.getOldPass(), user.getPassword())) {
-            if (changePasswordRequest.getNewPass().equals(changePasswordRequest.getOldPass())) {
+        if(passwordEncoder.matches(changePasswordRequest.getOldPass(), user.getPassword())){
+            if(changePasswordRequest.getNewPass().equals(changePasswordRequest.getOldPass())){
                 throw new Exception("Old pass and new pass must different");
             }
             user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPass()));
@@ -100,5 +101,6 @@ public class UserService implements com.example.backend.service.UserService {
             throw new Exception("Password is incorrect....");
         }
     }
+
 
 }

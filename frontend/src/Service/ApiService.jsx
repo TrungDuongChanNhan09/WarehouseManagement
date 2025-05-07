@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default class ApiService {
+ export default class ApiService {
 
     static BASE_URL = "http://localhost:6060";
     
@@ -307,11 +307,6 @@ export default class ApiService {
             throw error;
         }
     }
-
-    
-
-
-    
 
     // Phát
     
