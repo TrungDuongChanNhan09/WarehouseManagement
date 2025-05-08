@@ -10,9 +10,9 @@ import com.example.backend.repository.ShelfRepository;
 import com.example.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.backend.iterator.OrderItemCollection;
-import com.example.backend.iterator.OrderItemIterator;
-import com.example.backend.iterator.OrderItemFilter;
+import com.example.backend.pattern.IteratorPattern.OrderItemIterator;
+import com.example.backend.pattern.IteratorPattern.OrderItemCollection;
+import com.example.backend.pattern.IteratorPattern.OrderItemFilter;
 
 import java.util.ArrayList;
 import java.util.List;

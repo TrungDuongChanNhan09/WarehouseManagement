@@ -1,5 +1,6 @@
-package com.example.backend.iterator;
+package com.example.backend.pattern.IteratorPattern;
 
+import com.example.backend.pattern.IteratorPattern.OrderItemIterator;
 import com.example.backend.model.OrderItem;
 import java.util.List;
 
@@ -10,7 +11,8 @@ public class OrderItemCollection {
         this.orderItems = orderItems;
     }
 
-    public OrderItemIterator createIterator() {
+    public com.example.backend.pattern.IteratorPattern.OrderItemIterator createIterator() {
         return new OrderItemIterator(orderItems);
     }
 }
+

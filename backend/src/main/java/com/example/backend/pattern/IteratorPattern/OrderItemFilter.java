@@ -1,4 +1,4 @@
-package com.example.backend.iterator;
+package com.example.backend.pattern.IteratorPattern;
 
 import com.example.backend.ENUM.ORDER_ITEM_STATE;
 import com.example.backend.model.OrderItem;
