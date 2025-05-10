@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import './Product.css'
-import { Alert, alpha, Box, Button, Container, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Snackbar, Stack, styled, TextField, Typography } from "@mui/material";
+import { Alert, alpha, Box, Button, Container, Dialog, DialogActions, DialogContent, DialogTitle, Fade, FormControl, IconButton, InputAdornment, InputBase, InputLabel, MenuItem, Modal, Select, Snackbar, Stack, styled, TextField, Typography } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import MyTable from "../../Component/MyTable";
@@ -104,6 +104,8 @@ const Product = () => {
     const [openEdit, setOpenEdit] = useState(false);
     const [rows, setRows] = useState([]);
     const [selectedRow, setSelectedRow] = useState(null);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [idProductDelete, setIdProductDelete] = useState("");
     const nav = useNavigate();
 
     const [openSnackbar, setOpenSnackbar] = useState(false);  // Control Snackbar visibility
@@ -121,6 +123,11 @@ const Product = () => {
     // useEffect(() => {
     //     console.log('change sub filter ' + subfilter);
     // },[subfilter]);
+
+    useEffect(() => {
+        if (!open || !openEdit)
+            fetchRows();
+    }, [openEdit,open]);
 
     const handleFilterChange = async (e) => {
         const value = e.target.value;
@@ -162,16 +169,16 @@ const Product = () => {
             const respond = await ApiService.addProduct(refInput.current);
             if (respond.status === 201) {
                 setOpen(false);
-                setSnackbarMessage("Thêm đơn xuất hàng thành công!");
+                setSnackbarMessage("Thêm sản phẩm thành công!");
                 setSnackbarSeverity("success");
                 setOpenSnackbar(true);
             } else {
-                setSnackbarMessage("Lỗi khi thêm đơn xuất hàng. Vui lòng thử lại.");
+                setSnackbarMessage("Lỗi khi thêm sản phẩm. Vui lòng thử lại.");
                 setSnackbarSeverity("error");
                 setOpenSnackbar(true);
             }
         } else {
-            setSnackbarMessage("Lỗi khi thêm đơn xuất hàng. Vui lòng thử lại.");
+            setSnackbarMessage("Lỗi khi thêm sản phẩm. Vui lòng thử lại.");
             setSnackbarSeverity("error");
             setOpenSnackbar(true);
         }
@@ -184,18 +191,24 @@ const Product = () => {
         console.log(respond.data);
         if (respond.status === 200) {
             setOpenEdit(false);
-            setSnackbarMessage("Cập nhật đơn xuất hàng thành công!");
+            setSnackbarMessage("Cập nhật sản phẩm thành công!");
             setSnackbarSeverity("success");
             setOpenSnackbar(true);
         } else {
-            setSnackbarMessage("Lỗi khi cập nhật đơn xuất hàng. Vui lòng thử lại.");
+            setSnackbarMessage("Lỗi khi cập nhật sản phẩm. Vui lòng thử lại.");
             setSnackbarSeverity("error");
             setOpenSnackbar(true);
         }
     }
 
     const handleDeleteButton = async (id) => {
-        await ApiService.deleteProduct(id);
+        setIdProductDelete(id);
+        setOpenConfirmDialog(true);
+    }
+
+    const deleteProduct = async () => {
+        await ApiService.deleteProduct(idProductDelete);
+        setOpenConfirmDialog(false);
         fetchRows();
     }
 
@@ -235,9 +248,8 @@ const Product = () => {
         setListCategory(await ApiService.getAllCategorys());
         setListSupplier(await ApiService.getAllSupplier());
     }
-    const handleClose = () => {
+    const handleClose = async () => {
         setOpen(false);
-        fetchRows();
     }
  
     const fetchRows = async () => {
@@ -565,7 +577,6 @@ const Product = () => {
                 open={openEdit}
                 onClose={()=>{
                     setOpenEdit(false)
-                    fetchRows()
                 }}
                 closeAfterTransition
             >
@@ -708,7 +719,26 @@ const Product = () => {
             <Alert onClose={() => setOpenSnackbar(false)} severity={snackbarSeverity}>
                 {snackbarMessage}
             </Alert>
-        </Snackbar>                        
+        </Snackbar>
+        <Dialog
+            open={openConfirmDialog}
+            onClose={() => setOpenConfirmDialog(false)}
+        >
+            <DialogTitle>Xác Nhận Xóa</DialogTitle>
+            <DialogContent>
+                <Typography variant="body1">
+                    Bạn có chắc chắn muốn xóa sản phẩm này không?
+                </Typography>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setOpenConfirmDialog(false)} color="default">
+                    Hủy
+                </Button>
+                <Button onClick={deleteProduct} color="primary">
+                    Xóa
+                </Button>
+            </DialogActions>
+        </Dialog>                        
         </Container>
     )
 }
